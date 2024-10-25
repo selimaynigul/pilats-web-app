@@ -104,13 +104,13 @@ const MyCalendar: React.FC = () => {
       <DnDCalendar
         events={myEvents}
         localizer={localizer}
-        onEventDrop={moveEvent}
+        /*  onEventDrop={moveEvent} */
         style={{ height: "calc(100vh - 80px" }} // Use flex-grow + full width
         resizable
         draggableAccessor={() => true}
         components={{
           toolbar: CustomToolbar,
-          eventWrapper: CustomEvent,
+          /*  eventWrapper: CustomEvent, */
         }}
       />
     </CalendarWrapper>

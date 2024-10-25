@@ -99,7 +99,7 @@ const CustomToolbar: React.FC<ToolbarProps> = ({
 
       {/* View Selector */}
       <Nav>
-        {views.map((v) => (
+        {/*   {views.map((v: any) => (
           <StyledButton2
             key={v}
             onClick={() => onView(v)}
@@ -109,12 +109,8 @@ const CustomToolbar: React.FC<ToolbarProps> = ({
             }}
           >
             {v.charAt(0).toUpperCase() + v.slice(1)}{" "}
-            {/* Capitalize view name */}
           </StyledButton2>
-        ))}
-        {/*  <div style={{ width: 40, height: 40, background: "red" }}>
-          <PlusOutlined />
-        </div> */}
+        ))} */}
         <StyledButton
           style={{
             border: "1px solid #5d46e5",
