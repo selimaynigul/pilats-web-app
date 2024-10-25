@@ -1,25 +1,67 @@
 @import url("https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Raleway:wght@600&display=swap");
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
 body {
   margin: 0;
-  font-family: "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
-    "Droid Sans", "Helvetica Neue", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 h1,
 h2,
 h3,
-p {
+p,
+strong,
+small,
+li,
+span {
+  font-family: "Instrument Sans", sans-serif !important;
   margin: 0;
 }
-
-.header {
-  font-family: "Raleway" !important;
+div,
+button {
+  font-family: "Instrument Sans", sans-serif !important;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+.ant-layout {
+  background-color: white;
+}
+
+.ant-menu-item-selected {
+  background: #5d46e5 !important;
+  .anticon,
+  svg,
+  path {
+    color: #f6f5ff !important;
+  }
+
+  .ant-menu-title-content {
+    color: #f6f5ff !important;
+  }
+}
+.ant-menu-item {
+  color: #5d46e5 !important;
+  border-radius: 15px !important;
+}
+.ant-menu-item:hover {
+  background: #f6f5ff !important;
+}
+
+.ant-layout-sider-children {
+}
+
+.ant-menu.ant-menu-inline-collapsed {
+  width: 100% !important;
+}
+
+.ant-menu-item-selected:hover {
+  background: #5d46e5 !important;
+}
+
+.ant-popover-inner {
+  background-color: rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(8px) !important;
+  border: 1px solid white;
+  border-radius: 15px !important;
 }

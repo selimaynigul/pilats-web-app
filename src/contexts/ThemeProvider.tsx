@@ -1,26 +1,41 @@
-// src/theme/ThemeProvider.tsx
-import React, { createContext, useContext, useState, ReactNode } from "react";
-import styled, {
-  ThemeProvider as StyledThemeProvider,
-  DefaultTheme,
-} from "styled-components";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import { ThemeProvider as StyledThemeProvider } from "styled-components";
 
 interface Theme {
-  background: string;
-  color: string;
+  bodyBg: string;
+  text: string;
+  header: string;
+  primary: string;
+  inputBg: string;
+  inputBorder: string;
 }
 
 const lightTheme: Theme = {
-  background: "#ffffff",
-  color: "#000000",
+  bodyBg: "#ffffff",
+  text: "#000000",
+  header: "#f6f5ff",
+  primary: "#5d46e5",
+  inputBg: "white",
+  inputBorder: "white",
 };
 
 const darkTheme: Theme = {
-  background: "#000000",
-  color: "#ffffff",
+  bodyBg: "#14102b",
+  text: "#ffffff",
+  header: "#ffffff",
+  primary: "#5d46e5",
+  inputBg: "#1e1840",
+  inputBorder: "#1e1840",
 };
 
 interface ThemeContextType {
+  theme: Theme;
   toggleTheme: () => void;
 }
 
@@ -31,7 +46,14 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const [theme, setTheme] = useState<Theme>(lightTheme);
+  const getInitialTheme = (): Theme =>
+    localStorage.getItem("app-theme") === "dark" ? darkTheme : lightTheme;
+
+  const [theme, setTheme] = useState<Theme>(getInitialTheme);
+
+  useEffect(() => {
+    localStorage.setItem("app-theme", theme === darkTheme ? "dark" : "light");
+  }, [theme]);
 
   const toggleTheme = () => {
     setTheme((prevTheme) =>
@@ -40,7 +62,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   };
 
   return (
-    <ThemeContext.Provider value={{ toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
       <StyledThemeProvider theme={theme}>{children}</StyledThemeProvider>
     </ThemeContext.Provider>
   );
