@@ -1,12 +1,13 @@
-import React, { useState } from "react";
-import MyCalendar from "../../components/scheduler/Scheduler";
-import Sider from "antd/es/layout/Sider";
+import React from "react";
+import { Card } from "components";
+import CompanyList from "./company-list";
 
 const CompaniesPage: React.FC = () => {
   return (
-    <div>
-      <MyCalendar />
-    </div>
+    <Card toolbar={<div></div>}>
+      <CompanyList />
+    </Card>
   );
 };
+
 export default CompaniesPage;

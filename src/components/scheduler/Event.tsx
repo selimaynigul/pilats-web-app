@@ -10,7 +10,6 @@ import {
   EditFilled,
   UserOutlined,
 } from "@ant-design/icons";
-import { MyEvent } from "./Scheduler";
 
 const Container = styled.div<{ more?: boolean }>`
   background: #5d46e5;
@@ -151,10 +150,6 @@ const AttendeeInfo = styled.div`
   align-items: center;
 `;
 
-interface CustomEventProps {
-  event: MyEvent;
-}
-
 const content = (
   <div style={{ position: "relative", maxWidth: 300 }}>
     <div style={{ marginBottom: 20 }}>
@@ -234,7 +229,7 @@ const content = (
 );
 const moreContent = <div>elma</div>;
 
-const CustomEvent: React.FC<CustomEventProps> = ({ event }) => {
+const CustomEvent: React.FC = ({ event }) => {
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
     // Set the event ID in the dataTransfer object for drop handling
     e.dataTransfer.setData("eventId", event.id?.toString() || "");

@@ -1,22 +1,42 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import {
   RightOutlined,
   LeftOutlined,
   PlusOutlined,
   DownOutlined,
-  SearchOutlined,
 } from "@ant-design/icons";
-import { ToolbarProps } from "react-big-calendar"; // Import the required type
+import { ToolbarProps } from "react-big-calendar";
+import {
+  Dropdown,
+  Menu,
+  Select,
+  DatePicker,
+  Input,
+  Modal,
+  Button,
+  Form,
+} from "antd";
+import dayjs from "dayjs";
+import type { Dayjs } from "dayjs";
+
+const StyledContainer = styled.div`
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  border-radius: 50px;
+  padding: 10px;
+`;
 
 const Nav = styled.div`
   display: flex;
   gap: 5px;
 `;
+
 const Title = styled.button`
   margin: 0;
-  border: 1px solid #4d3abd;
-  border-radius: 15px;
   height: 35px;
   padding: 5px 15px;
   color: #4d3abd;
@@ -26,13 +46,42 @@ const Title = styled.button`
   gap: 10px;
   align-items: center;
   justify-content: space-between;
+  font-size: 16px;
+  border-radius: 50px;
+  border: none;
+  transition: 0.2s;
+
+  &:hover {
+    background: #f6f5ff;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+  }
+`;
+
+const CompanyName = styled.button`
+  margin: 0;
+  border: none;
+  height: 35px;
+  padding: 5px 15px;
+  color: #4d3abd;
+  cursor: pointer;
+  background: transparent;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: bold;
+  border: 1px solid #4d3abd;
+  border-radius: 50px;
 `;
 
 const StyledButton = styled.button`
   border: 1px solid transparent;
   background: #e6e3ff;
   color: #4d3abd;
-  border-radius: 15px;
+  border-radius: 50px;
   padding: 5px;
   display: flex;
   justify-content: center;
@@ -52,79 +101,289 @@ const StyledButton2 = styled(StyledButton)`
   padding: 5px 15px;
 `;
 
-// Extend the ToolbarProps interface
+const ButtonContainer = styled.div`
+  display: flex;
+  gap: 5px;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;
+
 const CustomToolbar: React.FC<ToolbarProps> = ({
   label,
   onNavigate,
   onView,
   views,
   view,
+  date,
 }) => {
+  const [selectedMonth, setSelectedMonth] = useState(dayjs(date).month());
+  const [selectedYear, setSelectedYear] = useState(dayjs(date).year());
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [form] = Form.useForm();
+
+  const currentYear = dayjs().year();
+  const yearOptions = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
+
+  const handleMonthChange = (month: number) => {
+    setSelectedMonth(month);
+    navigateToDate(month, selectedYear);
+  };
+
+  const handleYearChange = (year: number) => {
+    setSelectedYear(year);
+    navigateToDate(selectedMonth, year);
+  };
+
+  const navigateToDate = (month: number, year: number) => {
+    const newDate = dayjs().year(year).month(month).startOf("month").toDate();
+    onNavigate("DATE", newDate);
+  };
+
+  const mockCompanies = [
+    { name: "Tech Corp - New York" },
+    { name: "Eco Energy - San Francisco" },
+    { name: "Health Solutions - Los Angeles" },
+  ];
+
+  const filteredCompanies = mockCompanies.filter((company) =>
+    company.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const companyDropdown = (
+    <Menu>
+      <Menu.Item key="search">
+        <Input
+          placeholder="Search Company"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </Menu.Item>
+      {filteredCompanies.map((company, index) => (
+        <Menu.Item
+          key={index}
+          onClick={() => console.log(`Selected: ${company.name}`)}
+        >
+          {company.name}
+        </Menu.Item>
+      ))}
+    </Menu>
+  );
+
+  const monthYearMenu = (
+    <Menu>
+      <Menu.ItemGroup title="Select Month">
+        {Array.from({ length: 12 }, (_, i) => (
+          <Menu.Item key={i} onClick={() => handleMonthChange(i)}>
+            {dayjs().month(i).format("MMMM")}
+          </Menu.Item>
+        ))}
+      </Menu.ItemGroup>
+      <Menu.Divider />
+      <Menu.ItemGroup title="Select Year">
+        <Select
+          value={selectedYear}
+          onChange={handleYearChange}
+          style={{ width: "100%" }}
+        >
+          {yearOptions.map((year) => (
+            <Select.Option key={year} value={year}>
+              {year}
+            </Select.Option>
+          ))}
+        </Select>
+      </Menu.ItemGroup>
+    </Menu>
+  );
+
+  const getTitleDropdown = () => {
+    if (view === "month") {
+      return (
+        <Dropdown overlay={monthYearMenu} trigger={["click"]}>
+          <Title>{dayjs(date).format("MMMM YYYY")}</Title>
+        </Dropdown>
+      );
+    } else if (view === "week") {
+      return (
+        <Dropdown
+          overlay={
+            <DatePicker
+              picker="week"
+              onChange={(value: Dayjs | null) => {
+                if (value) onNavigate("DATE", value.startOf("week").toDate());
+              }}
+              bordered={false}
+              style={{ padding: 0, border: 0, fontSize: "inherit" }}
+            />
+          }
+          trigger={["click"]}
+        >
+          <Title>
+            {dayjs(date).startOf("week").format("MMM D")} -{" "}
+            {dayjs(date).endOf("week").format("MMM D, YYYY")}
+          </Title>
+        </Dropdown>
+      );
+    } else if (view === "day") {
+      return (
+        <Dropdown
+          overlay={
+            <DatePicker
+              onChange={(value: Dayjs | null) => {
+                if (value) onNavigate("DATE", value.toDate());
+              }}
+              bordered={false}
+              style={{ padding: 0, border: 0, fontSize: "inherit" }}
+            />
+          }
+          trigger={["click"]}
+        >
+          <Title>{dayjs(date).format("dddd, MMM D, YYYY")}</Title>
+        </Dropdown>
+      );
+    } else {
+      return <Title>{label}</Title>;
+    }
+  };
+
+  const handleModalOpen = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalVisible(false);
+    form.resetFields();
+  };
+
+  const handleAddClass = () => {
+    form
+      .validateFields()
+      .then((values: any) => {
+        console.log("Class Data:", values);
+        handleModalClose();
+      })
+      .catch((info: any) => {
+        console.log("Validate Failed:", info);
+      });
+  };
+
+  const trainerOptions = [
+    { label: "Alice Johnson", value: "alice" },
+    { label: "Bob Smith", value: "bob" },
+    { label: "Charlie Brown", value: "charlie" },
+  ];
+
   return (
-    <div
-      className="custom-toolbar"
-      style={{
-        marginBottom: "20px",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        background: "white",
-        borderRadius: 20,
-        padding: "10px",
-      }}
-    >
-      {/* Navigation Buttons */}
+    <StyledContainer className="custom-toolbar">
       <Nav>
-        <StyledButton2
-          onClick={() => onNavigate("TODAY")}
-          style={{ marginRight: "5px" }}
-        >
-          Today
-        </StyledButton2>
-        <StyledButton
-          onClick={() => onNavigate("PREV")}
-          style={{ marginRight: "5px" }}
-        >
-          <LeftOutlined />
-        </StyledButton>
-        <StyledButton onClick={() => onNavigate("NEXT")}>
-          <RightOutlined />
-        </StyledButton>
+        <ButtonContainer>
+          <StyledButton2 onClick={() => onNavigate("TODAY")}>
+            Today
+          </StyledButton2>
+          <StyledButton onClick={() => onNavigate("PREV")}>
+            <LeftOutlined />
+          </StyledButton>
+          <StyledButton onClick={() => onNavigate("NEXT")}>
+            <RightOutlined />
+          </StyledButton>
+        </ButtonContainer>
+
+        {getTitleDropdown()}
       </Nav>
 
-      {/* Title */}
-      <Title>
-        {label} <DownOutlined />
-      </Title>
+      <Dropdown overlay={companyDropdown} trigger={["click"]}>
+        <CompanyName>
+          MacFit - Gebze <DownOutlined />
+        </CompanyName>
+      </Dropdown>
 
-      {/* View Selector */}
       <Nav>
-        {/*   {views.map((v: any) => (
-          <StyledButton2
-            key={v}
-            onClick={() => onView(v)}
-            style={{
-              marginRight: "5px",
-              fontWeight: view === v ? "bold" : "normal",
-            }}
-          >
-            {v.charAt(0).toUpperCase() + v.slice(1)}{" "}
-          </StyledButton2>
-        ))} */}
+        <ButtonContainer>
+          {views.map((v: any) => (
+            <StyledButton2
+              key={v}
+              onClick={() => onView(v)}
+              style={{
+                fontWeight: view === v ? "bold" : "normal",
+              }}
+            >
+              {v.charAt(0).toUpperCase() + v.slice(1)}
+            </StyledButton2>
+          ))}
+        </ButtonContainer>
         <StyledButton
-          style={{
-            border: "1px solid #5d46e5",
-            color: "#5d46e5",
-            background: "white",
-          }}
+          style={{ background: "#5d46e5", color: "white" }}
+          onClick={handleModalOpen}
         >
-          <SearchOutlined />
-        </StyledButton>
-        <StyledButton style={{ background: "#5d46e5", color: "white" }}>
           <PlusOutlined />
         </StyledButton>
       </Nav>
-    </div>
+
+      <Modal
+        title="Add New Class"
+        visible={isModalVisible}
+        onCancel={handleModalClose}
+        footer={[
+          <Button key="cancel" onClick={handleModalClose}>
+            Cancel
+          </Button>,
+          <Button key="add" type="primary" onClick={handleAddClass}>
+            Add
+          </Button>,
+        ]}
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item
+            name="className"
+            label="Class Name"
+            rules={[{ required: true, message: "Please enter the class name" }]}
+          >
+            <Input placeholder="Enter class name" />
+          </Form.Item>
+          <Form.Item
+            name="description"
+            label="Description"
+            rules={[{ required: true, message: "Please enter a description" }]}
+          >
+            <Input.TextArea rows={3} placeholder="Enter description" />
+          </Form.Item>
+          <Form.Item
+            name="startDate"
+            label="Start Date"
+            rules={[
+              { required: true, message: "Please select the start date" },
+            ]}
+          >
+            <DatePicker style={{ width: "100%" }} />
+          </Form.Item>
+          <Form.Item
+            name="endDate"
+            label="End Date"
+            rules={[{ required: true, message: "Please select the end date" }]}
+          >
+            <DatePicker style={{ width: "100%" }} />
+          </Form.Item>
+          <Form.Item
+            name="trainer"
+            label="Trainer"
+            rules={[{ required: true, message: "Please select a trainer" }]}
+          >
+            <Select
+              showSearch
+              placeholder="Select a trainer"
+              options={trainerOptions}
+              filterOption={(input, option) =>
+                (option?.label ?? "")
+                  .toLowerCase()
+                  .includes(input.toLowerCase())
+              }
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
+    </StyledContainer>
   );
 };
 

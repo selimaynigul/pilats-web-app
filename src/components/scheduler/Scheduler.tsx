@@ -1,16 +1,15 @@
-// MyCalendar.tsx
-import React from "react";
-import { Calendar, momentLocalizer, Event } from "react-big-calendar";
+import React, { useState, useCallback } from "react";
+import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
+import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import withDragAndDrop, {
-  EventInteractionArgs,
-} from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import { CalendarWrapper } from "./SchedulerStyles";
 import CustomEvent from "./Event";
 import CustomToolbar from "./Toolbar";
-import { useState, useCallback } from "react";
+import { Modal, Form, Input, DatePicker, Button, Select } from "antd";
+import type { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 
 const DnDCalendar = withDragAndDrop(Calendar);
 const localizer = momentLocalizer(moment);
@@ -33,14 +32,14 @@ const events = [
   {
     title: "Yoga Dersi",
     start: new Date(2024, 9, 14, 9, 0),
-    end: new Date(2024, 9, 14, 17, 0), // Oct 14, 2024, 5:00 PM
+    end: new Date(2024, 9, 14, 17, 0),
     allDay: false,
     id: 3,
   },
 ];
 
-// Define the type for your event object
-export interface MyEvent {
+// Define types for the event and function parameters
+interface MyEvent {
   id: string | number;
   title?: string;
   start: Date;
@@ -48,7 +47,6 @@ export interface MyEvent {
   allDay: boolean;
 }
 
-// Define the type for the function parameter
 interface MoveEventArgs {
   event: MyEvent;
   start: Date;
@@ -58,61 +56,132 @@ interface MoveEventArgs {
 
 const MyCalendar: React.FC = () => {
   const [myEvents, setMyEvents] = useState(events);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [form] = Form.useForm();
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   const moveEvent = useCallback(
-    ({
-      event,
-      start,
-      end,
-      isAllDay: droppedOnAllDaySlot = false,
-    }: MoveEventArgs) => {
-      const { allDay } = event;
-
-      // Update the `allDay` property based on where the event was dropped
-      if (!allDay && droppedOnAllDaySlot) {
-        event.allDay = true;
-      } else if (allDay && !droppedOnAllDaySlot) {
-        event.allDay = false;
-      }
-
-      /* setMyEvents((prev) => {
-        const existing = prev.find((ev) => ev.id === event.id) || {
-          title: "", // Provide a default title if it doesn't exist
-          start: new Date(), // Provide a default start date
-          end: new Date(), // Provide a default end date
-          allDay: false, // Default value for allDay
-        };
-        const filtered = prev.filter((ev) => ev.id !== event.id);
-
-        // Ensure the updated event has all required properties of MyEvent
-        const updatedEvent: MyEvent = {
-          id: existing.id || event.id,
-          title: existing.title || event.title, // Default to the existing title or current event title
-          start,
-          end,
-          allDay: event.allDay,
-        };
-
-        return [...filtered, updatedEvent];
-      }); */
+    ({ event, start, end }: MoveEventArgs) => {
+      setMyEvents((prev) =>
+        prev.map((ev) => (ev.id === event.id ? { ...ev, start, end } : ev))
+      );
     },
     [setMyEvents]
   );
+
+  const handleDateClick = (slotInfo: { start: Date; end: Date }) => {
+    setSelectedDate(slotInfo.start);
+    form.setFieldsValue({
+      startDate: dayjs(slotInfo.start),
+      endDate: dayjs(slotInfo.end),
+    });
+    setIsModalVisible(true);
+  };
+
+  const handleAddEvent = () => {
+    form.validateFields().then((values) => {
+      const newEvent: MyEvent = {
+        id: myEvents.length + 1,
+        title: values.className,
+        start: values.startDate.toDate(),
+        end: values.endDate.toDate(),
+        allDay: false,
+      };
+      setMyEvents((prev: any) => [...prev, newEvent]);
+      setIsModalVisible(false);
+      form.resetFields();
+    });
+  };
 
   return (
     <CalendarWrapper>
       <DnDCalendar
         events={myEvents}
         localizer={localizer}
+        selectable
+        onSelectSlot={handleDateClick}
         /*  onEventDrop={moveEvent} */
-        style={{ height: "calc(100vh - 80px" }} // Use flex-grow + full width
+        style={{ height: "600px" }}
         resizable
         draggableAccessor={() => true}
         components={{
           toolbar: CustomToolbar,
-          /*  eventWrapper: CustomEvent, */
+          eventWrapper: CustomEvent,
         }}
       />
+
+      <Modal
+        title="Add New Class"
+        visible={isModalVisible}
+        onCancel={() => setIsModalVisible(false)}
+        footer={[
+          <Button key="cancel" onClick={() => setIsModalVisible(false)}>
+            Cancel
+          </Button>,
+          <Button key="add" type="primary" onClick={handleAddEvent}>
+            Add
+          </Button>,
+        ]}
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item
+            name="className"
+            label="Class Name"
+            rules={[{ required: true, message: "Please enter the class name" }]}
+          >
+            <Input placeholder="Enter class name" />
+          </Form.Item>
+          <Form.Item
+            name="description"
+            label="Description"
+            rules={[{ required: true, message: "Please enter a description" }]}
+          >
+            <Input.TextArea rows={3} placeholder="Enter description" />
+          </Form.Item>
+          <Form.Item
+            name="startDate"
+            label="Start Date & Time"
+            rules={[
+              {
+                required: true,
+                message: "Please select the start date and time",
+              },
+            ]}
+          >
+            <DatePicker
+              showTime
+              style={{ width: "100%" }}
+              defaultValue={dayjs(selectedDate)}
+            />
+          </Form.Item>
+          <Form.Item
+            name="endDate"
+            label="End Date & Time"
+            rules={[
+              {
+                required: true,
+                message: "Please select the end date and time",
+              },
+            ]}
+          >
+            <DatePicker showTime style={{ width: "100%" }} />
+          </Form.Item>
+          <Form.Item
+            name="trainer"
+            label="Trainer"
+            rules={[{ required: true, message: "Please select a trainer" }]}
+          >
+            <Select
+              showSearch
+              placeholder="Select a trainer"
+              options={[
+                { label: "Trainer 1", value: "trainer1" },
+                { label: "Trainer 2", value: "trainer2" },
+              ]}
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
     </CalendarWrapper>
   );
 };

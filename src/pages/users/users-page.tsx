@@ -64,7 +64,7 @@ const UsersPage: React.FC = () => {
   return (
     <Card
       toolbar={
-        <span>
+        /*  <span>
           <TabsContainer>
             <Segmented<string>
               options={["Dersler", "Paketler", "Ölçümler"]}
@@ -73,7 +73,7 @@ const UsersPage: React.FC = () => {
               }}
             />
           </TabsContainer>
-        </span>
+        </span> */ <div></div>
       }
     >
       <Row>

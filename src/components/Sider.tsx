@@ -1,6 +1,11 @@
 import React, { useState } from "react";
-import { Layout, Menu } from "antd";
-import { CaretRightOutlined, CaretLeftOutlined } from "@ant-design/icons";
+import { Layout, Menu, Switch, Select } from "antd";
+import {
+  CaretRightOutlined,
+  CaretLeftOutlined,
+  MoonFilled,
+  SunFilled,
+} from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import {
   BsFillHouseDoorFill,
@@ -10,33 +15,58 @@ import {
   BsCreditCard2FrontFill,
   BsBarChartFill,
 } from "react-icons/bs";
+import styled from "styled-components";
 
 const { Sider } = Layout;
+const { Option } = Select;
 
-const CustomTrigger: React.FC<{ collapsed: boolean; onClick: () => void }> = ({
-  collapsed,
-  onClick,
-}) => (
-  <div
-    onClick={onClick}
-    style={{
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      width: "40px",
-      height: "40px",
-      cursor: "pointer",
-      position: "absolute",
-      bottom: "10px",
-      left: "20px",
-      borderRadius: 10,
-      background: "#e9e6ff",
-      color: "black",
-    }}
-  >
-    {collapsed ? <CaretRightOutlined /> : <CaretLeftOutlined />}
-  </div>
-);
+const StyledSider = styled(Sider)<{ isMobile: boolean }>`
+  background: white;
+  padding: 80px 0 0;
+  height: ${({ isMobile }) => (isMobile ? "100vh" : "auto")};
+  position: ${({ isMobile }) => (isMobile ? "fixed" : "sticky")};
+  top: 0;
+  left: 0;
+  margin: 0 10px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+`;
+
+const CustomTrigger = styled.div<{ collapsed: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  position: absolute;
+  bottom: 20px;
+  left: 10px;
+  border-radius: 10px;
+  background: #e9e6ff;
+  color: black;
+`;
+
+const BottomSwitch = styled(Switch)`
+  position: absolute;
+  bottom: 85px;
+  left: 10px;
+  background-color: #5d46e5;
+`;
+
+const LanguageSelector = styled(Select)`
+  position: absolute;
+  bottom: 120px;
+  left: 5px;
+  background: white !important;
+  color: "#8a2be2";
+
+  .ant-select-selector {
+    border: none !important;
+  }
+`;
 
 interface SiderProps {
   collapsed: boolean;
@@ -51,25 +81,15 @@ const Sidebar: React.FC<SiderProps> = ({
   closeSider,
   setCollapsed,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
   const [selectedKey, setSelectedKey] = useState("1");
-  const navigate = useNavigate(); // For navigation
-
-  const handleMouseEnter = () => {
-    if (collapsed) setCollapsed(false);
-  };
-
-  const handleMouseLeave = () => {
-    if (!isOpen) setCollapsed(true);
-  };
+  const navigate = useNavigate();
 
   const handleMenuSelect = ({ key }: { key: string }) => {
     setSelectedKey(key);
-    console.log(selectedKey);
     const routes: { [key: string]: string } = {
       companies: "/companies",
       classes: "/classes",
-      traniers: "/trainers",
+      trainers: "/trainers",
       users: "/users",
       packages: "/packages",
       reports: "/reports",
@@ -84,35 +104,23 @@ const Sidebar: React.FC<SiderProps> = ({
   const menuItems = [
     { key: "companies", icon: <BsFillHouseDoorFill />, label: "Şirketim" },
     { key: "classes", icon: <BsFillCalendarRangeFill />, label: "Dersler" },
-    { key: "traniers", icon: <BsFillPeopleFill />, label: "Eğitmenler" },
+    { key: "trainers", icon: <BsFillPeopleFill />, label: "Eğitmenler" },
     { key: "users", icon: <BsFillPersonFill />, label: "Kullanıcılar" },
     { key: "packages", icon: <BsCreditCard2FrontFill />, label: "Paketler" },
     { key: "reports", icon: <BsBarChartFill />, label: "Raporlar" },
   ];
 
-  /*   console.log(window.location.pathname); */
   return (
-    <Sider
+    <StyledSider
       trigger={null}
       collapsible
       collapsed={collapsed}
       collapsedWidth={isMobile ? 0 : 60}
       width={isMobile ? 260 : undefined}
-      style={{
-        background: "white",
-        margin: "20px 10px 10px 10px",
-        borderRadius: 15,
-        height: isMobile ? "100vh" : "null",
-        position: isMobile ? "fixed" : "sticky",
-        top: 0,
-        left: 0,
-        zIndex: "100",
-      }}
+      isMobile={isMobile}
     >
       <Menu
         defaultSelectedKeys={[window.location.pathname]}
-        onMouseEnter={!isMobile ? handleMouseEnter : () => {}}
-        onMouseLeave={!isMobile ? handleMouseLeave : () => {}}
         theme="light"
         style={{
           background: "white",
@@ -125,11 +133,27 @@ const Sidebar: React.FC<SiderProps> = ({
         selectedKeys={[selectedKey]}
         items={menuItems}
       />
+
+      {/* Language Selector */}
+      <LanguageSelector defaultValue="EN">
+        <Option value="EN">EN</Option>
+      </LanguageSelector>
+
+      {/* Theme Switch */}
+      <BottomSwitch
+        checkedChildren={<MoonFilled />}
+        unCheckedChildren={<SunFilled />}
+        /* onChange={toggleTheme} */
+      />
+
+      {/* Custom Trigger */}
       <CustomTrigger
         collapsed={collapsed}
         onClick={() => setCollapsed(!collapsed)}
-      />
-    </Sider>
+      >
+        {collapsed ? <CaretRightOutlined /> : <CaretLeftOutlined />}
+      </CustomTrigger>
+    </StyledSider>
   );
 };
 

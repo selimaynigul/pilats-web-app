@@ -6,33 +6,8 @@ import React, {
   ReactNode,
 } from "react";
 import { ThemeProvider as StyledThemeProvider } from "styled-components";
-
-interface Theme {
-  bodyBg: string;
-  text: string;
-  header: string;
-  primary: string;
-  inputBg: string;
-  inputBorder: string;
-}
-
-const lightTheme: Theme = {
-  bodyBg: "#ffffff",
-  text: "#000000",
-  header: "#f6f5ff",
-  primary: "#5d46e5",
-  inputBg: "white",
-  inputBorder: "white",
-};
-
-const darkTheme: Theme = {
-  bodyBg: "#14102b",
-  text: "#ffffff",
-  header: "#ffffff",
-  primary: "#5d46e5",
-  inputBg: "#1e1840",
-  inputBorder: "#1e1840",
-};
+import { Theme } from "../theme/themeTypes";
+import { lightTheme, darkTheme } from "../theme";
 
 interface ThemeContextType {
   theme: Theme;
@@ -56,7 +31,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme((prevTheme) =>
+    setTheme((prevTheme: any) =>
       prevTheme === lightTheme ? darkTheme : lightTheme
     );
   };

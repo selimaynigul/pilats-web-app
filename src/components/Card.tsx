@@ -10,11 +10,14 @@ const Container = styled.div`
 
 const Toolbar = styled.div`
   background: white;
-  border-radius: 20px;
+  border-radius: 50px;
   padding: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 20px;
+
+  height: 50px;
 `;
 const Content = styled.div``;
 

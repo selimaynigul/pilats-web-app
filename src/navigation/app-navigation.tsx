@@ -1,6 +1,15 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { HomePage, LoginPage, CompaniesPage, TestPage, UsersPage } from "pages";
-import AppLayout from "components/Layout";
+import {
+  HomePage,
+  LoginPage,
+  CompaniesPage,
+  TestPage,
+  UsersPage,
+  ClassesPage,
+  TrainersPage,
+  PackagesPage,
+} from "pages";
+import AppLayout from "components/layout/Layout";
 
 const AppNavigation = () => {
   return (
@@ -10,6 +19,9 @@ const AppNavigation = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/companies" element={<CompaniesPage />} />
         <Route path="/users" element={<UsersPage />} />
+        <Route path="/classes" element={<ClassesPage />} />
+        <Route path="/trainers" element={<TrainersPage />} />
+        <Route path="/packages" element={<PackagesPage />} />
         <Route path="/test" element={<TestPage />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Route>
