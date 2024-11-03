@@ -6,7 +6,7 @@ import {
   PlusOutlined,
   DownOutlined,
 } from "@ant-design/icons";
-import { ToolbarProps } from "react-big-calendar";
+import { ToolbarProps, View } from "react-big-calendar";
 import {
   Dropdown,
   Menu,
@@ -274,7 +274,6 @@ const CustomToolbar: React.FC<ToolbarProps> = ({
     { label: "Bob Smith", value: "bob" },
     { label: "Charlie Brown", value: "charlie" },
   ];
-
   return (
     <StyledContainer className="custom-toolbar">
       <Nav>
@@ -301,10 +300,10 @@ const CustomToolbar: React.FC<ToolbarProps> = ({
 
       <Nav>
         <ButtonContainer>
-          {views.map((v: any) => (
+          {Object.keys(views).map((v) => (
             <StyledButton2
               key={v}
-              onClick={() => onView(v)}
+              onClick={() => onView(v as View)}
               style={{
                 fontWeight: view === v ? "bold" : "normal",
               }}

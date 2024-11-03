@@ -134,25 +134,26 @@ const Sidebar: React.FC<SiderProps> = ({
         items={menuItems}
       />
 
-      {/* Language Selector */}
-      <LanguageSelector defaultValue="EN">
-        <Option value="EN">EN</Option>
-      </LanguageSelector>
+      {!isMobile && (
+        <>
+          <LanguageSelector defaultValue="EN">
+            <Option value="EN">EN</Option>
+          </LanguageSelector>
 
-      {/* Theme Switch */}
-      <BottomSwitch
-        checkedChildren={<MoonFilled />}
-        unCheckedChildren={<SunFilled />}
-        /* onChange={toggleTheme} */
-      />
+          <BottomSwitch
+            checkedChildren={<MoonFilled />}
+            unCheckedChildren={<SunFilled />}
+            /* onChange={toggleTheme} */
+          />
 
-      {/* Custom Trigger */}
-      <CustomTrigger
-        collapsed={collapsed}
-        onClick={() => setCollapsed(!collapsed)}
-      >
-        {collapsed ? <CaretRightOutlined /> : <CaretLeftOutlined />}
-      </CustomTrigger>
+          <CustomTrigger
+            collapsed={collapsed}
+            onClick={() => setCollapsed(!collapsed)}
+          >
+            {collapsed ? <CaretRightOutlined /> : <CaretLeftOutlined />}
+          </CustomTrigger>
+        </>
+      )}
     </StyledSider>
   );
 };

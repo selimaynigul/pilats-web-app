@@ -10,6 +10,7 @@ import {
   EditFilled,
   UserOutlined,
 } from "@ant-design/icons";
+import { EventWrapperProps } from "react-big-calendar"; // Import EventWrapperProps for compatibility
 
 const Container = styled.div<{ more?: boolean }>`
   background: #5d46e5;
@@ -229,21 +230,19 @@ const content = (
 );
 const moreContent = <div>elma</div>;
 
-const CustomEvent: React.FC = ({ event }) => {
+const CustomEvent: React.FC<EventWrapperProps<object>> = ({ event }) => {
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
-    // Set the event ID in the dataTransfer object for drop handling
-    e.dataTransfer.setData("eventId", event.id?.toString() || "");
+    e.dataTransfer.setData("eventId", (event as any).id?.toString() || "");
   };
 
   const more = true;
-
   return (
     <div style={{ position: "relative" }}>
       {more && (
         <Popover
           trigger="click"
           content={moreContent}
-          title={event.title}
+          title={(event as any).title}
           arrow={false}
         >
           <MoreButton>+2 daha</MoreButton>
@@ -252,11 +251,10 @@ const CustomEvent: React.FC = ({ event }) => {
       <Popover trigger="click" content={content} arrow={false}>
         <div style={{ margin: 5 }} draggable onDragStart={handleDragStart}>
           <Container more={more}>
-            <strong style={{ display: "block" }}>{event.title}</strong>
-
+            <strong style={{ display: "block" }}>{(event as any).title}</strong>
             <small>
-              {event.start.toLocaleTimeString()} -{" "}
-              {event.end.toLocaleTimeString()}
+              {(event as any).start.toLocaleTimeString()} -{" "}
+              {(event as any).end.toLocaleTimeString()}
             </small>
           </Container>
         </div>
