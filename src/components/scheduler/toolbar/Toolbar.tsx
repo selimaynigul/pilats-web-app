@@ -155,18 +155,15 @@ const Toolbar: React.FC<ToolbarProps> = ({
       </Dropdown>
 
       <NavButtons>
-        {viewArray.map((v: any) => {
-          console.log(v);
-          return (
-            <ToggleViewButton
-              key={v}
-              onClick={() => onView(v)}
-              style={{ fontWeight: view === v ? "bold" : "normal" }}
-            >
-              {v.charAt(0).toUpperCase() + v.slice(1)}
-            </ToggleViewButton>
-          );
-        })}
+        {viewArray.map((v: any) => (
+          <ToggleViewButton
+            key={v}
+            onClick={() => onView(v)}
+            style={{ fontWeight: view === v ? "bold" : "normal" }}
+          >
+            {v.charAt(0).toUpperCase() + v.slice(1)}
+          </ToggleViewButton>
+        ))}
         <AddButton onClick={() => handleModalToggle(true)}>
           <PlusOutlined />
         </AddButton>
