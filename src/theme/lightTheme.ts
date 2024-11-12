@@ -7,4 +7,5 @@ export const lightTheme: Theme = {
   primary: "#5d46e5",
   inputBg: "white",
   inputBorder: "white",
+  contentBg: "#f6f5ff",
 };

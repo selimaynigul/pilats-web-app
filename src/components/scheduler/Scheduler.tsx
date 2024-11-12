@@ -1,4 +1,6 @@
-import React, { useState, useCallback } from "react";
+// MyCalendar.tsx
+
+import React, { useState } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
@@ -7,7 +9,8 @@ import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import { CalendarWrapper } from "./SchedulerStyles";
 import CustomEvent from "./Event";
 import CustomToolbar from "./Toolbar";
-import { Modal, Form, Input, DatePicker, Button, Select } from "antd";
+import { Modal } from "antd";
+import AddClassForm from "./add-class-form/AddClassForm";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 
@@ -29,68 +32,37 @@ const events = [
     allDay: false,
     id: 2,
   },
-  {
-    title: "Yoga Dersi",
-    start: new Date(2024, 9, 14, 9, 0),
-    end: new Date(2024, 9, 14, 17, 0),
-    allDay: false,
-    id: 3,
-  },
 ];
-
-// Define types for the event and function parameters
-interface MyEvent {
-  id: string | number;
-  title?: string;
-  start: Date;
-  end: Date;
-  allDay: boolean;
-}
-
-interface MoveEventArgs {
-  event: MyEvent;
-  start: Date;
-  end: Date;
-  isAllDay?: boolean;
-}
 
 const MyCalendar: React.FC = () => {
   const [myEvents, setMyEvents] = useState(events);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [form] = Form.useForm();
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedRange, setSelectedRange] = useState<{
+    start: Date;
+    end: Date;
+  } | null>(null);
 
-  const moveEvent = useCallback(
-    ({ event, start, end }: MoveEventArgs) => {
-      setMyEvents((prev) =>
-        prev.map((ev) => (ev.id === event.id ? { ...ev, start, end } : ev))
-      );
-    },
-    [setMyEvents]
-  );
-
-  const handleDateClick = (slotInfo: { start: Date; end: Date }) => {
-    setSelectedDate(slotInfo.start);
-    form.setFieldsValue({
-      startDate: dayjs(slotInfo.start),
-      endDate: dayjs(slotInfo.end),
-    });
+  const handleSelectSlot = (slotInfo: { start: Date; end: Date }) => {
+    setSelectedRange(slotInfo);
     setIsModalVisible(true);
   };
 
-  const handleAddEvent = () => {
-    form.validateFields().then((values) => {
-      const newEvent: MyEvent = {
-        id: myEvents.length + 1,
-        title: values.className,
-        start: values.startDate.toDate(),
-        end: values.endDate.toDate(),
-        allDay: false,
-      };
-      setMyEvents((prev: any) => [...prev, newEvent]);
-      setIsModalVisible(false);
-      form.resetFields();
-    });
+  const handleAddEvent = (values: any) => {
+    const newEvent = {
+      id: myEvents.length + 1,
+      title: values.className,
+      start: dayjs(values.startDate)
+        .hour(dayjs(values.startTime).hour())
+        .minute(dayjs(values.startTime).minute())
+        .toDate(),
+      end: dayjs(values.startDate)
+        .hour(dayjs(values.startTime).hour())
+        .minute(dayjs(values.startTime).minute())
+        .toDate(),
+      allDay: false,
+    };
+    setMyEvents((prev) => [...prev, newEvent]);
+    setIsModalVisible(false);
   };
 
   return (
@@ -99,8 +71,7 @@ const MyCalendar: React.FC = () => {
         events={myEvents}
         localizer={localizer}
         selectable
-        onSelectSlot={handleDateClick}
-        /*  onEventDrop={moveEvent} */
+        onSelectSlot={handleSelectSlot}
         style={{ height: "600px" }}
         resizable
         draggableAccessor={() => true}
@@ -114,73 +85,14 @@ const MyCalendar: React.FC = () => {
         title="Add New Class"
         visible={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
-        footer={[
-          <Button key="cancel" onClick={() => setIsModalVisible(false)}>
-            Cancel
-          </Button>,
-          <Button key="add" type="primary" onClick={handleAddEvent}>
-            Add
-          </Button>,
-        ]}
+        footer={null}
       >
-        <Form form={form} layout="vertical">
-          <Form.Item
-            name="className"
-            label="Class Name"
-            rules={[{ required: true, message: "Please enter the class name" }]}
-          >
-            <Input placeholder="Enter class name" />
-          </Form.Item>
-          <Form.Item
-            name="description"
-            label="Description"
-            rules={[{ required: true, message: "Please enter a description" }]}
-          >
-            <Input.TextArea rows={3} placeholder="Enter description" />
-          </Form.Item>
-          <Form.Item
-            name="startDate"
-            label="Start Date & Time"
-            rules={[
-              {
-                required: true,
-                message: "Please select the start date and time",
-              },
-            ]}
-          >
-            <DatePicker
-              showTime
-              style={{ width: "100%" }}
-              defaultValue={dayjs(selectedDate)}
-            />
-          </Form.Item>
-          <Form.Item
-            name="endDate"
-            label="End Date & Time"
-            rules={[
-              {
-                required: true,
-                message: "Please select the end date and time",
-              },
-            ]}
-          >
-            <DatePicker showTime style={{ width: "100%" }} />
-          </Form.Item>
-          <Form.Item
-            name="trainer"
-            label="Trainer"
-            rules={[{ required: true, message: "Please select a trainer" }]}
-          >
-            <Select
-              showSearch
-              placeholder="Select a trainer"
-              options={[
-                { label: "Trainer 1", value: "trainer1" },
-                { label: "Trainer 2", value: "trainer2" },
-              ]}
-            />
-          </Form.Item>
-        </Form>
+        <AddClassForm
+          visible={isModalVisible}
+          onCancel={() => setIsModalVisible(false)}
+          onSubmit={handleAddEvent}
+          selectedRange={selectedRange}
+        />
       </Modal>
     </CalendarWrapper>
   );

@@ -15,8 +15,7 @@ export const theme = {
 const { Content } = Layout;
 
 export const StyledContent = styled(Content)<{ isMobile: boolean }>`
-  background: ${({ isMobile }) =>
-    isMobile ? theme.backgroundColor : theme.secondaryColor};
+  background: ${({ theme }) => theme.contentBg};
   padding: ${({ isMobile }) => (isMobile ? "10px" : "20px")};
   border-radius: ${({ isMobile }) => (isMobile ? "0" : "30px")};
   margin: ${({ isMobile }) => (isMobile ? "0" : "16px 16px 16px 0")};
@@ -56,7 +55,7 @@ export const Search = styled(Input)<{ focused: boolean }>`
   height: 48px;
   padding-right: ${({ focused }) => (focused ? "50px" : "20px")};
   border: none;
-  background: ${theme.secondaryColor} !important;
+  background: ${({ theme }) => theme.contentBg} !important;
   padding-left: 20px;
 
   &::placeholder {

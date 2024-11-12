@@ -5,4 +5,5 @@ export interface Theme {
   primary: string;
   inputBg: string;
   inputBorder: string;
+  contentBg: string;
 }

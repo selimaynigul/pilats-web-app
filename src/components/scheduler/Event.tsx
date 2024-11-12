@@ -12,6 +12,16 @@ import {
 } from "@ant-design/icons";
 import { EventWrapperProps } from "react-big-calendar"; // Import EventWrapperProps for compatibility
 
+const Overlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+  z-index: 10; /* Ensures it's on top */
+  pointer-events: auto; /* Allows clicks on this overlay */
+`;
 const Container = styled.div<{ more?: boolean }>`
   background: #5d46e5;
   border-bottom: 5px solid #4d3abd;

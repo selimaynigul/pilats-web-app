@@ -6,7 +6,7 @@ import {
   PlusOutlined,
   DownOutlined,
 } from "@ant-design/icons";
-import { ToolbarProps, View } from "react-big-calendar";
+import { ToolbarProps } from "react-big-calendar";
 import {
   Dropdown,
   Menu,
@@ -19,13 +19,14 @@ import {
 } from "antd";
 import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
+import { IoIosArrowDown } from "react-icons/io";
 
 const StyledContainer = styled.div`
   margin-bottom: 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: white;
+  background: ${({ theme }) => theme.bodyBg};
   border-radius: 50px;
   padding: 10px;
 `;
@@ -59,8 +60,8 @@ const Title = styled.button`
     font-size: 14px;
   }
 `;
-
 const CompanyName = styled.button`
+  position: relative;
   margin: 0;
   border: none;
   height: 35px;
@@ -69,17 +70,36 @@ const CompanyName = styled.button`
   cursor: pointer;
   background: transparent;
   display: flex;
-  gap: 10px;
   align-items: center;
-  justify-content: space-between;
   font-weight: bold;
   border: 1px solid #4d3abd;
   border-radius: 50px;
+  transition: padding-right 0.3s ease;
+
+  &:hover {
+    padding-right: 35px; /* Adds space for the icon when hovered */
+  }
 `;
 
+const IconContainer = styled.div`
+  position: absolute;
+  right: 15px;
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  transform: translateX(10px);
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
+
+  ${CompanyName}:hover & {
+    opacity: 1;
+    transform: translateX(0); /* Slide in the icon */
+  }
+`;
 const StyledButton = styled.button`
   border: 1px solid transparent;
-  background: #e6e3ff;
+  background: ${({ theme }) => theme.contentBg};
   color: #4d3abd;
   border-radius: 50px;
   padding: 5px;
@@ -93,6 +113,16 @@ const StyledButton = styled.button`
 
   &:hover {
     border: 1px solid #4d3abd;
+  }
+`;
+const AddButton = styled(StyledButton)`
+  border: none;
+  &:hover {
+    border: none;
+    transform: scale(1.1);
+  }
+  &:active {
+    transform: scale(0.9);
   }
 `;
 
@@ -274,6 +304,7 @@ const CustomToolbar: React.FC<ToolbarProps> = ({
     { label: "Bob Smith", value: "bob" },
     { label: "Charlie Brown", value: "charlie" },
   ];
+
   return (
     <StyledContainer className="custom-toolbar">
       <Nav>
@@ -294,16 +325,19 @@ const CustomToolbar: React.FC<ToolbarProps> = ({
 
       <Dropdown overlay={companyDropdown} trigger={["click"]}>
         <CompanyName>
-          MacFit - Gebze <DownOutlined />
+          MacFit - Gebze
+          <IconContainer className="icon">
+            <IoIosArrowDown />
+          </IconContainer>
         </CompanyName>
       </Dropdown>
 
       <Nav>
         <ButtonContainer>
-          {Object.keys(views).map((v) => (
+          {views.map((v: any) => (
             <StyledButton2
               key={v}
-              onClick={() => onView(v as View)}
+              onClick={() => onView(v)}
               style={{
                 fontWeight: view === v ? "bold" : "normal",
               }}
@@ -312,12 +346,12 @@ const CustomToolbar: React.FC<ToolbarProps> = ({
             </StyledButton2>
           ))}
         </ButtonContainer>
-        <StyledButton
+        <AddButton
           style={{ background: "#5d46e5", color: "white" }}
           onClick={handleModalOpen}
         >
           <PlusOutlined />
-        </StyledButton>
+        </AddButton>
       </Nav>
 
       <Modal

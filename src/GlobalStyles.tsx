@@ -1,18 +1,31 @@
 import { createGlobalStyle } from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
-/*   body {
-    margin: 0;
-    padding: 0;
-    background-color: #121212;
-    color: white;
-  }
- */
+
   .ant-layout {
-  background-color: white;
+  background-color: ${({ theme }) => theme.bodyBg};
 }
 
-.ant-menu-item-selected {
+/* .ant-modal-content {
+  background-color: transparent !important;
+  backdrop-filter: blur(8px);
+  border: 1px solid white;
+  background-color: rgba(255, 255, 255, 0.5) !important;
+  border-radius: 20px !important;
+  }
+  
+  */
+ 
+ .ant-modal-content {
+  border-radius: 20px !important;
+  }
+/* 
+  .ant-menu {
+    background: ${({ theme }) => theme.bodyBg} !important;
+  }
+
+ */
+  .ant-menu-item-selected {
   background: #5d46e5 !important;
   .anticon,
   svg,
@@ -24,8 +37,13 @@ const GlobalStyle = createGlobalStyle`
     color: #f6f5ff !important;
   }
 }
+
+.ant-menu {
+  background:  ${({ theme }) => theme.bodyBg}!important;
+
+}
 .ant-menu-item {
-  color: #5d46e5 !important;
+  color:  ${({ theme }) => theme.primary}!important;
   border-radius: 15px !important;
 }
 .ant-menu-item:hover {

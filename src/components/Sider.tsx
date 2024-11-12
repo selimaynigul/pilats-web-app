@@ -21,7 +21,7 @@ const { Sider } = Layout;
 const { Option } = Select;
 
 const StyledSider = styled(Sider)<{ isMobile: boolean }>`
-  background: white;
+  background: ${({ theme }) => theme.bodyBg};
   padding: 80px 0 0;
   height: ${({ isMobile }) => (isMobile ? "100vh" : "auto")};
   position: ${({ isMobile }) => (isMobile ? "fixed" : "sticky")};
