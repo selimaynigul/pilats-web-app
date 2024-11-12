@@ -8,7 +8,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import { CalendarWrapper } from "./SchedulerStyles";
 import CustomEvent from "./Event";
-import CustomToolbar from "./Toolbar";
+import CustomToolbar from "./toolbar/Toolbar";
 import { Modal } from "antd";
 import AddClassForm from "./add-class-form/AddClassForm";
 import type { Dayjs } from "dayjs";
