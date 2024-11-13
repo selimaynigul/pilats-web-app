@@ -1,0 +1,106 @@
+import React from "react";
+import styled from "styled-components";
+import { Card, Avatar } from "antd";
+import {
+  MailOutlined,
+  PhoneOutlined,
+  EllipsisOutlined,
+} from "@ant-design/icons";
+
+const { Meta } = Card;
+
+const StyledCard = styled(Card)`
+  border-radius: 20px;
+  .ant-card-body {
+    padding: 10px;
+  }
+  cursor: pointer;
+  transition: 0.2s;
+
+  &:hover {
+    transform: scale(1.02);
+  }
+`;
+
+const Container = styled.div`
+  background: ${({ theme }) => theme.contentBg};
+  padding: 10px;
+  border-radius: 12px;
+  margin-top: 8px;
+`;
+
+const InfoSection = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+`;
+
+const InfoItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 14px;
+  color: #7a7a7a;
+`;
+
+const ContactInfo = styled.div`
+  margin-top: 16px;
+  font-size: 14px;
+  color: #4a4a4a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+interface Trainer {
+  name: string;
+  title: string;
+  department: string;
+  hiredDate: string;
+  email: string;
+  phone: string;
+  avatarUrl?: string;
+}
+
+const TrainerCard: React.FC<{ trainer: Trainer }> = ({ trainer }) => (
+  <StyledCard
+    cover={
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        <Avatar
+          size={80}
+          src={trainer.avatarUrl}
+          style={{ margin: "16px 16px 0 16px", borderRadius: "20px" }}
+        />
+        <Meta title={trainer.name} description={trainer.title} />
+      </div>
+    }
+  >
+    <Container>
+      <InfoSection>
+        <InfoItem>
+          <span>Department</span>
+          <strong>{trainer.department}</strong>
+        </InfoItem>
+        <InfoItem>
+          <span>Hired Date</span>
+          <strong>{trainer.hiredDate}</strong>
+        </InfoItem>
+      </InfoSection>
+      <ContactInfo>
+        <MailOutlined />
+        <span>{trainer.email}</span>
+      </ContactInfo>
+      <ContactInfo>
+        <PhoneOutlined />
+        <span>{trainer.phone}</span>
+      </ContactInfo>
+    </Container>
+  </StyledCard>
+);
+
+export default TrainerCard;
