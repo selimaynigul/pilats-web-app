@@ -23,6 +23,7 @@ import {
   SettingOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
+import { useAuth } from "contexts/AuthProvider";
 
 const AppLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(window.innerWidth <= 768);
@@ -44,12 +45,20 @@ const AppLayout: React.FC = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    console.log("loogout");
+    logout();
+  };
+
   const profileMenu = (
     <Menu>
       <Menu.Item key="settings" icon={<SettingOutlined />}>
         Settings
       </Menu.Item>
       <Menu.Item
+        onClick={handleLogout}
         key="logout"
         icon={<LogoutOutlined style={{ color: "red" }} />}
         style={{ color: "red" }}

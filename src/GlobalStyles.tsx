@@ -77,6 +77,53 @@ const GlobalStyle = createGlobalStyle`
       color: ${({ theme }) => theme.text} !important;
     }
   } */
+
+   
+ @keyframes expandWidth {
+  0% {
+    width: 40px; /* Icon only */
+  }
+  50% {
+    width: 40px; /* Midway expansion */
+  }
+  100% {
+    width: 170px; /* Full width for content */
+  }
+}
+
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-10px); /* Start slightly to the left */
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0); /* End in normal position */
+  }
+}
+
+.ant-message-notice-content {
+  /* display: flex !important;
+  align-items: center !important; */
+  padding: 0 12px !important;
+  margin: auto !important;
+  border-radius: 50px !important;
+  background-color: rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(8px) !important;
+  border: 1px solid white;
+ /*  height: 40px;
+ 
+   animation: expandWidth 1s ease-in-out forwards;   */
+}
+
+.ant-message-custom-slide .ant-message-content {
+ /*  opacity: 0;
+  animation: slideIn 0.5s ease-in-out forwards;
+  animation-delay: 0.7s; /* Delays for expandWidth to finish */
+  white-space: nowrap;
+  margin-left: 8px; */
+}
+
 `;
 
 export default GlobalStyle;

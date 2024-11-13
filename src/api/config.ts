@@ -1,16 +1,14 @@
+// src/api/config.ts
+
 import axios from "axios";
-import { API_URL } from "config/api";
+import { API_URL } from "./constants";
 
 const apiClient = axios.create({
   baseURL: API_URL,
+  headers: { "Content-Type": "application/json" },
   timeout: 5000,
-  headers: {
-    "Content-Type": "application/json",
-  },
-  withCredentials: true,
 });
 
-// Optional interceptors for request and response handling
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {

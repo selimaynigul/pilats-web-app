@@ -10,15 +10,20 @@ import {
   Carousel,
   Row,
   Col,
+  message,
 } from "antd";
 import {
   UserOutlined,
   LockOutlined,
   SunFilled,
   MoonFilled,
+  CheckCircleFilled,
 } from "@ant-design/icons";
 import styled, { keyframes } from "styled-components";
 import { useTheme } from "contexts/ThemeProvider";
+import { useAuth } from "contexts/AuthProvider";
+import { useNavigate } from "react-router-dom";
+import { login as loginService } from "api/services/authService";
 
 const { Title, Text, Link } = Typography;
 const { Option } = Select;
@@ -261,11 +266,84 @@ const TextContent = styled.div`
 const LoginPage: React.FC = () => {
   const handleFinish = (values: any) => {
     console.log("Form Values:", values);
+    handleLogin(values);
   };
 
   const { theme, toggleTheme } = useTheme();
 
   const [hovered, setHovered] = useState(false);
+
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
+  const mockResponses = {
+    "mainadmin@test.com": {
+      token: "mock-main-admin-token",
+      user: {
+        id: "1",
+        name: "Main Admin",
+        email: "mainadmin@test.com",
+        role: "mainAdmin",
+      },
+    },
+    "companyadmin@test.com": {
+      token: "mock-company-admin-token",
+      user: {
+        id: "2",
+        name: "Company Admin",
+        email: "companyadmin@test.com",
+        role: "companyAdmin",
+      },
+    },
+    "branchadmin@test.com": {
+      token: "mock-branch-admin-token",
+      user: {
+        id: "3",
+        name: "Branch Admin",
+        email: "branchadmin@test.com",
+        role: "branchAdmin",
+      },
+    },
+  };
+
+  const [messageApi, contextHolder] = message.useMessage();
+
+  const success = () => {
+    messageApi.open({
+      type: "success",
+      content:
+        "This is a prompt message for success, and it will disappear in 10 seconds",
+      duration: 10,
+    });
+  };
+
+  const handleLogin = async (values: { email: string; password: string }) => {
+    setLoading(true);
+    try {
+      /* const response = await loginService(values.email, values.password); */
+
+      const response = mockResponses["mainadmin@test.com"];
+      login(response.token, response.user);
+      message.success({
+        content: (
+          <div className="ant-message-custom-slide">
+            <CheckCircleFilled
+              style={{ color: theme.primary, fontSize: "24px" }}
+            />
+            <span className="ant-message-content">Welcome back!</span>
+          </div>
+        ),
+        duration: 3, // Duration in seconds
+        icon: <></>, // Set to null so it won't duplicate icon from message API
+      });
+      navigate("/");
+    } catch (error) {
+      message.error("Login failed. Please check your credentials.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Wrapper>

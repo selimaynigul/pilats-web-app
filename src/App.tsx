@@ -1,15 +1,17 @@
 import AppNavigation from "navigation/app-navigation";
-import { LanguageProvider, ThemeProvider } from "contexts";
+import { AuthProvider, LanguageProvider, ThemeProvider } from "contexts";
 import GlobalStyle from "GlobalStyles";
 
 function App() {
   return (
-    <LanguageProvider>
-      <ThemeProvider>
-        <GlobalStyle />
-        <AppNavigation />
-      </ThemeProvider>
-    </LanguageProvider>
+    <AuthProvider>
+      <LanguageProvider>
+        <ThemeProvider>
+          <GlobalStyle />
+          <AppNavigation />
+        </ThemeProvider>
+      </LanguageProvider>
+    </AuthProvider>
   );
 }
 
