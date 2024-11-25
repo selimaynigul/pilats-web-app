@@ -2,13 +2,15 @@ import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { Row, Col, Spin } from "antd";
 import TrainerCard from "./trainer-card";
-import apiClient from "api/config";
+import apiClient from "config/api-client";
+import { Link } from "react-router-dom";
 
 const TrainerListContainer = styled.div``;
 
 const trainersData = Array(50)
   .fill("")
   .map((_, i) => ({
+    id: i,
     name: `Trainer ${i + 1}`,
     title: "Title",
     department: "Department",
@@ -113,7 +115,9 @@ const TrainerList: React.FC = () => {
       <Row gutter={[16, 16]}>
         {trainers.map((trainer, index) => (
           <Col xs={24} sm={12} md={8} lg={6} key={index}>
-            <TrainerCard trainer={trainer} />
+            <Link to={`/trainers/${trainer.id}`}>
+              <TrainerCard trainer={trainer} />
+            </Link>
           </Col>
         ))}
       </Row>

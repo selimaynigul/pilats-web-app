@@ -23,7 +23,7 @@ import styled, { keyframes } from "styled-components";
 import { useTheme } from "contexts/ThemeProvider";
 import { useAuth } from "contexts/AuthProvider";
 import { useNavigate } from "react-router-dom";
-import { login as loginService } from "api/services/auth-service";
+import { authService } from "services";
 
 const { Title, Text, Link } = Typography;
 const { Option } = Select;
@@ -318,31 +318,29 @@ const LoginPage: React.FC = () => {
     });
   };
 
-  const handleLogin = async (values: { email: string; password: string }) => {
+  const handleLogin = (values: any) => {
     setLoading(true);
-    try {
-      /* const response = await loginService(values.email, values.password); */
-
-      const response = mockResponses["mainadmin@test.com"];
-      login(response.token, response.user);
-      message.success({
-        content: (
-          <div className="ant-message-custom-slide">
-            <CheckCircleFilled
-              style={{ color: theme.primary, fontSize: "24px" }}
-            />
-            <span className="ant-message-content">Welcome back!</span>
-          </div>
-        ),
-        duration: 3, // Duration in seconds
-        icon: <></>, // Set to null so it won't duplicate icon from message API
+    authService
+      .login(values)
+      .then((res) => {
+        /*  login(res?.token, res?.user); */
+        message.success("Login successful");
+        navigate("/");
+      })
+      .catch((error) => {
+        message.error("Login failed");
+        console.log(error);
       });
-      navigate("/");
-    } catch (error) {
-      message.error("Login failed. Please check your credentials.");
-    } finally {
-      setLoading(false);
-    }
+    /* 
+    authService
+      .adminRegister({ email: "selim@test.com", password: "1234" })
+      .then(() => {
+        message.success("register successful");
+      })
+      .catch(() => {
+        message.error("register failed");
+      }); */
+    setLoading(false);
   };
 
   return (
@@ -457,7 +455,7 @@ const LoginPage: React.FC = () => {
           <Catchword>Please log in to your account or sign up!</Catchword>
 
           <Form.Item
-            name="username"
+            name="email"
             rules={[{ required: true, message: "Please input your username!" }]}
           >
             <Input placeholder="Username" size="large" />

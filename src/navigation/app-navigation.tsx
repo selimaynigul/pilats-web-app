@@ -7,6 +7,7 @@ import {
   UsersPage,
   ClassesPage,
   TrainersPage,
+  TrainerDetailsPage,
   PackagesPage,
 } from "pages";
 import AppLayout from "components/layout/Layout";
@@ -27,9 +28,9 @@ const AppNavigation = () => {
         <Route
           path="/companies"
           element={
-            <AuthGuard requiredRoles={["companyAdmin", "mainAdmin"]}>
-              <CompaniesPage />
-            </AuthGuard>
+            <CompaniesPage />
+            /*   <AuthGuard requiredRoles={["companyAdmin", "mainAdmin"]}>
+            </AuthGuard> */
           }
         />
 
@@ -37,9 +38,9 @@ const AppNavigation = () => {
         <Route
           path="/users"
           element={
-            <AuthGuard requiredRoles={["mainAdmin"]}>
-              <UsersPage />
-            </AuthGuard>
+            <UsersPage />
+            /*  <AuthGuard requiredRoles={["mainAdmin"]}>
+            </AuthGuard> */
           }
         />
 
@@ -47,9 +48,9 @@ const AppNavigation = () => {
         <Route
           path="/classes"
           element={
-            <AuthGuard requiredRoles={["mainAdmin", "branchAdmin"]}>
-              <ClassesPage />
-            </AuthGuard>
+            <ClassesPage />
+            /* <AuthGuard requiredRoles={["mainAdmin", "branchAdmin"]}>
+            </AuthGuard>*/
           }
         />
 
@@ -57,19 +58,21 @@ const AppNavigation = () => {
         <Route
           path="/trainers"
           element={
-            <AuthGuard requiredRoles={["mainAdmin", "branchAdmin"]}>
-              <TrainersPage />
-            </AuthGuard>
+            <TrainersPage />
+            /*  <AuthGuard requiredRoles={["mainAdmin", "branchAdmin"]}>
+            </AuthGuard>*/
           }
         />
+
+        <Route path="/trainers/:id" element={<TrainerDetailsPage />} />
 
         {/* Packages (accessible to mainAdmin and branchAdmin) */}
         <Route
           path="/packages"
           element={
-            <AuthGuard requiredRoles={["mainAdmin", "branchAdmin"]}>
-              <PackagesPage />
-            </AuthGuard>
+            /*  <AuthGuard requiredRoles={["mainAdmin", "branchAdmin"]}>
+          </AuthGuard>*/
+            <PackagesPage />
           }
         />
 

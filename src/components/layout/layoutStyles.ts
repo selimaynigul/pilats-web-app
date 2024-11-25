@@ -21,6 +21,7 @@ export const StyledContent = styled(Content)<{ isMobile: boolean }>`
   margin: ${({ isMobile }) => (isMobile ? "0" : "16px 16px 16px 0")};
   display: flex;
   flex-direction: column;
+  height: 100dvh;
 
   overflow-y: scroll;
 

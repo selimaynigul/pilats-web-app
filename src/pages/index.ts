@@ -5,4 +5,5 @@ export { default as TestPage } from "./test/test-page";
 export { default as UsersPage } from "./users/users-page";
 export { default as ClassesPage } from "./classes/classes-page";
 export { default as TrainersPage } from "./trainers/trainers-page";
+export { default as TrainerDetailsPage } from "./trainers/trainer-detail/trainer-details-page";
 export { default as PackagesPage } from "./packages/packages-page";

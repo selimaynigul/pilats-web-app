@@ -5,7 +5,7 @@ import { Card } from "components";
 const TrainersPage: React.FC = () => {
   return (
     <Card toolbar={<div></div>}>
-      <TrainerList></TrainerList>
+      <TrainerList />
     </Card>
   );
 };

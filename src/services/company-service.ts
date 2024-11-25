@@ -1,4 +1,4 @@
-import apiClient from "../config";
+import { apiClient } from "config";
 
 const companyService = {
   getAll: () => apiClient.get("/"),

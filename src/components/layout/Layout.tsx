@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Layout, Dropdown, Avatar, Menu } from "antd";
-import Sidebar from "../Sider";
-import Header from "../Header";
+import Sidebar from "./Sider";
+import Header from "./Header";
 import { Outlet, useLocation } from "react-router-dom";
 import {
   StyledContent,

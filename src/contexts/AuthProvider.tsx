@@ -6,8 +6,7 @@ import React, {
   ReactNode,
 } from "react";
 import { useNavigate } from "react-router-dom";
-import { logout as logoutService } from "../api/services/auth-service";
-
+import { authService } from "services";
 interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
@@ -48,10 +47,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = () => {
-    logoutService();
+    authService.logout();
     setUser(null);
     setIsAuthenticated(false);
-    navigate("/login");
   };
 
   const hasRole = (role: string) => {

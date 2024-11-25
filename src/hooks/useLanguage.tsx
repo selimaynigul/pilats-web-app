@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
 import { LanguageContext } from "../contexts/LanguageProvider";
 
-export const UseLanguage = () => {
+export const useLanguage = () => {
   return useContext(LanguageContext);
 };
 
-export default UseLanguage;
+export default useLanguage;
