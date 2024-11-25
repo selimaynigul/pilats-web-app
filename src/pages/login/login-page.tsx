@@ -323,7 +323,8 @@ const LoginPage: React.FC = () => {
     authService
       .login(values)
       .then((res) => {
-        /*  login(res?.token, res?.user); */
+        login(res.data);
+        console.log(res);
         message.success("Login successful");
         navigate("/");
       })

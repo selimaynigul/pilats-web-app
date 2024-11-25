@@ -1,55 +1,67 @@
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { Row, Col, Spin } from "antd";
+import { Row, Col, Spin, message } from "antd";
 import TrainerCard from "./trainer-card";
 import apiClient from "config/api-client";
 import { Link } from "react-router-dom";
+import { trainerService } from "services";
 
 const TrainerListContainer = styled.div``;
 
-const trainersData = Array(50)
-  .fill("")
-  .map((_, i) => ({
-    id: i,
-    name: `Trainer ${i + 1}`,
-    title: "Title",
-    department: "Department",
-    hiredDate: "Date",
-    email: `trainer${i + 1}@example.com`,
-    phone: `123-456-789${i}`,
-    avatarUrl: `https://i.pravatar.cc/150?img=${i % 10}`,
-  }));
-
 const TrainerList: React.FC = () => {
-  /*  const [trainers, setTrainers] = useState<any>([]);
+  const [trainers, setTrainers] = useState<any>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const observerRef = useRef(null);
 
-  const fetchTrainers = async (page: any) => {
+  const fetchTrainers = (page: any) => {
     setLoading(true);
-    try {
-      const response = await apiClient.get(
-        `/users` {
-        params: { page, limit: 8 },
-      } 
-      );
-      const data = response.data;
 
-      setTrainers((prevTrainers: any) => [...prevTrainers, ...data]);
-      setHasMore(data.hasMore); // API should return a flag indicating if there are more items
-    } catch (error) {
-      console.error("Error fetching trainers:", error);
-    } finally {
-      setLoading(false);
-    }
+    const trainerSearchRequest = {
+      ucSearchRequest: {
+        id: null, // Or any other filters
+        name: "John",
+        surname: "Doe",
+        birthdate: "1990-01-01",
+        gender: "MALE", // Enum value
+        telNo1: "123456789",
+        birthdateStart: "1980-01-01",
+        birthdateEnd: "2000-01-01",
+      },
+      id: null,
+      branchId: 3,
+      companyId: 4,
+      searchByPageDto: {
+        pageNumber: 1,
+        pageSize: 10,
+        sortField: "name",
+        sortDirection: "ASC", // Sorting direction: "ASC" or "DESC"
+      },
+    };
+    trainerService
+      .getAll({
+        ucSearchRequest: {
+          gender: "MALE",
+        },
+        searchByPageDto: {
+          sort: "DESC",
+        },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setTrainers(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+        message.error("trainers getall failed");
+      });
   };
 
   useEffect(() => {
     fetchTrainers(page);
   }, [page]);
-
+  /* 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -69,51 +81,10 @@ const TrainerList: React.FC = () => {
     };
   }, [loading, hasMore]); */
 
-  const [trainers, setTrainers] = useState(trainersData.slice(0, 8)); // Initial 6 items
-  const [loading, setLoading] = useState(false);
-  const observerRef = useRef(null);
-
-  const loadMore = () => {
-    console.log("load");
-    setLoading(true);
-    setTimeout(() => {
-      const currentLength = trainers.length;
-      const newTrainers = trainersData.slice(currentLength, currentLength + 8);
-      setTrainers((prevTrainers) => [...prevTrainers, ...newTrainers]);
-      setLoading(false);
-    }, 1000); // Simulate network delay
-  };
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !loading) {
-          loadMore();
-        }
-      },
-      { threshold: 1.0 }
-    );
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
-    }
-    return () => observer.disconnect();
-  }, [loading]);
   return (
-    /*   <TrainerListContainer>
-      <Row gutter={[16, 16]}>
-        {trainers.map((trainer: any, index: any) => (
-          <Col xs={24} sm={12} md={12} lg={6} key={index}>
-            <TrainerCard trainer={trainer} />
-          </Col>
-        ))}
-      </Row>
-      {loading && <Spin style={{ display: "block", margin: "20px auto" }} />}
-      <div ref={observerRef} style={{ height: "20px" }} />{" "}
-     
-    </TrainerListContainer> */
     <TrainerListContainer>
       <Row gutter={[16, 16]}>
-        {trainers.map((trainer, index) => (
+        {trainers.map((trainer: any, index: any) => (
           <Col xs={24} sm={12} md={8} lg={6} key={index}>
             <Link to={`/trainers/${trainer.id}`}>
               <TrainerCard trainer={trainer} />
@@ -121,9 +92,8 @@ const TrainerList: React.FC = () => {
           </Col>
         ))}
       </Row>
-      {loading && <Spin style={{ display: "block", margin: "20px auto" }} />}
-      <div ref={observerRef} style={{ height: "20px" }} />{" "}
-      {/* Trigger element */}
+      {/*   {loading && <Spin style={{ display: "block", margin: "20px auto" }} />}
+      <div ref={observerRef} style={{ height: "20px" }} />{" "} */}
     </TrainerListContainer>
   );
 };

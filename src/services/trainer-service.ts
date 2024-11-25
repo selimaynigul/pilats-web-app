@@ -1,7 +1,7 @@
 import { apiClient } from "config";
 
 const trainerService = {
-  getAll: () => apiClient.get("/get"),
+  getAll: (params = {}) => apiClient.post("/trainer/search", params),
 
   getTrainer: (params = {}) => apiClient.get("/auth/register", { params }),
 };

@@ -10,7 +10,7 @@ import { authService } from "services";
 interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
-  login: (token: string, userData: User) => void;
+  login: (token: string) => void;
   logout: () => void;
   hasRole: (role: string) => boolean;
 }
@@ -39,10 +39,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const login = (token: string, userData: User) => {
+  const login = (token: string) => {
     localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(userData));
-    setUser(userData);
     setIsAuthenticated(true);
   };
 
