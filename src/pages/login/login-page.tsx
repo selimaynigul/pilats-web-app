@@ -23,7 +23,7 @@ import styled, { keyframes } from "styled-components";
 import { useTheme } from "contexts/ThemeProvider";
 import { useAuth } from "contexts/AuthProvider";
 import { useNavigate } from "react-router-dom";
-import { login as loginService } from "api/services/authService";
+import { login as loginService } from "api/services/auth-service";
 
 const { Title, Text, Link } = Typography;
 const { Option } = Select;

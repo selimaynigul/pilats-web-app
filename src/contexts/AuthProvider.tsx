@@ -6,7 +6,7 @@ import React, {
   ReactNode,
 } from "react";
 import { useNavigate } from "react-router-dom";
-import { logout as logoutService } from "../api/services/authService";
+import { logout as logoutService } from "../api/services/auth-service";
 
 interface AuthContextType {
   isAuthenticated: boolean;

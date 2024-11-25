@@ -15,10 +15,9 @@ const StyledCard = styled(Card)`
     padding: 10px;
   }
   cursor: pointer;
-  transition: 0.2s;
+  transition: 0.3s;
 
   &:hover {
-    transform: scale(1.02);
     box-shadow: 0px 8px 42px -5px rgba(93, 70, 229, 0.2);
   }
 `;

@@ -1,6 +1,6 @@
 import React, { useState, createContext, useContext, ReactNode } from "react";
 
-import { languageOptions, dictionaryList } from "../translations";
+import { languageOptions, dictionaryList } from "../locales";
 
 interface LanguageContextProps {
   userLanguage: any;

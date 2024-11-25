@@ -1,5 +1,5 @@
-import tr from "translations/tr/tr.json";
-import en from "translations/en/en.json";
+import tr from "locales/tr/tr.json";
+import en from "locales/en/en.json";
 
 export const dictionaryList = { en, tr };
 

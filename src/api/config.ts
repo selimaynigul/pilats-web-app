@@ -1,10 +1,7 @@
-// src/api/config.ts
-
 import axios from "axios";
-import { API_URL } from "./constants";
 
 const apiClient = axios.create({
-  baseURL: "https://jsonplaceholder.typicode.com/",
+  baseURL: "", // TODO: Base url should be here
   headers: { "Content-Type": "application/json" },
   timeout: 5000,
 });
