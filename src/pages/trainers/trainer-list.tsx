@@ -40,10 +40,7 @@ const TrainerList: React.FC = () => {
       },
     };
     trainerService
-      .getAll({
-        ucSearchRequest: {
-          gender: "MALE",
-        },
+      .search({
         searchByPageDto: {
           sort: "DESC",
         },
