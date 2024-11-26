@@ -28,7 +28,7 @@ const AppNavigation = () => {
         <Route
           path="/companies"
           element={
-            <AuthGuard requiredRoles={["companyAdmin", "mainAdmin"]}>
+            <AuthGuard requiredRoles={["COMPANY_ADMIN", "ADMIN"]}>
               <CompaniesPage />
             </AuthGuard>
           }
@@ -38,27 +38,27 @@ const AppNavigation = () => {
         <Route
           path="/users"
           element={
-            <AuthGuard requiredRoles={["mainAdmin"]}>
+            <AuthGuard requiredRoles={["ADMIN"]}>
               <UsersPage />
             </AuthGuard>
           }
         />
 
-        {/* Classes (accessible to mainAdmin and branchAdmin) */}
+        {/* Classes (accessible to ADMIN and BRANCH_ADMIN) */}
         <Route
           path="/classes"
           element={
-            <AuthGuard requiredRoles={["mainAdmin", "branchAdmin"]}>
+            <AuthGuard requiredRoles={["ADMIN", "BRANCH_ADMIN"]}>
               <ClassesPage />
             </AuthGuard>
           }
         />
 
-        {/* Trainers (accessible to mainAdmin and branchAdmin) */}
+        {/* Trainers (accessible to ADMIN and BRANCH_ADMIN) */}
         <Route
           path="/trainers"
           element={
-            <AuthGuard requiredRoles={["mainAdmin", "branchAdmin"]}>
+            <AuthGuard requiredRoles={["ADMIN", "BRANCH_ADMIN"]}>
               <TrainersPage />
             </AuthGuard>
           }
@@ -66,11 +66,11 @@ const AppNavigation = () => {
 
         <Route path="/trainers/:id" element={<TrainerDetailsPage />} />
 
-        {/* Packages (accessible to mainAdmin and branchAdmin) */}
+        {/* Packages (accessible to ADMIN and BRANCH_ADMIN) */}
         <Route
           path="/packages"
           element={
-            <AuthGuard requiredRoles={["mainAdmin", "branchAdmin"]}>
+            <AuthGuard requiredRoles={["ADMIN", "BRANCH_ADMIN"]}>
               <PackagesPage />
             </AuthGuard>
           }

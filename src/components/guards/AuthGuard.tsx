@@ -5,7 +5,7 @@ import { useAuth } from "contexts/AuthProvider";
 
 interface AuthGuardProps {
   children: React.ReactNode;
-  requiredRoles: Array<"mainAdmin" | "companyAdmin" | "branchAdmin">;
+  requiredRoles: Array<"ADMIN" | "COMPANY_ADMIN" | "BRANCH_ADMIN">;
 }
 
 const AuthGuard: React.FC<AuthGuardProps> = ({ children, requiredRoles }) => {
