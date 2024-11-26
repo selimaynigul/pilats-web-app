@@ -62,7 +62,7 @@ interface Trainer {
   avatarUrl?: string;
 }
 
-const TrainerCard: React.FC<{ trainer: Trainer }> = ({ trainer }) => (
+const TrainerCard: React.FC<{ trainer: any }> = ({ trainer }) => (
   <StyledCard
     cover={
       <div
@@ -76,7 +76,12 @@ const TrainerCard: React.FC<{ trainer: Trainer }> = ({ trainer }) => (
           src={trainer.avatarUrl}
           style={{ margin: "16px 16px 0 16px", borderRadius: "20px" }}
         />
-        <Meta title={trainer.name} description={trainer.title} />
+        <Meta
+          title={
+            trainer.ucGetResponse.name + " " + trainer.ucGetResponse.surname
+          }
+          description={trainer.title}
+        />
       </div>
     }
   >
@@ -84,11 +89,11 @@ const TrainerCard: React.FC<{ trainer: Trainer }> = ({ trainer }) => (
       <InfoSection>
         <InfoItem>
           <span>Department</span>
-          <strong>{trainer.department}</strong>
+          <strong>{trainer.ucGetResponse.gender}</strong>
         </InfoItem>
         <InfoItem>
           <span>Hired Date</span>
-          <strong>{trainer.hiredDate}</strong>
+          <strong>{trainer.ucGetResponse.birthdate}</strong>
         </InfoItem>
       </InfoSection>
       <ContactInfo>
@@ -97,7 +102,7 @@ const TrainerCard: React.FC<{ trainer: Trainer }> = ({ trainer }) => (
       </ContactInfo>
       <ContactInfo>
         <PhoneOutlined />
-        <span>{trainer.phone}</span>
+        <span>{trainer.ucGetResponse.telNo1}</span>
       </ContactInfo>
     </Container>
   </StyledCard>

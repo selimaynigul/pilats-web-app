@@ -28,9 +28,9 @@ const AppNavigation = () => {
         <Route
           path="/companies"
           element={
-            <CompaniesPage />
-            /*   <AuthGuard requiredRoles={["companyAdmin", "mainAdmin"]}>
-            </AuthGuard> */
+            <AuthGuard requiredRoles={["companyAdmin", "mainAdmin"]}>
+              <CompaniesPage />
+            </AuthGuard>
           }
         />
 
@@ -38,9 +38,9 @@ const AppNavigation = () => {
         <Route
           path="/users"
           element={
-            <UsersPage />
-            /*  <AuthGuard requiredRoles={["mainAdmin"]}>
-            </AuthGuard> */
+            <AuthGuard requiredRoles={["mainAdmin"]}>
+              <UsersPage />
+            </AuthGuard>
           }
         />
 
@@ -48,9 +48,9 @@ const AppNavigation = () => {
         <Route
           path="/classes"
           element={
-            <ClassesPage />
-            /* <AuthGuard requiredRoles={["mainAdmin", "branchAdmin"]}>
-            </AuthGuard>*/
+            <AuthGuard requiredRoles={["mainAdmin", "branchAdmin"]}>
+              <ClassesPage />
+            </AuthGuard>
           }
         />
 
@@ -58,9 +58,9 @@ const AppNavigation = () => {
         <Route
           path="/trainers"
           element={
-            <TrainersPage />
-            /*  <AuthGuard requiredRoles={["mainAdmin", "branchAdmin"]}>
-            </AuthGuard>*/
+            <AuthGuard requiredRoles={["mainAdmin", "branchAdmin"]}>
+              <TrainersPage />
+            </AuthGuard>
           }
         />
 
@@ -70,9 +70,9 @@ const AppNavigation = () => {
         <Route
           path="/packages"
           element={
-            /*  <AuthGuard requiredRoles={["mainAdmin", "branchAdmin"]}>
-          </AuthGuard>*/
-            <PackagesPage />
+            <AuthGuard requiredRoles={["mainAdmin", "branchAdmin"]}>
+              <PackagesPage />
+            </AuthGuard>
           }
         />
 

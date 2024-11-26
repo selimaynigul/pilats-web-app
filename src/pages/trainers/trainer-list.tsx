@@ -31,8 +31,7 @@ const TrainerList: React.FC = () => {
       })
       .then((response) => {
         const newTrainers = response.data;
-        console.log(response);
-        console.log("page", page);
+
         if (newTrainers.length === 0) {
           setHasMore(false);
         } else {
