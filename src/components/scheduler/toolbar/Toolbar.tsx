@@ -8,7 +8,6 @@ import {
   CompanyDropdownButton,
   IconWrapper,
   ActionButton,
-  AddButton,
   ToggleViewButton,
 } from "./ToolbarStyles";
 import { RightOutlined, LeftOutlined, PlusOutlined } from "@ant-design/icons";
@@ -25,6 +24,7 @@ import {
   Form,
 } from "antd";
 import dayjs, { Dayjs } from "dayjs";
+import AddButton from "components/AddButton";
 
 const Toolbar: React.FC<ToolbarProps> = ({
   label,
@@ -164,9 +164,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
             {v.charAt(0).toUpperCase() + v.slice(1)}
           </ToggleViewButton>
         ))}
-        <AddButton onClick={() => handleModalToggle(true)}>
-          <PlusOutlined />
-        </AddButton>
+        <AddButton onClick={() => handleModalToggle(true)} />
       </NavButtons>
 
       <Modal

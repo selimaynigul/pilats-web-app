@@ -1,4 +1,5 @@
 import axios from "axios";
+import { authService } from "services";
 
 const apiClient = axios.create({
   baseURL: "http://localhost:8000/api/v1",
@@ -17,6 +18,7 @@ apiClient.interceptors.request.use(
     }
     return config;
   },
+
   (error) => Promise.reject(error)
 );
 
@@ -26,7 +28,7 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error.response && error.response.status === 401) {
+    if (error.response && error.response.status === 403) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       window.location.href = "/login";

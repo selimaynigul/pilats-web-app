@@ -93,22 +93,6 @@ export const ActionButton = styled.button`
   }
 `;
 
-export const AddButton = styled(ActionButton)`
-  border: none;
-  color: white;
-  transition: 0.2s;
-
-  background: ${({ theme }) => theme.primary};
-  &:hover {
-    border: none;
-    transform: scale(1.1);
-  }
-  &:active {
-    border: none;
-    transform: scale(0.9);
-  }
-`;
-
 export const ToggleViewButton = styled(ActionButton)`
   width: fit-content;
   padding: 5px 15px;
