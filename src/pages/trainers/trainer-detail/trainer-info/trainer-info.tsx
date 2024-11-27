@@ -8,6 +8,6 @@ const Container = styled.div`
 `;
 
 const TrainerInfo: React.FC = () => {
-  return <Container>trainer info</Container>;
+  return <Container></Container>;
 };
 export default TrainerInfo;

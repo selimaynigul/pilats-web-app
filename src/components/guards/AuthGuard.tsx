@@ -1,6 +1,6 @@
 // src/guards/AuthGuard.tsx
-import React from "react";
-import { Navigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "contexts/AuthProvider";
 
 interface AuthGuardProps {
@@ -10,11 +10,24 @@ interface AuthGuardProps {
 
 const AuthGuard: React.FC<AuthGuardProps> = ({ children, requiredRoles }) => {
   const { isAuthenticated, user } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
-  const hasRequiredRole = user && requiredRoles.includes(user.role as any);
+  useEffect(() => {
+    const hasRequiredRole = user && requiredRoles.includes(user.role as any);
 
-  if (!isAuthenticated || !hasRequiredRole) {
-    return <Navigate to="/login" replace />;
+    if (!isAuthenticated) {
+      navigate("/login", { state: { from: location }, replace: true });
+    } else if (!hasRequiredRole) {
+      navigate("/unauthorized", { state: { from: location }, replace: true });
+    }
+
+    setLoading(false);
+  }, [requiredRoles, location]);
+
+  if (loading) {
+    return <div>Loading...</div>;
   }
 
   return <>{children}</>;

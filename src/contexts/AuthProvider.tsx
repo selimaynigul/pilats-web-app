@@ -16,10 +16,10 @@ interface AuthContextType {
 }
 
 interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string; // e.g., "user", "admin"
+  id?: string;
+  name?: string;
+  email?: string;
+  role?: string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -41,6 +41,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = (token: string) => {
     localStorage.setItem("token", token);
+    setUser({ role: "ADMIN" });
     setIsAuthenticated(true);
   };
 

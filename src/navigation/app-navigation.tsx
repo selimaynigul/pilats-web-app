@@ -78,6 +78,7 @@ const AppNavigation = () => {
 
         {/* Test Page (publicly accessible or add roles as needed) */}
         <Route path="/test" element={<TestPage />} />
+        <Route path="/unauthorized" element={<TestPage />} />
 
         {/* Redirect for non-existent routes */}
         <Route path="*" element={<Navigate to="/" />} />

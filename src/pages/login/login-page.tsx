@@ -324,7 +324,6 @@ const LoginPage: React.FC = () => {
       .login(values)
       .then((res) => {
         login(res.data);
-        console.log(res);
         message.success("Login successful");
         navigate("/");
       })
