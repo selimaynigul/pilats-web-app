@@ -1,15 +1,53 @@
 import React, { useState } from "react";
+import styled from "styled-components";
 import AddButton from "components/AddButton";
 import AddTrainerModal from "./add-trainer-form/add-trainer-form";
 import { trainerService } from "services";
 import { handleError } from "utils/apiHelpers";
 import { message } from "antd";
+import { CompanyDropdown } from "components";
 
-const TrainersToolbar: React.FC = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
+const ToolbarContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+`;
+
+const CountContainer = styled.div`
+  font-size: 16px;
+  font-weight: bold;
+  height: 50px;
+  background: white;
+  padding: 10px 20px;
+  gap: 6px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+`;
+
+const ActionContainer = styled.div`
+  display: flex;
+  gap: 8px;
+  background: red;
+  background: white;
+  height: 50px;
+  border-radius: 50px;
+  align-items: center;
+  padding: 10px;
+`;
+
+const CountNumber = styled.span`
+  color: ${({ theme }) => theme.primary}; /* Primary color for the number */
+`;
+
+const TrainersToolbar: React.FC<{ trainerCount: number }> = ({
+  trainerCount,
+}) => {
+  const [isModalVisible, setIsModalVisible] = React.useState(false);
+  const [selectedCompany, setSelectedCompany] = useState("MacFit - Gebze");
 
   const handleAddTrainer = (values: any) => {
-    console.log(values);
     trainerService
       .register({
         uaRegisterRequest: {
@@ -33,14 +71,23 @@ const TrainersToolbar: React.FC = () => {
   };
 
   return (
-    <div>
-      <AddButton onClick={() => setIsModalVisible(true)} />
+    <ToolbarContainer>
+      <CountContainer>
+        <CountNumber>{trainerCount}</CountNumber> trainers listed
+      </CountContainer>
+      <ActionContainer>
+        <CompanyDropdown
+          selectedCompany={selectedCompany}
+          onCompanySelect={(company) => setSelectedCompany(company)}
+        />
+        <AddButton onClick={() => setIsModalVisible(true)} />
+      </ActionContainer>
       <AddTrainerModal
         visible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
         onSubmit={handleAddTrainer}
       />
-    </div>
+    </ToolbarContainer>
   );
 };
 

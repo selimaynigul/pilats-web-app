@@ -1,6 +1,6 @@
 import React from "react";
 import { Row, Col } from "antd";
-import TrainerInfo from "./trainer-info/trainer-info";
+import TrainerInfo from "./trainer-info/trainer-info-card";
 import TrainerClassesList from "./trainer-classes/trainer-classes-list";
 import styled from "styled-components";
 

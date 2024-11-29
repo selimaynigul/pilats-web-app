@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { Row, Col, Spin, Button } from "antd";
-import TrainerCard from "./trainer-card";
+import TrainerCard from "./trainer-list-card";
 import { Link } from "react-router-dom";
 import { trainerService } from "services";
 import { usePagination } from "hooks";
@@ -11,7 +11,11 @@ const LoadMoreContainer = styled.div`
   margin-top: 20px;
 `;
 
-const TrainerList: React.FC = () => {
+interface TrainerListProps {
+  onTrainerCountChange: (count: number) => void;
+}
+
+const TrainerList: React.FC<TrainerListProps> = ({ onTrainerCountChange }) => {
   const {
     items: trainers,
     loading,
@@ -23,14 +27,18 @@ const TrainerList: React.FC = () => {
     sort: "DESC",
   });
 
+  useEffect(() => {
+    onTrainerCountChange(trainers.length);
+  }, [trainers, onTrainerCountChange]);
+
   return (
     <>
       <Row gutter={[16, 16]}>
         {trainers.map((trainer: any, index: number) => (
           <Col xs={24} sm={12} md={8} lg={6} key={index}>
-            <Link to={`/trainers/${trainer.id}`}>
-              <TrainerCard trainer={trainer} />
-            </Link>
+            <TrainerCard trainer={trainer} />
+            {/*   <Link to={`/trainers/${trainer.id}`}>
+            </Link> */}
           </Col>
         ))}
       </Row>

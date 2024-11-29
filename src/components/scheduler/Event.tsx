@@ -37,7 +37,7 @@ const Container = styled.div<{ more?: boolean }>`
     background: #4d3abd;
   }
 `;
-const TranierInfo = styled.div`
+const TrainerInfo = styled.div`
   border: 1px solid white;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 12px;
   width: 100%;
@@ -74,7 +74,7 @@ const DateInfo = styled.div`
   gap: 8px;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 12px;
 `;
-const TranierPhoto = styled.div`
+const TrainerPhoto = styled.div`
   background: grey;
   height: 40px;
   width: 40px;
@@ -84,11 +84,11 @@ const TranierPhoto = styled.div`
   align-items: center;
   color: white;
 `;
-const TranierName = styled.div`
+const TrainerName = styled.div`
   display: flex;
   flex-direction: column;
 `;
-const TranierDetailButton = styled.div`
+const TrainerDetailButton = styled.div`
   background: transparent;
   height: 30px;
   width: 30px;
@@ -198,18 +198,18 @@ const content = (
 
     <strong style={{ display: "block", marginTop: 15 }}>Eğitmen</strong>
     <div style={{ marginTop: 0 }}>
-      <TranierInfo>
-        <TranierPhoto>
+      <TrainerInfo>
+        <TrainerPhoto>
           <UserOutlined style={{ fontSize: 20 }} />
-        </TranierPhoto>
-        <TranierName>
+        </TrainerPhoto>
+        <TrainerName>
           <strong>Ahmet Yiğit</strong>
           <small> Uzman Yoga Eğitmeni</small>
-        </TranierName>
-        <TranierDetailButton>
+        </TrainerName>
+        <TrainerDetailButton>
           <ArrowRightOutlined />
-        </TranierDetailButton>
-      </TranierInfo>
+        </TrainerDetailButton>
+      </TrainerInfo>
       <strong style={{ display: "block", marginTop: 15 }}>Katılımcılar</strong>
       <AttendeeInfo>
         <Avatar.Group

@@ -1,5 +1,3 @@
-// ToolbarStyles.ts
-
 import styled from "styled-components";
 
 export const ToolbarContainer = styled.div`
@@ -33,44 +31,6 @@ export const TitleButton = styled.button`
 
   &:hover {
     background: #f6f5ff;
-  }
-`;
-
-export const CompanyDropdownButton = styled.button`
-  position: relative;
-  margin: 0;
-  border: none;
-  height: 35px;
-  padding: 5px 15px;
-  color: #4d3abd;
-  cursor: pointer;
-  background: transparent;
-  display: flex;
-  align-items: center;
-  font-weight: bold;
-  border: 1px solid #4d3abd;
-  border-radius: 50px;
-  transition: padding-right 0.3s ease;
-
-  &:hover {
-    padding-right: 35px;
-  }
-`;
-
-export const IconWrapper = styled.div`
-  position: absolute;
-  right: 15px;
-  display: flex;
-  align-items: center;
-  opacity: 0;
-  transform: translateX(10px);
-  transition:
-    transform 0.3s ease,
-    opacity 0.3s ease;
-
-  ${CompanyDropdownButton}:hover & {
-    opacity: 1;
-    transform: translateX(0);
   }
 `;
 

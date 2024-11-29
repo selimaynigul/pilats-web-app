@@ -1,30 +1,17 @@
-// Toolbar.tsx
-
 import React, { useState } from "react";
 import {
   ToolbarContainer,
   NavButtons,
   TitleButton,
-  CompanyDropdownButton,
-  IconWrapper,
   ActionButton,
   ToggleViewButton,
 } from "./ToolbarStyles";
-import { RightOutlined, LeftOutlined, PlusOutlined } from "@ant-design/icons";
-import { IoIosArrowDown } from "react-icons/io";
-import { ToolbarProps, View } from "react-big-calendar";
-import {
-  Dropdown,
-  Menu,
-  Select,
-  DatePicker,
-  Input,
-  Modal,
-  Button,
-  Form,
-} from "antd";
-import dayjs, { Dayjs } from "dayjs";
+import { RightOutlined, LeftOutlined } from "@ant-design/icons";
+import { DatePicker, Modal, Button, Form, Input, Select } from "antd";
+import dayjs from "dayjs";
 import AddButton from "components/AddButton";
+import { CompanyDropdown } from "components";
+import { ToolbarProps, View } from "react-big-calendar";
 
 const Toolbar: React.FC<ToolbarProps> = ({
   label,
@@ -34,19 +21,9 @@ const Toolbar: React.FC<ToolbarProps> = ({
   view,
   date,
 }) => {
-  const [selectedMonth, setSelectedMonth] = useState(dayjs(date).month());
-  const [selectedYear, setSelectedYear] = useState(dayjs(date).year());
-  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCompany, setSelectedCompany] = useState("MacFit - Gebze");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
-
-  const currentYear = dayjs().year();
-  const yearOptions = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
-
-  const handleDateNavigation = (month: number, year: number) => {
-    const newDate = dayjs().year(year).month(month).startOf("month").toDate();
-    onNavigate("DATE", newDate);
-  };
 
   const handleModalToggle = (visible: boolean) => {
     setIsModalVisible(visible);
@@ -75,34 +52,6 @@ const Toolbar: React.FC<ToolbarProps> = ({
         (key) => views[key as keyof typeof views]
       ) as View[]);
 
-  const companyMenu = (
-    <Menu>
-      <Menu.Item key="search">
-        <Input
-          placeholder="Search Company"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </Menu.Item>
-      {[
-        "Tech Corp - New York",
-        "Eco Energy - San Francisco",
-        "Health Solutions - Los Angeles",
-      ]
-        .filter((company) =>
-          company.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-        .map((company, index) => (
-          <Menu.Item
-            key={index}
-            onClick={() => console.log(`Selected: ${company}`)}
-          >
-            {company}
-          </Menu.Item>
-        ))}
-    </Menu>
-  );
-
   return (
     <ToolbarContainer>
       <NavButtons>
@@ -115,44 +64,13 @@ const Toolbar: React.FC<ToolbarProps> = ({
         <ActionButton onClick={() => onNavigate("NEXT")}>
           <RightOutlined />
         </ActionButton>
-        <Dropdown
-          overlay={
-            <Menu>
-              <Menu.ItemGroup title="Select Month">
-                {Array.from({ length: 12 }, (_, i) => (
-                  <Menu.Item key={i} onClick={() => setSelectedMonth(i)}>
-                    {dayjs().month(i).format("MMMM")}
-                  </Menu.Item>
-                ))}
-              </Menu.ItemGroup>
-              <Menu.Divider />
-              <Menu.ItemGroup title="Select Year">
-                <Select
-                  value={selectedYear}
-                  onChange={(year) => setSelectedYear(year)}
-                >
-                  {yearOptions.map((year) => (
-                    <Select.Option key={year} value={year}>
-                      {year}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Menu.ItemGroup>
-            </Menu>
-          }
-        >
-          <TitleButton>{dayjs(date).format("MMMM YYYY")}</TitleButton>
-        </Dropdown>
+        <TitleButton>{dayjs(date).format("MMMM YYYY")}</TitleButton>
       </NavButtons>
 
-      <Dropdown overlay={companyMenu} trigger={["click"]}>
-        <CompanyDropdownButton>
-          MacFit - Gebze
-          <IconWrapper>
-            <IoIosArrowDown />
-          </IconWrapper>
-        </CompanyDropdownButton>
-      </Dropdown>
+      <CompanyDropdown
+        selectedCompany={selectedCompany}
+        onCompanySelect={(company) => setSelectedCompany(company)}
+      />
 
       <NavButtons>
         {viewArray.map((v: any) => (
