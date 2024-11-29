@@ -46,7 +46,8 @@ const TrainerList: React.FC = () => {
       )}
 
       {!hasMore && !loading && (
-        <LoadMoreContainer>No more results</LoadMoreContainer>
+        /*  <LoadMoreContainer></LoadMoreContainer> */
+        <></>
       )}
     </>
   );

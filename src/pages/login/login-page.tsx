@@ -324,8 +324,6 @@ const LoginPage: React.FC = () => {
       .login(values)
       .then((res) => {
         login(res.data);
-        message.success("Login successful");
-        navigate("/");
       })
       .catch((error) => {
         message.error("Login failed");

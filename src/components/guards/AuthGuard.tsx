@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "contexts/AuthProvider";
+import { message } from "antd";
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -17,11 +18,11 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children, requiredRoles }) => {
   useEffect(() => {
     const hasRequiredRole = user && requiredRoles.includes(user.role as any);
 
-    if (!isAuthenticated) {
+    /*  if (!isAuthenticated) {
       navigate("/login", { state: { from: location }, replace: true });
     } else if (!hasRequiredRole) {
       navigate("/unauthorized", { state: { from: location }, replace: true });
-    }
+    } */
 
     setLoading(false);
   }, [requiredRoles, location]);

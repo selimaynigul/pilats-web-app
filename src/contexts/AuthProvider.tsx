@@ -1,3 +1,4 @@
+import { message } from "antd";
 import React, {
   createContext,
   useContext,
@@ -7,10 +8,11 @@ import React, {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import { authService } from "services";
+
 interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
-  login: (token: string) => void;
+  login: (token: string /* , user: User */) => void;
   logout: () => void;
   hasRole: (role: string) => boolean;
 }
@@ -27,6 +29,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,24 +39,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (storedUser && storedToken) {
       setUser(JSON.parse(storedUser));
       setIsAuthenticated(true);
+    } else {
+      setIsAuthenticated(false);
     }
+    setLoading(false); // Authentication check complete
   }, []);
 
-  const login = (token: string) => {
+  const login = (token: string /*  user: User */) => {
     localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+    /*    setUser(user); */
     setUser({ role: "ADMIN" });
     setIsAuthenticated(true);
+    message.success("Login successful");
+    navigate("/");
   };
 
   const logout = () => {
-    authService.logout();
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setUser(null);
     setIsAuthenticated(false);
+    navigate("/login");
   };
 
   const hasRole = (role: string) => {
     return user?.role === role;
   };
+
+  if (loading) {
+    return <div>Loading...</div>; // Or a spinner/loading animation
+  }
 
   return (
     <AuthContext.Provider
