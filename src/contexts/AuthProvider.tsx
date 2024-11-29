@@ -1,4 +1,3 @@
-import { message } from "antd";
 import React, {
   createContext,
   useContext,
@@ -7,13 +6,12 @@ import React, {
   ReactNode,
 } from "react";
 import { useNavigate } from "react-router-dom";
-import { authService } from "services";
+import { message } from "antd";
 
 interface AuthContextType {
-  isAuthenticated: boolean;
   user: User | null;
-  login: (token: string /* , user: User */) => void;
-  logout: () => void;
+  login: (user: User) => void;
+  logout: (location: any) => void;
   hasRole: (role: string) => boolean;
 }
 
@@ -22,59 +20,47 @@ interface User {
   name?: string;
   email?: string;
   role?: string;
+  token?: string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
-    const storedToken = localStorage.getItem("token");
 
-    if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
-      setIsAuthenticated(true);
-    } else {
-      setIsAuthenticated(false);
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error("Failed to parse stored user:", error);
+        localStorage.removeItem("user");
+      }
     }
-    setLoading(false); // Authentication check complete
   }, []);
 
-  const login = (token: string /*  user: User */) => {
-    localStorage.setItem("token", token);
+  const login = (user: User) => {
     localStorage.setItem("user", JSON.stringify(user));
-    /*    setUser(user); */
-    setUser({ role: "ADMIN" });
-    setIsAuthenticated(true);
+    setUser(user);
     message.success("Login successful");
     navigate("/");
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+  const logout = (location: any) => {
+    localStorage.clear();
     setUser(null);
-    setIsAuthenticated(false);
-    navigate("/login");
+    navigate("/login", { state: { from: location }, replace: true });
   };
 
   const hasRole = (role: string) => {
     return user?.role === role;
   };
 
-  if (loading) {
-    return <div>Loading...</div>; // Or a spinner/loading animation
-  }
-
   return (
-    <AuthContext.Provider
-      value={{ isAuthenticated, user, login, logout, hasRole }}
-    >
+    <AuthContext.Provider value={{ user, login, logout, hasRole }}>
       {children}
     </AuthContext.Provider>
   );

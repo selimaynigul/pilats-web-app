@@ -12,7 +12,9 @@ const apiClient = axios.create({
 // Add a request interceptor to include the token in the headers
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    const storedUser = localStorage.getItem("user");
+    const token = storedUser ? JSON.parse(storedUser)?.token : null;
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -29,8 +31,6 @@ apiClient.interceptors.response.use(
   },
   (error) => {
     if (error.response && error.response.status === 403) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
       localStorage.clear();
       window.location.href = "/login";
     }

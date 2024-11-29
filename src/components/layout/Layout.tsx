@@ -48,8 +48,7 @@ const AppLayout: React.FC = () => {
   const { logout } = useAuth();
 
   const handleLogout = () => {
-    console.log("loogout");
-    logout();
+    logout(location);
   };
 
   const profileMenu = (

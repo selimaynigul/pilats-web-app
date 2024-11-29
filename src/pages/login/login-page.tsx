@@ -323,13 +323,22 @@ const LoginPage: React.FC = () => {
     authService
       .login(values)
       .then((res) => {
-        login(res.data);
+        console.log(res.data);
+        login({
+          token: res.data,
+          id: "1",
+          name: "Admin User",
+          email: "admin@example.com",
+          role: "ADMIN",
+        });
       })
       .catch((error) => {
         message.error("Login failed");
         console.log(error);
       });
-    /* 
+    setLoading(false);
+  };
+  /* 
     authService
       .adminRegister({ email: "selim@test.com", password: "1234" })
       .then(() => {
@@ -338,8 +347,6 @@ const LoginPage: React.FC = () => {
       .catch(() => {
         message.error("register failed");
       }); */
-    setLoading(false);
-  };
 
   return (
     <Wrapper>
