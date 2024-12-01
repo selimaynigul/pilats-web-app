@@ -36,6 +36,7 @@ export function usePagination<T>({
         } else {
           setItems((prev) => [...prev, ...newItems]);
         }
+        console.log(response.data);
       })
       .catch((error) => {
         console.error("Error fetching items:", error);

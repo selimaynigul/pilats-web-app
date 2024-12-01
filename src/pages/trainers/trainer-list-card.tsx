@@ -60,7 +60,7 @@ const ContactButton = styled.div`
   font-size: 14px;
 `;
 
-const TrainerInfo = styled.div`
+const CompanyInfo = styled.div`
   border: 1px solid white;
   /*   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 12px;
  */
@@ -88,7 +88,7 @@ const TrainerInfo = styled.div`
   }
 `;
 
-const TrainerPhoto = styled.div`
+const CompanyLogo = styled.div`
   background: grey;
   height: 40px;
   width: 40px;
@@ -98,11 +98,11 @@ const TrainerPhoto = styled.div`
   align-items: center;
   color: white;
 `;
-const TrainerName = styled.div`
+const CompanyName = styled.div`
   display: flex;
   flex-direction: column;
 `;
-const TrainerDetailButton = styled.div`
+const CompanyDetailButton = styled.div`
   background: transparent;
   height: 30px;
   width: 30px;
@@ -161,18 +161,18 @@ const TrainerCard: React.FC<{ trainer: any }> = ({ trainer }) => {
         </InfoItem>
       </InfoSection> */}
 
-        <TrainerInfo>
-          <TrainerPhoto>
+        <CompanyInfo>
+          <CompanyLogo>
             <UserOutlined style={{ fontSize: 20 }} />
-          </TrainerPhoto>
-          <TrainerName>
-            <strong>Ahmet Yiğit</strong>
-            <small> Uzman Yoga Eğitmeni</small>
-          </TrainerName>
-          <TrainerDetailButton>
+          </CompanyLogo>
+          <CompanyName>
+            <strong>{trainer.companyName}</strong>
+            <small>{trainer.branchName}</small>
+          </CompanyName>
+          <CompanyDetailButton>
             <ArrowRightOutlined />
-          </TrainerDetailButton>
-        </TrainerInfo>
+          </CompanyDetailButton>
+        </CompanyInfo>
         <ContactInfo>
           <Link
             to={`mailto:${trainer.ucGetResponse.name}`}

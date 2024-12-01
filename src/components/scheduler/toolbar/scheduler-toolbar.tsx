@@ -34,8 +34,8 @@ const Toolbar: React.FC<ToolbarProps> = ({
     form
       .validateFields()
       .then((values) => {
-        console.log("Class Data:", values);
-        handleModalToggle(false);
+        /*         console.log("Class Data:", values);
+         */ handleModalToggle(false);
       })
       .catch((info) => console.log("Validation Failed:", info));
   };

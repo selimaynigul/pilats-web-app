@@ -265,7 +265,6 @@ const TextContent = styled.div`
 
 const LoginPage: React.FC = () => {
   const handleFinish = (values: any) => {
-    console.log("Form Values:", values);
     handleLogin(values);
   };
 
@@ -323,18 +322,10 @@ const LoginPage: React.FC = () => {
     authService
       .login(values)
       .then((res) => {
-        console.log(res.data);
-        login({
-          token: res.data,
-          id: "1",
-          name: "Admin User",
-          email: "admin@example.com",
-          role: "ADMIN",
-        });
+        login(res.data);
       })
-      .catch((error) => {
+      .catch(() => {
         message.error("Login failed");
-        console.log(error);
       });
     setLoading(false);
   };
