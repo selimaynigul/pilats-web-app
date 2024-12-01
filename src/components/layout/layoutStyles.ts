@@ -25,26 +25,8 @@ export const StyledContent = styled(Content)<{ isMobile: boolean }>`
 
   overflow-y: scroll;
 
-  /* For WebKit browsers (Chrome, Safari) */
-  &::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
   &::-webkit-scrollbar-track {
-    background: #f0f0f0;
-    border-radius: 10px;
     margin: 24px 0;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: #888;
-    border-radius: 10px;
-    border: 2px solid #f0f0f0;
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background-color: #555;
   }
 `;
 

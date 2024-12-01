@@ -117,6 +117,29 @@ const GlobalStyle = createGlobalStyle`
  
 }
 
+
+/* For WebKit browsers (Chrome, Safari) */
+&::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+&::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 10px;
+ 
+}
+
+&::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 10px;
+  border: 2px solid #f0f0f0;
+}
+
+&::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+
 `;
 
 export default GlobalStyle;

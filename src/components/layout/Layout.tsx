@@ -65,8 +65,9 @@ const AppLayout: React.FC = () => {
     "/reports": "Reports",
   };
 
-  const pageTitle = pathTitles[location.pathname] || "Dashboard";
-
+  const pathSegments = location.pathname.split("/").filter(Boolean);
+  const basePath = `/${pathSegments[0] || ""}`;
+  const pageTitle = pathTitles[basePath] || "Dashboard";
   return (
     <Layout style={{ height: "100vh" }}>
       {!collapsed && isMobile && (

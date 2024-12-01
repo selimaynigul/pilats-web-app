@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Dropdown, Spin, InputRef } from "antd";
-import { useNavigate } from "react-router-dom";
+import { Dropdown, Spin, InputRef, Avatar } from "antd";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   SearchContainer,
   Search,
@@ -24,25 +24,36 @@ const SearchBar: React.FC<SearchBarProps> = ({
   searchActive,
   setSearchActive,
 }) => {
-  const [searchFocused, setSearchFocused] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("company");
   const [searchValue, setSearchValue] = useState("");
   const [results, setResults] = useState<any[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const inputRef = useRef<InputRef>(null);
+
+  useEffect(() => {
+    if (location.pathname.includes("users")) {
+      setSelectedCategory("users");
+    } else if (location.pathname.includes("trainers")) {
+      setSelectedCategory("trainers");
+    } else {
+      setSelectedCategory("companies");
+    }
+  }, [location.pathname]);
 
   const fetchResults = async () => {
     setLoading(true);
     try {
       let fetchedResults = [];
-      const inputPayload = { ucSearchRequest: { name: searchValue } };
 
-      if (selectedCategory === "company") {
+      if (selectedCategory === "companies") {
+        const inputPayload = {};
         const response = await companyService.getByPagination(inputPayload);
         fetchedResults = response.data || [];
-      } else if (selectedCategory === "trainer") {
+      } else if (selectedCategory === "trainers") {
+        const inputPayload = { ucSearchRequest: { name: searchValue } };
         const response = await trainerService.search(inputPayload);
         fetchedResults = response.data || [];
       }
@@ -57,6 +68,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   useEffect(() => {
     setResults([]);
+    if (dropdownOpen) inputRef.current?.focus();
   }, [selectedCategory]);
 
   const handleSearchIconClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -69,7 +81,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
     setDropdownOpen(false);
     setSearchValue("");
     setResults([]);
-    navigate(`/trainers/${id}`);
+    navigate(`/${selectedCategory}/${id}`);
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      fetchResults();
+    }
   };
 
   const renderResults = () => {
@@ -83,20 +101,25 @@ const SearchBar: React.FC<SearchBarProps> = ({
       );
     }
 
-    if (selectedCategory === "company") {
+    if (selectedCategory === "companies") {
       return results.map((company: any) => (
-        <ResultItem key={company.id}>
+        <ResultItem
+          key={company.id}
+          onClick={() => handleResultClick(company.id)}
+        >
+          <Avatar>{company.companyName[0].toUpperCase()}</Avatar>
           <div>
             <strong>{company.companyName}</strong>
           </div>
         </ResultItem>
       ));
-    } else if (selectedCategory === "trainer") {
+    } else if (selectedCategory === "trainers") {
       return results.map((trainer: any) => (
         <ResultItem
           key={trainer.id}
           onClick={() => handleResultClick(trainer.id)}
         >
+          <Avatar>{trainer.ucGetResponse?.name[0].toUpperCase()}</Avatar>
           <div>
             <strong>
               {trainer.ucGetResponse?.name} {trainer.ucGetResponse?.surname}
@@ -123,26 +146,30 @@ const SearchBar: React.FC<SearchBarProps> = ({
     <DropdownOverlay>
       <TransparentMenu>
         <CategoryItem
-          isSelected={selectedCategory === "company"}
-          onClick={() => setSelectedCategory("company")}
+          isSelected={selectedCategory === "companies"}
+          onClick={() => setSelectedCategory("companies")}
         >
           Company
         </CategoryItem>
         <CategoryItem
-          isSelected={selectedCategory === "trainer"}
-          onClick={() => setSelectedCategory("trainer")}
+          isSelected={selectedCategory === "trainers"}
+          onClick={() => setSelectedCategory("trainers")}
         >
           Trainer
         </CategoryItem>
         <CategoryItem
-          isSelected={selectedCategory === "user"}
-          onClick={() => setSelectedCategory("user")}
+          isSelected={selectedCategory === "users"}
+          onClick={() => setSelectedCategory("users")}
         >
           User
         </CategoryItem>
       </TransparentMenu>
       <div style={{ maxHeight: "300px", overflowY: "auto" }}>
-        {renderResults()}
+        {results.length > 0 ? (
+          renderResults()
+        ) : (
+          <div style={{ textAlign: "center", marginTop: 8 }}>Sonuç yok</div>
+        )}
       </div>
     </DropdownOverlay>
   );
@@ -166,8 +193,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
           focused={dropdownOpen}
-          onFocus={() => setSearchFocused(true)}
-          onBlur={() => setSearchFocused(false)}
+          onKeyDown={handleKeyDown}
         />
         <SearchIcon visible={dropdownOpen} onClick={handleSearchIconClick}>
           <SearchOutlined />
