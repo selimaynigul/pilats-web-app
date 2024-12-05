@@ -49,8 +49,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
       let fetchedResults = [];
 
       if (selectedCategory === "companies") {
-        const inputPayload = {};
-        const response = await companyService.getByPagination(inputPayload);
+        const inputPayload = { companyName: name };
+        const response = await companyService.search(inputPayload);
         fetchedResults = response.data || [];
       } else if (selectedCategory === "trainers") {
         const inputPayload = { ucSearchRequest: { name: name } };
@@ -67,7 +67,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   useEffect(() => {
-    setResults([]);
+    fetchResults(searchValue);
     if (dropdownOpen) inputRef.current?.focus();
   }, [selectedCategory]);
 

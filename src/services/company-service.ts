@@ -1,6 +1,8 @@
 import { apiClient } from "config";
 
 const companyService = {
+  search: (params = {}) => apiClient.post("/company/search", params),
+
   add: (params = {}) => apiClient.post("/company", params),
 
   update: (params = {}) => apiClient.put("/company", params),
