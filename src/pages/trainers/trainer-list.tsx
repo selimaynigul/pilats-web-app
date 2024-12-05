@@ -1,10 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import styled from "styled-components";
 import { Row, Col, Spin, Button } from "antd";
 import TrainerCard from "./trainer-list-card";
-import { Link } from "react-router-dom";
-import { trainerService } from "services";
 import { usePagination } from "hooks";
+import { trainerService } from "services";
 
 const LoadMoreContainer = styled.div`
   text-align: center;
@@ -13,9 +12,22 @@ const LoadMoreContainer = styled.div`
 
 interface TrainerListProps {
   onTrainerCountChange: (count: number) => void;
+  company: any;
 }
 
-const TrainerList: React.FC<TrainerListProps> = ({ onTrainerCountChange }) => {
+const TrainerList: React.FC<TrainerListProps> = ({
+  onTrainerCountChange,
+  company,
+}) => {
+  const params = useMemo(
+    () => ({
+      pageSize: 8,
+      sort: "DESC",
+      companyId: company?.id,
+    }),
+    [company?.id]
+  );
+
   const {
     items: trainers,
     loading,
@@ -23,8 +35,7 @@ const TrainerList: React.FC<TrainerListProps> = ({ onTrainerCountChange }) => {
     loadMore,
   } = usePagination({
     fetchService: trainerService.search,
-    pageSize: 8,
-    sort: "DESC",
+    params,
   });
 
   useEffect(() => {
@@ -37,8 +48,6 @@ const TrainerList: React.FC<TrainerListProps> = ({ onTrainerCountChange }) => {
         {trainers.map((trainer: any, index: number) => (
           <Col xs={24} sm={12} md={8} lg={6} key={index}>
             <TrainerCard trainer={trainer} />
-            {/*   <Link to={`/trainers/${trainer.id}`}>
-            </Link> */}
           </Col>
         ))}
       </Row>
@@ -53,10 +62,7 @@ const TrainerList: React.FC<TrainerListProps> = ({ onTrainerCountChange }) => {
         </LoadMoreContainer>
       )}
 
-      {!hasMore && !loading && (
-        /*  <LoadMoreContainer></LoadMoreContainer> */
-        <></>
-      )}
+      {!hasMore && !loading && <></>}
     </>
   );
 };

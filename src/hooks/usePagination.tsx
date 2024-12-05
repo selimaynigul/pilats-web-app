@@ -3,40 +3,41 @@ import { useState, useEffect } from "react";
 interface UsePaginationOptions<T> {
   fetchService: (params: any) => Promise<{ data: T[] }>;
   initialPage?: number;
-  pageSize?: number;
-  sort?: string;
+  params?: any;
 }
 
 export function usePagination<T>({
   fetchService,
   initialPage = 0,
-  pageSize = 8,
-  sort = "DESC",
+  params,
 }: UsePaginationOptions<T>) {
   const [items, setItems] = useState<T[]>([]);
   const [page, setPage] = useState(initialPage);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
-  const fetchItems = (pageToFetch: number) => {
+  const fetchItems = (pageToFetch: number, resetItems = false) => {
     setLoading(true);
 
     fetchService({
+      ...params,
       searchByPageDto: {
         pageNo: pageToFetch,
-        pageSize,
-        sort,
+        pageSize: params?.pageSize,
+        sort: params?.sort,
       },
     })
       .then((response) => {
         const newItems = response.data;
+        console.log(response.data);
 
-        if (newItems.length === 0) {
-          setHasMore(false);
+        if (resetItems) {
+          setItems(newItems);
         } else {
           setItems((prev) => [...prev, ...newItems]);
         }
-        console.log(response.data);
+
+        setHasMore(newItems.length > 0);
       })
       .catch((error) => {
         console.error("Error fetching items:", error);
@@ -53,8 +54,9 @@ export function usePagination<T>({
   };
 
   useEffect(() => {
-    fetchItems(page);
-  }, []);
+    setPage(initialPage);
+    fetchItems(initialPage, true);
+  }, [params]);
 
   return {
     items,

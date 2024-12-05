@@ -26,6 +26,14 @@ const StyledCard = styled(Card)`
   &:hover {
     box-shadow: 0px 8px 42px -5px rgba(93, 70, 229, 0.2);
   }
+
+  /* .ant-card-body {
+    display: none;
+  } */
+
+  .ant-card-meta-title {
+    margin-bottom: 0 !important;
+  }
 `;
 
 const Container = styled.div`
@@ -89,7 +97,7 @@ const CompanyInfo = styled.div`
 `;
 
 const CompanyLogo = styled.div`
-  background: grey;
+  background: #e6e3ff;
   height: 40px;
   width: 40px;
   border-radius: 10px;
@@ -137,9 +145,17 @@ const TrainerCard: React.FC<{ trainer: any }> = ({ trainer }) => {
             display: "flex",
             alignItems: "center",
             padding: 16,
+            paddingBottom: 0,
+            gap: 12,
           }}
         >
-          <Avatar size={60} src={trainer.avatarUrl} />
+          <Avatar
+            size={60}
+            src={trainer.avatarUrl}
+            style={{ background: "lightgrey" }}
+          >
+            {trainer.ucGetResponse.name[0].toUpperCase()}
+          </Avatar>
           <Meta
             title={
               trainer.ucGetResponse.name + " " + trainer.ucGetResponse.surname
@@ -150,17 +166,6 @@ const TrainerCard: React.FC<{ trainer: any }> = ({ trainer }) => {
       }
     >
       <Container>
-        {/*  <InfoSection>
-        <InfoItem>
-          <span>Department</span>
-          <strong>{trainer.ucGetResponse.gender}</strong>
-        </InfoItem>
-        <InfoItem>
-          <span>Hired Date</span>
-          <strong>{trainer.ucGetResponse.birthdate}</strong>
-        </InfoItem>
-      </InfoSection> */}
-
         <CompanyInfo>
           <CompanyLogo>
             <UserOutlined style={{ fontSize: 20 }} />

@@ -41,11 +41,12 @@ const CountNumber = styled.span`
   color: ${({ theme }) => theme.primary}; /* Primary color for the number */
 `;
 
-const TrainersToolbar: React.FC<{ trainerCount: number }> = ({
-  trainerCount,
-}) => {
+const TrainersToolbar: React.FC<{
+  trainerCount: number;
+  selectedCompany: any;
+  setSelectedCompany: any;
+}> = ({ trainerCount, selectedCompany, setSelectedCompany }) => {
   const [isModalVisible, setIsModalVisible] = React.useState(false);
-  const [selectedCompany, setSelectedCompany] = useState("MacFit - Gebze");
 
   const handleAddTrainer = (values: any) => {
     trainerService

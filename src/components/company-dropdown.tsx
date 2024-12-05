@@ -1,7 +1,8 @@
-import React, { useState } from "react";
-import { Dropdown, Input, Menu } from "antd";
+import React, { useState, useEffect, useCallback } from "react";
+import { Dropdown, Input, Menu, Spin } from "antd";
 import styled from "styled-components";
 import { IoIosArrowDown } from "react-icons/io";
+import { companyService } from "services";
 
 const CompanyDropdownButton = styled.button`
   position: relative;
@@ -41,15 +42,8 @@ const IconWrapper = styled.div`
   }
 `;
 
-const companies = [
-  "Tech Corp - New York",
-  "Eco Energy - San Francisco",
-  "Health Solutions - Los Angeles",
-  "MacFit - Gebze",
-];
-
 interface CompanyDropdownProps {
-  selectedCompany: string;
+  selectedCompany: any;
   onCompanySelect: (company: string) => void;
 }
 
@@ -58,10 +52,29 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
   onCompanySelect,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [companies, setCompanies] = useState<any>([]);
 
-  const filteredCompanies = companies.filter((company) =>
-    company.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const fetchCompanies = useCallback(async (query: string) => {
+    if (!query) {
+      setCompanies([]);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await companyService.search({ companyName: query });
+      setCompanies(response.data || []);
+    } catch (error) {
+      console.error("Error fetching companies:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCompanies(searchQuery);
+  }, [searchQuery]);
 
   const companyMenu = (
     <Menu>
@@ -70,25 +83,34 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
           placeholder="Search Company"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
+          onClick={(e) => e?.stopPropagation()}
         />
       </Menu.Item>
-      {filteredCompanies.map((company, index) => (
-        <Menu.Item
-          key={index}
-          onClick={() => {
-            onCompanySelect(company);
-          }}
-        >
-          {company}
+      {loading ? (
+        <Menu.Item key="loading" disabled>
+          <Spin size="small" /> Loading...
         </Menu.Item>
-      ))}
+      ) : companies.length > 0 ? (
+        companies.map((company: any, index: number) => (
+          <Menu.Item
+            key={company.id || index}
+            onClick={() => onCompanySelect(company)}
+          >
+            {company.companyName}
+          </Menu.Item>
+        ))
+      ) : (
+        <Menu.Item key="no-results" disabled>
+          No companies found
+        </Menu.Item>
+      )}
     </Menu>
   );
 
   return (
     <Dropdown overlay={companyMenu} trigger={["click"]}>
       <CompanyDropdownButton>
-        {selectedCompany}
+        {selectedCompany.companyName || "Select Company"}
         <IconWrapper>
           <IoIosArrowDown />
         </IconWrapper>
