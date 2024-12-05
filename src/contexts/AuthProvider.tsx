@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import { message } from "antd";
+import { branchAdminService, companyAdminService } from "services";
 
 interface AuthContextType {
   user: User | null;
@@ -26,7 +27,7 @@ interface User {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<any>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -42,11 +43,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const login = (user: User) => {
+  const login = (user: any) => {
     localStorage.setItem("user", JSON.stringify(user));
+
+    /*  const role = user.role;
+    if (role === "ADMIN") {
+    } else if (role === "COMPANY_ADMIN") {
+      companyAdminService
+        .getById(user.userId)
+        .then((res) => {})
+        .catch((err) => {});
+    } else if (role === "BRANCH_ADMIN") {
+      branchAdminService
+        .getById(user.userId)
+        .then((res) => {})
+        .catch((err) => {});
+    } */
+
     setUser(user);
     message.success("Login successful");
-    navigate("/");
+    navigate("/trainers");
   };
 
   const logout = (location: any) => {

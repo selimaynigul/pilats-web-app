@@ -20,6 +20,7 @@ const AppLayout: React.FC = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [searchActive, setSearchActive] = useState(false);
 
+  const { user } = useAuth();
   const location = useLocation();
 
   useEffect(() => {

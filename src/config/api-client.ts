@@ -25,7 +25,7 @@ apiClient.interceptors.request.use(
 );
 
 // Add a response interceptor to handle token-related errors
-apiClient.interceptors.response.use(
+/* apiClient.interceptors.response.use(
   (response) => {
     return response;
   },
@@ -38,5 +38,5 @@ apiClient.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
+ */
 export default apiClient;

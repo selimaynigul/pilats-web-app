@@ -9,7 +9,7 @@ const companyAdminService = {
 
   delete: (id: any) => apiClient.delete(`/companyAdmin/${id}`),
 
-  getById: (id: any) => apiClient.get(`/companyAdmin/${id}`),
+  getById: (id: any) => apiClient.get(`/companyAdmin/userid/${id}`),
 };
 
 export default companyAdminService;

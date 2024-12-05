@@ -43,7 +43,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
   }, [location.pathname]);
 
-  const fetchResults = async () => {
+  const fetchResults = async (name: string) => {
     setLoading(true);
     try {
       let fetchedResults = [];
@@ -53,7 +53,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         const response = await companyService.getByPagination(inputPayload);
         fetchedResults = response.data || [];
       } else if (selectedCategory === "trainers") {
-        const inputPayload = { ucSearchRequest: { name: searchValue } };
+        const inputPayload = { ucSearchRequest: { name: name } };
         const response = await trainerService.search(inputPayload);
         fetchedResults = response.data || [];
       }
@@ -74,7 +74,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const handleSearchIconClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     inputRef.current?.focus();
-    fetchResults();
+    fetchResults(searchValue);
   };
 
   const handleResultClick = (id: string) => {
@@ -86,7 +86,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
-      fetchResults();
+      fetchResults(searchValue);
     }
   };
 
@@ -165,7 +165,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
         </CategoryItem>
       </TransparentMenu>
       <div style={{ maxHeight: "300px", overflowY: "auto" }}>
-        {results.length > 0 ? (
+        {searchValue.length === 0 ? (
+          /*  <div style={{ textAlign: "center", marginTop: 8 }}>
+            Aramak yapmak için bir şeyler yazın
+          </div> */ <></>
+        ) : results.length > 0 ? (
           renderResults()
         ) : (
           <div style={{ textAlign: "center", marginTop: 8 }}>Sonuç yok</div>
@@ -191,7 +195,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
           ref={inputRef}
           placeholder="Search something"
           value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
+          onChange={(e) => {
+            setSearchValue(e.target.value);
+            fetchResults(e.target.value);
+          }}
           focused={dropdownOpen}
           onKeyDown={handleKeyDown}
         />
