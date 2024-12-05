@@ -67,8 +67,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   useEffect(() => {
-    fetchResults(searchValue);
-    if (dropdownOpen) inputRef.current?.focus();
+    if (dropdownOpen) {
+      fetchResults(searchValue);
+      inputRef.current?.focus();
+    }
   }, [selectedCategory]);
 
   const handleSearchIconClick = (e: React.MouseEvent<HTMLDivElement>) => {
