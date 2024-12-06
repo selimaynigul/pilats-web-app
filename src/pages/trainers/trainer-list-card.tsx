@@ -86,13 +86,14 @@ const CompanyInfo = styled.div`
 
   gap: 10px;
   cursor: pointer;
+  transition: 0.2s;
 
   &:hover {
     div:nth-of-type(3) {
       opacity: 1;
     }
 
-    box-shadow: rgba(149, 157, 165, 0.4) 0px 8px 24px;
+    box-shadow: 0px 8px 42px -5px rgba(93, 70, 229, 0.2);
   }
 `;
 
@@ -109,6 +110,13 @@ const CompanyLogo = styled.div`
 const CompanyName = styled.div`
   display: flex;
   flex-direction: column;
+
+  strong {
+    color: black;
+  }
+  small {
+    color: gray;
+  }
 `;
 const CompanyDetailButton = styled.div`
   background: transparent;
@@ -140,44 +148,48 @@ const TrainerCard: React.FC<{ trainer: any }> = ({ trainer }) => {
   return (
     <StyledCard
       cover={
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            padding: 16,
-            paddingBottom: 0,
-            gap: 12,
-          }}
-        >
-          <Avatar
-            size={60}
-            src={trainer.avatarUrl}
-            style={{ background: "lightgrey" }}
+        <Link to={`/trainers/${trainer.id}`}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              padding: 16,
+              paddingBottom: 0,
+              gap: 12,
+            }}
           >
-            {trainer.ucGetResponse.name[0].toUpperCase()}
-          </Avatar>
-          <Meta
-            title={
-              trainer.ucGetResponse.name + " " + trainer.ucGetResponse.surname
-            }
-            description="Yoga Trainer"
-          />
-        </div>
+            <Avatar
+              size={60}
+              src={trainer.avatarUrl}
+              style={{ background: "lightgrey" }}
+            >
+              {trainer.ucGetResponse.name[0].toUpperCase()}
+            </Avatar>
+            <Meta
+              title={
+                trainer.ucGetResponse.name + " " + trainer.ucGetResponse.surname
+              }
+              description="Yoga Trainer"
+            />
+          </div>
+        </Link>
       }
     >
       <Container>
-        <CompanyInfo>
-          <CompanyLogo>
-            <UserOutlined style={{ fontSize: 20 }} />
-          </CompanyLogo>
-          <CompanyName>
-            <strong>{trainer.companyName}</strong>
-            <small>{trainer.branchName}</small>
-          </CompanyName>
-          <CompanyDetailButton>
-            <ArrowRightOutlined />
-          </CompanyDetailButton>
-        </CompanyInfo>
+        <Link to={`/companies/${trainer.companyId}`}>
+          <CompanyInfo>
+            <CompanyLogo>
+              <UserOutlined style={{ fontSize: 20 }} />
+            </CompanyLogo>
+            <CompanyName>
+              <strong>{trainer.companyName}</strong>
+              <small>{trainer.branchName}</small>
+            </CompanyName>
+            <CompanyDetailButton>
+              <ArrowRightOutlined />
+            </CompanyDetailButton>
+          </CompanyInfo>
+        </Link>
         <ContactInfo>
           <Link
             to={`mailto:${trainer.ucGetResponse.name}`}

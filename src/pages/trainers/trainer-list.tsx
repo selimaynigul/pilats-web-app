@@ -4,6 +4,7 @@ import { Row, Col, Spin, Button } from "antd";
 import TrainerCard from "./trainer-list-card";
 import { usePagination } from "hooks";
 import { trainerService } from "services";
+import { Link } from "react-router-dom";
 
 const LoadMoreContainer = styled.div`
   text-align: center;

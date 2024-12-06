@@ -6,6 +6,7 @@ import { trainerService } from "services";
 import { handleError } from "utils/apiHelpers";
 import { message } from "antd";
 import { CompanyDropdown } from "components";
+import moment from "moment";
 
 const ToolbarContainer = styled.div`
   display: flex;
@@ -49,26 +50,36 @@ const TrainersToolbar: React.FC<{
   const [isModalVisible, setIsModalVisible] = React.useState(false);
 
   const handleAddTrainer = (values: any) => {
+    const payload = {
+      uaRegisterRequest: {
+        email: values.email,
+        password: "1234",
+        // role: "USER_ROLE", // Replace with a valid RoleEnum value if required
+      },
+      ucRegisterRequest: {
+        name: values.name,
+        surname: values.surname,
+        /*  birthdate: values.birthdate
+          ? moment(values.birthdate).format("YYYY-MM-DD") 
+          : null, */
+        gender: values.gender.toUpperCase(),
+        telNo1: values.phoneNumber,
+      },
+      branchId: parseInt(values.branch, 10), // Ensure this is a valid integer
+      /*       jobId: values.jobId || null, // If jobId is optional, send null when not provided
+       */
+    };
+
     trainerService
-      .register({
-        uaRegisterRequest: {
-          email: "aynigulselim@gmail.com",
-          password: "1234",
-        },
-        ucRegisterRequest: {
-          name: values.name,
-          surname: values.surname,
-          birthdate: values.birthdate,
-          gender: values.gender,
-          telNo1: values.phoneNumber,
-        },
-        branchId: 1,
-      })
+      .register(payload)
       .then(() => {
         message.success("Trainer is added");
         setIsModalVisible(false);
       })
-      .catch((err) => handleError(err));
+      .catch((err) => {
+        console.error("Error adding trainer:", err);
+        handleError(err);
+      });
   };
 
   return (

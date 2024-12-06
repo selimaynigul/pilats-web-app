@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { Form, Input, DatePicker, Select, Button, Modal } from "antd";
 import { addTrainerFormItems } from "./add-trainer-form-items";
+import { companyService, branchService } from "services";
 
 interface AddTrainerFormProps {
   visible: boolean;
@@ -14,13 +15,43 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
   onSubmit,
 }) => {
   const [form] = Form.useForm();
+  const [companies, setCompanies] = useState([]);
+  const [branches, setBranches] = useState([]);
+  const [companySearchLoading, setCompanySearchLoading] = useState(false);
+  const [branchLoading, setBranchLoading] = useState(false);
+
+  const handleCompanySearch = async (value: string) => {
+    if (!value) return;
+    setCompanySearchLoading(true);
+    try {
+      const res = await companyService.search({ companyName: value });
+      setCompanies(res.data);
+    } catch (error) {
+      console.error("Error fetching companies:", error);
+    } finally {
+      setCompanySearchLoading(false);
+    }
+  };
+
+  const handleCompanySelect = async (companyId: string) => {
+    setBranchLoading(true);
+    try {
+      const res = await branchService.getByPagination({ companyId });
+      setBranches(res.data);
+    } catch (error) {
+      console.error("Error fetching branches:", error);
+    } finally {
+      setBranchLoading(false);
+    }
+  };
 
   const handleSubmit = () => {
     form
       .validateFields()
       .then((values) => {
+        console.log("vasdasdg: ", values);
         onSubmit(values);
-        form.resetFields(); // Reset form after successful submission
+        form.resetFields();
       })
       .catch((info) => {
         console.error("Validation Failed:", info);
@@ -35,42 +66,60 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
       footer={null}
     >
       <Form form={form} layout="vertical" onFinish={handleSubmit}>
-        <Form.Item {...addTrainerFormItems.name}>
+        <Form.Item {...addTrainerFormItems.name} name="name">
           <Input placeholder="Enter trainer's name" />
         </Form.Item>
-        <Form.Item {...addTrainerFormItems.surname}>
+        <Form.Item {...addTrainerFormItems.surname} name="surname">
           <Input placeholder="Enter trainer's surname" />
         </Form.Item>
-        <Form.Item {...addTrainerFormItems.title}>
+        <Form.Item {...addTrainerFormItems.title} name="title">
           <Input placeholder="Enter trainer's title" />
         </Form.Item>
-        <Form.Item {...addTrainerFormItems.company}>
-          <Select placeholder="Select company">
-            <Select.Option value="company1">Company 1</Select.Option>
-            <Select.Option value="company2">Company 2</Select.Option>
+        <Form.Item {...addTrainerFormItems.company} name="company">
+          <Select
+            showSearch
+            placeholder="Search and select company"
+            filterOption={false}
+            onSearch={handleCompanySearch}
+            onSelect={handleCompanySelect}
+            loading={companySearchLoading}
+          >
+            {companies.map((company: any) => (
+              <Select.Option key={company.id} value={company.id}>
+                {company.companyName}
+              </Select.Option>
+            ))}
           </Select>
         </Form.Item>
-        <Form.Item {...addTrainerFormItems.branch}>
-          <Select placeholder="Select branch">
-            <Select.Option value="branch1">Branch 1</Select.Option>
-            <Select.Option value="branch2">Branch 2</Select.Option>
+        <Form.Item {...addTrainerFormItems.branch} name="branch">
+          <Select
+            placeholder="Select branch"
+            loading={branchLoading}
+            disabled={!branches.length}
+          >
+            {branches.map((branch: any) => (
+              <Select.Option key={branch.id} value={branch.id}>
+                {branch.branchName}
+              </Select.Option>
+            ))}
           </Select>
         </Form.Item>
-        <Form.Item {...addTrainerFormItems.birthdate}>
+        <Form.Item {...addTrainerFormItems.birthdate} name="birthdate">
           <DatePicker style={{ width: "100%" }} />
         </Form.Item>
-        <Form.Item {...addTrainerFormItems.gender}>
+        <Form.Item {...addTrainerFormItems.gender} name="gender">
           <Select placeholder="Select gender">
-            <Select.Option value="male">Male</Select.Option>
-            <Select.Option value="female">Female</Select.Option>
+            <Select.Option value="male">MALE</Select.Option>
+            <Select.Option value="female">FEMALE</Select.Option>
           </Select>
         </Form.Item>
-        <Form.Item {...addTrainerFormItems.email}>
+        <Form.Item {...addTrainerFormItems.email} name="email">
           <Input placeholder="Enter email address" />
         </Form.Item>
-        <Form.Item {...addTrainerFormItems.phoneNumber}>
+        <Form.Item {...addTrainerFormItems.phoneNumber} name="phoneNumber">
           <Input placeholder="Enter phone number" />
         </Form.Item>
+
         <Form.Item>
           <Button type="primary" htmlType="submit">
             Submit
