@@ -7,7 +7,7 @@ const trainerService = {
 
   register: (params = {}) => apiClient.post("/trainer", params),
 
-  update: (id: any, data: any) => apiClient.put(`/trainer/${id}`, data),
+  update: (data: any) => apiClient.put("/trainer", data),
 
   delete: (id: any) => apiClient.delete(`/trainer/${id}`),
 };

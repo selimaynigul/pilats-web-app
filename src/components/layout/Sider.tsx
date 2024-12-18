@@ -102,7 +102,7 @@ const Sidebar: React.FC<SiderProps> = ({
   };
 
   const menuItems = [
-    { key: "companies", icon: <BsFillHouseDoorFill />, label: "Şirketim" },
+    { key: "companies", icon: <BsFillHouseDoorFill />, label: "Şirketler" },
     { key: "classes", icon: <BsFillCalendarRangeFill />, label: "Dersler" },
     { key: "trainers", icon: <BsFillPeopleFill />, label: "Eğitmenler" },
     { key: "users", icon: <BsFillPersonFill />, label: "Kullanıcılar" },

@@ -1,14 +1,33 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Avatar, Spin } from "antd";
-import { Link, useParams } from "react-router-dom";
-import { BsEnvelopeFill, BsWhatsapp } from "react-icons/bs";
+import {
+  Avatar,
+  Spin,
+  Modal,
+  Form,
+  Input,
+  Select,
+  DatePicker,
+  Button,
+  message,
+} from "antd";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import {
+  BsBuilding,
+  BsEnvelopeFill,
+  BsWhatsapp,
+  BsPencil,
+  BsTrash,
+} from "react-icons/bs";
 import {
   ArrowRightOutlined,
+  DeleteOutlined,
+  EditFilled,
   PhoneFilled,
   UserOutlined,
 } from "@ant-design/icons";
 import { trainerService } from "services";
+import moment from "moment";
 
 const Container = styled.div`
   background: white;
@@ -18,8 +37,27 @@ const Container = styled.div`
   justify-content: center;
   flex-direction: column;
   padding: 48px 24px;
+  position: relative;
 `;
 
+const ActionButtons = styled.div`
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  gap: 8px;
+
+  button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 16px;
+
+    &:hover {
+      color: ${({ theme }) => theme.primary};
+    }
+  }
+`;
 const ProfileSection = styled.div`
   text-align: center;
   max-height: 45%;
@@ -139,10 +177,43 @@ const CompanyDetailButton = styled.div`
   color: gray;
 `;
 
+const EditButton = styled(Button)`
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid white;
+  width: 36px;
+  height: 36px;
+  color: grey;
+  box-shadow: none;
+  &:hover {
+    background: transparent !important;
+    color: grey !important;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 12px;
+  }
+`;
+
+const DeleteButton = styled(Button)`
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid #f54263;
+  width: 36px;
+  height: 36px;
+  color: #f54263;
+  box-shadow: none;
+  &:hover {
+    background: #f54263 !important;
+    color: white !important;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 12px;
+  }
+`;
+
 const TrainerInfo: React.FC = () => {
-  const { id } = useParams<{ id: string }>(); // Extract trainer ID from URL
+  const { id } = useParams<{ id: string }>();
   const [trainer, setTrainer] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [form] = Form.useForm();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTrainer = async () => {
@@ -160,6 +231,61 @@ const TrainerInfo: React.FC = () => {
 
     fetchTrainer();
   }, [id]);
+
+  const handleEdit = () => {
+    form.setFieldsValue({
+      ...trainer.ucGetResponse,
+      birthdate: moment(trainer.ucGetResponse.birthdate),
+    });
+    setIsEditModalVisible(true);
+  };
+
+  const handleEditSubmit = (values: any) => {
+    console.log(values);
+    const payload = {
+      id: trainer.id,
+      ucUpdateRequest: {
+        ...values,
+        birthdate: values.birthdate.format("YYYY-MM-DD"),
+      },
+    };
+
+    window.location.reload();
+
+    trainerService
+      .update(payload)
+      .then(() => {
+        message.success("Trainer updated successfully");
+        setIsEditModalVisible(false);
+        form.resetFields();
+      })
+      .catch((error) => {
+        console.error("Error updating trainer:", error);
+        message.error("Failed to update trainer");
+      });
+  };
+
+  const handleDelete = () => {
+    Modal.confirm({
+      title: "Are you sure?",
+      content: "This action will permanently delete the trainer.",
+      okText: "Delete",
+      okType: "danger",
+      cancelText: "Cancel",
+      onOk: () => {
+        trainerService
+          .delete(trainer.id)
+          .then(() => {
+            message.success("Trainer deleted successfully");
+            navigate("/trainers");
+          })
+          .catch((error) => {
+            console.error("Error deleting trainer:", error);
+            message.error("Failed to delete trainer");
+          });
+      },
+    });
+  };
 
   if (loading) {
     return (
@@ -185,6 +311,15 @@ const TrainerInfo: React.FC = () => {
 
   return (
     <Container>
+      <ActionButtons>
+        <EditButton onClick={handleEdit} type="primary">
+          <EditFilled />
+        </EditButton>
+        <DeleteButton onClick={handleDelete} type="primary">
+          <DeleteOutlined />
+        </DeleteButton>
+      </ActionButtons>
+
       <ProfileSection>
         <Avatar
           size={150}
@@ -201,7 +336,7 @@ const TrainerInfo: React.FC = () => {
       <Link to={`/companies/${trainer.companyId}`}>
         <CompanyInfo>
           <CompanyLogo>
-            <UserOutlined style={{ fontSize: 20 }} />
+            <BsBuilding style={{ fontSize: 20 }} />
           </CompanyLogo>
           <CompanyName>
             <strong>{trainer.companyName}</strong>
@@ -221,7 +356,8 @@ const TrainerInfo: React.FC = () => {
           <span>Phone:</span> {trainer.ucGetResponse.telNo1}
         </InfoItem>
         <InfoItem>
-          <span>Birthdate:</span> {trainer.ucGetResponse.birthdate}
+          <span>Birthdate:</span>{" "}
+          {moment(trainer.ucGetResponse.birthdate).format("DD MMMM YYYY")}
         </InfoItem>
       </InfoSection>
       <ContactInfo>
@@ -246,6 +382,58 @@ const TrainerInfo: React.FC = () => {
           </ContactButton>
         </a>
       </ContactInfo>
+
+      <Modal
+        title="Edit Trainer"
+        visible={isEditModalVisible}
+        onCancel={() => setIsEditModalVisible(false)}
+        onOk={() => {
+          form.validateFields().then(handleEditSubmit).catch(console.error);
+        }}
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item
+            name="name"
+            label="Name"
+            rules={[{ required: true, message: "Please enter the name" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="surname"
+            label="Surname"
+            rules={[{ required: true, message: "Please enter the surname" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="birthdate"
+            label="Birthdate"
+            rules={[{ required: true, message: "Please select the birthdate" }]}
+          >
+            <DatePicker style={{ width: "100%" }} />
+          </Form.Item>
+          <Form.Item
+            name="telNo1"
+            label="Phone Number"
+            rules={[
+              { required: true, message: "Please enter the phone number" },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="gender"
+            label="Gender"
+            rules={[{ required: true, message: "Please select the gender" }]}
+          >
+            <Select>
+              <Select.Option value="MALE">Male</Select.Option>
+              <Select.Option value="FEMALE">Female</Select.Option>
+            </Select>
+          </Form.Item>
+        </Form>
+      </Modal>
     </Container>
   );
 };

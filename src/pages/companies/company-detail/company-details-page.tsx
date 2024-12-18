@@ -1,21 +1,34 @@
-import React from "react";
+import React, { useState } from "react";
 import { Row, Col } from "antd";
-
+import CompanyInfo from "./company-info/company-info-card";
+import CompanyBranchList from "./company-branches/company-branches-list";
 import styled from "styled-components";
+import { branchService } from "services";
 
 const Container = styled.div`
   height: 100%;
 `;
 
 const CompanyDetailsPage: React.FC = () => {
+  const [branches, setBranches] = useState<any[]>([]);
+
+  const refreshBranches = () => {
+    window.location.reload();
+  };
+
   return (
     <Container>
       <Row gutter={[16, 16]} style={{ height: "100%" }}>
         <Col xs={24} sm={24} md={8}>
-          company detail page
+          <CompanyInfo setBranches={setBranches} />
         </Col>
 
-        <Col xs={24} sm={24} md={16}></Col>
+        <Col xs={24} sm={24} md={16}>
+          <CompanyBranchList
+            branches={branches}
+            onBranchUpdate={refreshBranches}
+          />
+        </Col>
       </Row>
     </Container>
   );

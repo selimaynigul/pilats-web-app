@@ -59,9 +59,9 @@ const TrainersToolbar: React.FC<{
       ucRegisterRequest: {
         name: values.name,
         surname: values.surname,
-        /*  birthdate: values.birthdate
-          ? moment(values.birthdate).format("YYYY-MM-DD") 
-          : null, */
+        birthdate: values.birthdate
+          ? moment(values.birthdate).format("YYYY-MM-DD")
+          : null,
         gender: values.gender.toUpperCase(),
         telNo1: values.phoneNumber,
       },
@@ -75,6 +75,7 @@ const TrainersToolbar: React.FC<{
       .then(() => {
         message.success("Trainer is added");
         setIsModalVisible(false);
+        window.location.reload();
       })
       .catch((err) => {
         console.error("Error adding trainer:", err);

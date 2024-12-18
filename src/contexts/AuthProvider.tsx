@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     setUser(user);
     message.success("Login successful");
-    navigate("/trainers");
+    navigate("/");
   };
 
   const logout = (location: any) => {

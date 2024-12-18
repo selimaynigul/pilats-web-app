@@ -57,9 +57,7 @@ const TrainerList: React.FC<TrainerListProps> = ({
 
       {!loading && hasMore && (
         <LoadMoreContainer>
-          <Button type="primary" onClick={loadMore}>
-            Load More
-          </Button>
+          <Button onClick={loadMore}>Load More</Button>
         </LoadMoreContainer>
       )}
 
