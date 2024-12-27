@@ -49,7 +49,6 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
     form
       .validateFields()
       .then((values) => {
-        console.log("vasdasdg: ", values);
         onSubmit(values);
         form.resetFields();
       })

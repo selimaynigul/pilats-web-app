@@ -42,11 +42,11 @@ const CountNumber = styled.span`
   color: ${({ theme }) => theme.primary}; /* Primary color for the number */
 `;
 
-const TrainersToolbar: React.FC<{
-  trainerCount: number;
+const UsersToolbar: React.FC<{
+  userCount: number;
   selectedCompany: any;
   setSelectedCompany: any;
-}> = ({ trainerCount, selectedCompany, setSelectedCompany }) => {
+}> = ({ userCount, selectedCompany, setSelectedCompany }) => {
   const [isModalVisible, setIsModalVisible] = React.useState(false);
 
   const handleAddTrainer = (values: any) => {
@@ -86,7 +86,7 @@ const TrainersToolbar: React.FC<{
   return (
     <ToolbarContainer>
       <CountContainer>
-        <CountNumber>{trainerCount}</CountNumber> trainers listed
+        <CountNumber>{userCount}</CountNumber> trainers listed
       </CountContainer>
       <ActionContainer>
         <CompanyDropdown
@@ -104,4 +104,4 @@ const TrainersToolbar: React.FC<{
   );
 };
 
-export default TrainersToolbar;
+export default UsersToolbar;

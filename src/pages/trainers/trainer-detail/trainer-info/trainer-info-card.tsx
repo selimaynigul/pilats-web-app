@@ -274,8 +274,6 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
   };
 
   const handleEditSubmit = (values: any) => {
-    console.log("values", values);
-    console.log("trainer", trainer);
     const payload = {
       id: trainer.id,
       isActive: values.active, // Checkbox state for active status

@@ -132,36 +132,13 @@ const CompanyDetailButton = styled.div`
   color: gray;
 `;
 
-const Overlay = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: ${({ theme }) => theme.contentBg};
-  opacity: 0.5;
-  z-index: 2;
-  border-radius: 20px;
-  pointer-events: none;
-`;
-
-interface Trainer {
-  name: string;
-  title: string;
-  department: string;
-  hiredDate: string;
-  email: string;
-  phone: string;
-  avatarUrl?: string;
-}
-
-const TrainerCard: React.FC<{ trainer: any }> = ({ trainer }) => {
+const UserCard: React.FC<{ user: any }> = ({ user }) => {
   const whatsappLink = `https://wa.me/+905077845678`;
 
   return (
     <StyledCard
       cover={
-        <Link to={`/trainers/${trainer.id}`}>
+        <Link to={`/users/${user.id}`}>
           <div
             style={{
               display: "flex",
@@ -173,32 +150,28 @@ const TrainerCard: React.FC<{ trainer: any }> = ({ trainer }) => {
           >
             <Avatar
               size={60}
-              src={trainer.avatarUrl}
+              src={user.avatarUrl}
               style={{ background: "lightgrey" }}
             >
-              {trainer.ucGetResponse.name[0].toUpperCase()}
+              {user.ucGetResponse.name[0].toUpperCase()}
             </Avatar>
             <Meta
-              title={
-                trainer.ucGetResponse.name + " " + trainer.ucGetResponse.surname
-              }
-              description="Yoga Trainer"
+              title={user.ucGetResponse.name + " " + user.ucGetResponse.surname}
+              description="Yoga user"
             />
           </div>
         </Link>
       }
     >
-      {!trainer.active && <Overlay />}
-
       <Container>
-        <Link to={`/companies/${trainer.companyId}`}>
+        <Link to={`/companies/${user.companyId}`}>
           <CompanyInfo>
             <CompanyLogo>
               <UserOutlined style={{ fontSize: 20 }} />
             </CompanyLogo>
             <CompanyName>
-              <strong>{trainer.companyName}</strong>
-              <small>{trainer.branchName}</small>
+              <strong>{user.companyName}</strong>
+              <small>{user.branchName}</small>
             </CompanyName>
             <CompanyDetailButton>
               <ArrowRightOutlined />
@@ -207,7 +180,7 @@ const TrainerCard: React.FC<{ trainer: any }> = ({ trainer }) => {
         </Link>
         <ContactInfo>
           <Link
-            to={`mailto:${trainer.ucGetResponse.name}`}
+            to={`mailto:${user.ucGetResponse.name}`}
             style={{ color: "#4a4a4a" }}
           >
             <ContactButton>
@@ -215,7 +188,7 @@ const TrainerCard: React.FC<{ trainer: any }> = ({ trainer }) => {
             </ContactButton>
           </Link>
           <Link
-            to={`mailto:${trainer.ucGetResponse.name}`}
+            to={`mailto:${user.ucGetResponse.name}`}
             style={{ color: "#4a4a4a" }}
           >
             <ContactButton>
@@ -239,4 +212,4 @@ const TrainerCard: React.FC<{ trainer: any }> = ({ trainer }) => {
   );
 };
 
-export default TrainerCard;
+export default UserCard;

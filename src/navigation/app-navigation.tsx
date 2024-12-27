@@ -10,6 +10,7 @@ import {
   TrainersPage,
   TrainerDetailsPage,
   PackagesPage,
+  UserDetailsPage,
 } from "pages";
 import AppLayout from "components/layout/Layout";
 import AuthGuard from "components/guards/AuthGuard";
@@ -52,6 +53,17 @@ const AppNavigation = () => {
           element={
             <AuthGuard requiredRoles={["ADMIN"]}>
               <UsersPage />
+            </AuthGuard>
+          }
+        />
+
+        <Route
+          path="/users/:id"
+          element={
+            <AuthGuard
+              requiredRoles={["ADMIN", "COMPANY_ADMIN", "BRANCH_ADMIN"]}
+            >
+              <UserDetailsPage />
             </AuthGuard>
           }
         />

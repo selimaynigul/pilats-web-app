@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo } from "react";
 import styled from "styled-components";
 import { Row, Col, Spin, Button } from "antd";
-import TrainerCard from "./user-list-card";
+import UserCard from "./user-list-card";
 import { usePagination } from "hooks";
-import { trainerService } from "services";
+import { userService } from "services";
 import { Link } from "react-router-dom";
 
 const LoadMoreContainer = styled.div`
@@ -12,12 +12,12 @@ const LoadMoreContainer = styled.div`
 `;
 
 interface TrainerListProps {
-  onTrainerCountChange: (count: number) => void;
+  onUserCountChange: (count: number) => void;
   company: any;
 }
 
 const UserList: React.FC<TrainerListProps> = ({
-  onTrainerCountChange,
+  onUserCountChange,
   company,
 }) => {
   const params = useMemo(
@@ -30,25 +30,25 @@ const UserList: React.FC<TrainerListProps> = ({
   );
 
   const {
-    items: trainers,
+    items: users,
     loading,
     hasMore,
     loadMore,
   } = usePagination({
-    fetchService: trainerService.search,
+    fetchService: userService.search,
     params,
   });
 
   useEffect(() => {
-    onTrainerCountChange(trainers.length);
-  }, [trainers, onTrainerCountChange]);
+    onUserCountChange(users.length);
+  }, [users, onUserCountChange]);
 
   return (
     <>
       <Row gutter={[16, 16]}>
-        {trainers.map((trainer: any, index: number) => (
+        {users.map((user: any, index: number) => (
           <Col xs={24} sm={12} md={8} lg={6} key={index}>
-            <TrainerCard trainer={trainer} />
+            <UserCard user={user} />
           </Col>
         ))}
       </Row>

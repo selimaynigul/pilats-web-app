@@ -19,8 +19,6 @@ const TrainerDetailPage: React.FC = () => {
     const fetchTrainer = async () => {
       try {
         const response = await trainerService.getById(id);
-        console.log(response.data);
-
         setTrainer(response.data);
       } catch (error) {
         console.error("Error fetching trainer:", error);

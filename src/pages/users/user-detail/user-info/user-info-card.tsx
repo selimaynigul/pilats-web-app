@@ -28,7 +28,7 @@ import {
   PhoneFilled,
   UserOutlined,
 } from "@ant-design/icons";
-import { trainerService } from "services";
+import { trainerService, userService } from "services";
 import moment from "moment";
 
 const Container = styled.div`
@@ -254,30 +254,25 @@ const Status = styled.div`
   font-size: 0.9em;
 `;
 
-const UserInfo: React.FC<{ trainer: any; loading: any }> = ({
-  trainer,
-  loading,
-}) => {
+const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [isActive, setIsActive] = useState(trainer?.active);
+  const [isActive, setIsActive] = useState(user?.active);
   const [form] = Form.useForm();
   const navigate = useNavigate();
 
   const handleEdit = () => {
     form.setFieldsValue({
-      ...trainer.ucGetResponse,
-      birthdate: moment(trainer.ucGetResponse.birthdate),
-      active: trainer.active,
-      endDate: trainer.passiveEndDate,
+      ...user.ucGetResponse,
+      birthdate: moment(user.ucGetResponse.birthdate),
+      active: user.active,
+      endDate: user.passiveEndDate,
     });
     setIsEditModalVisible(true);
   };
 
   const handleEditSubmit = (values: any) => {
-    console.log("values", values);
-    console.log("trainer", trainer);
     const payload = {
-      id: trainer.id,
+      id: user.id,
       isActive: values.active, // Checkbox state for active status
       temporarilyPassive: !values.active && values.endDate ? true : false, // Set to true only if inactive and endDate exists
       /* passiveEndDate: values.active
@@ -289,17 +284,17 @@ const UserInfo: React.FC<{ trainer: any; loading: any }> = ({
       },
     };
 
-    trainerService
+    userService
       .update(payload)
       .then(() => {
-        message.success("Trainer updated successfully");
+        message.success("User updated successfully");
         window.location.reload();
         setIsEditModalVisible(false);
         form.resetFields();
       })
       .catch((error) => {
-        console.error("Error updating trainer:", error);
-        message.error("Failed to update trainer");
+        console.error("Error updating user:", error);
+        message.error("Failed to update user");
       });
   };
 
@@ -310,20 +305,20 @@ const UserInfo: React.FC<{ trainer: any; loading: any }> = ({
   const handleDelete = () => {
     Modal.confirm({
       title: "Are you sure?",
-      content: "This action will permanently delete the trainer.",
+      content: "This action will permanently delete the user.",
       okText: "Delete",
       okType: "danger",
       cancelText: "Cancel",
       onOk: () => {
         trainerService
-          .delete(trainer.id)
+          .delete(user.id)
           .then(() => {
-            message.success("Trainer deleted successfully");
-            navigate("/trainers");
+            message.success("User deleted successfully");
+            navigate("/users");
           })
           .catch((error) => {
-            console.error("Error deleting trainer:", error);
-            message.error("Failed to delete trainer");
+            console.error("Error deleting user:", error);
+            message.error("Failed to delete user");
           });
       },
     });
@@ -344,10 +339,10 @@ const UserInfo: React.FC<{ trainer: any; loading: any }> = ({
     );
   }
 
-  if (!trainer) {
+  if (!user) {
     return (
       <Container>
-        <p style={{ textAlign: "center" }}>Trainer not found</p>
+        <p style={{ textAlign: "center" }}>User not found</p>
       </Container>
     );
   }
@@ -373,28 +368,27 @@ const UserInfo: React.FC<{ trainer: any; loading: any }> = ({
 
         <ProfileSection>
           <AvatarContainer>
-            {!trainer.active && <InactiveIcon title="Not working" />}
             <Avatar
               size={150}
-              src={trainer.avatarUrl || null}
+              src={user.avatarUrl || null}
               icon={<UserOutlined />}
               style={{ marginBottom: 8 }}
             />
           </AvatarContainer>
           <Name>
-            {trainer.ucGetResponse.name} {trainer.ucGetResponse.surname}
+            {user.ucGetResponse.name} {user.ucGetResponse.surname}
           </Name>
           <Title>Pilates Eğitmeni</Title>
         </ProfileSection>
 
-        <Link to={`/companies/${trainer.companyId}`}>
+        <Link to={`/companies/${user.companyId}`}>
           <CompanyInfo>
             <CompanyLogo>
               <BsBuilding style={{ fontSize: 20 }} />
             </CompanyLogo>
             <CompanyName>
-              <strong>{trainer.companyName}</strong>
-              <small>{trainer.branchName}</small>
+              <strong>{user.companyName}</strong>
+              <small>{user.branchName}</small>
             </CompanyName>
             <CompanyDetailButton>
               <ArrowRightOutlined />
@@ -404,23 +398,23 @@ const UserInfo: React.FC<{ trainer: any; loading: any }> = ({
 
         <InfoSection>
           <InfoItem>
-            <span>Email:</span> {trainer.email}
+            <span>Email:</span> {user.email}
           </InfoItem>
           <InfoItem>
-            <span>Phone:</span> {trainer.ucGetResponse.telNo1}
+            <span>Phone:</span> {user.ucGetResponse.telNo1}
           </InfoItem>
           <InfoItem>
             <span>Birthdate:</span>{" "}
-            {moment(trainer.ucGetResponse.birthdate).format("DD MMMM YYYY")}
+            {moment(user.ucGetResponse.birthdate).format("DD MMMM YYYY")}
           </InfoItem>
         </InfoSection>
         <ContactInfo>
-          <a href={`mailto:${trainer.email}`} style={{ color: "#4a4a4a" }}>
+          <a href={`mailto:${user.email}`} style={{ color: "#4a4a4a" }}>
             <ContactButton>
               <BsEnvelopeFill />
             </ContactButton>
           </a>
-          <a href={`tel:${trainer.phone}`} style={{ color: "#4a4a4a" }}>
+          <a href={`tel:${user.phone}`} style={{ color: "#4a4a4a" }}>
             <ContactButton>
               <PhoneFilled />
             </ContactButton>
@@ -438,7 +432,7 @@ const UserInfo: React.FC<{ trainer: any; loading: any }> = ({
         </ContactInfo>
 
         <Modal
-          title="Edit Trainer"
+          title="Edit User"
           visible={isEditModalVisible}
           onCancel={() => setIsEditModalVisible(false)}
           onOk={() => {
