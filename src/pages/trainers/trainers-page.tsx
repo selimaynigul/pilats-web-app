@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import TrainerList from "./trainer-list";
+import TrainerList from "./trainer-list/trainer-list";
 import { Card } from "components";
 import TrainersToolbar from "./trainers-toolbar";
 

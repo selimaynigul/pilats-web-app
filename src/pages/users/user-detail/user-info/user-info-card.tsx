@@ -254,7 +254,7 @@ const Status = styled.div`
   font-size: 0.9em;
 `;
 
-const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
+const UserInfo: React.FC<{ trainer: any; loading: any }> = ({
   trainer,
   loading,
 }) => {
@@ -508,4 +508,4 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
   );
 };
 
-export default TrainerInfo;
+export default UserInfo;

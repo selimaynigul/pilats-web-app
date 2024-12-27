@@ -132,6 +132,19 @@ const CompanyDetailButton = styled.div`
   color: gray;
 `;
 
+const Overlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: ${({ theme }) => theme.contentBg};
+  opacity: 0.5;
+  z-index: 2;
+  border-radius: 20px;
+  pointer-events: none;
+`;
+
 interface Trainer {
   name: string;
   title: string;
@@ -175,6 +188,8 @@ const TrainerCard: React.FC<{ trainer: any }> = ({ trainer }) => {
         </Link>
       }
     >
+      {!trainer.active && <Overlay />}
+
       <Container>
         <Link to={`/companies/${trainer.companyId}`}>
           <CompanyInfo>
