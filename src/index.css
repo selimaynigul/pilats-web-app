@@ -15,6 +15,7 @@ p,
 strong,
 small,
 li,
+input,
 span {
   font-family: "Instrument Sans", sans-serif !important;
   margin: 0;

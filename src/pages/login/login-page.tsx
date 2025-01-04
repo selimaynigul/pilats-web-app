@@ -469,7 +469,13 @@ const LoginPage: React.FC = () => {
           </ForgotPasswordLink>
 
           <ButtonContainer>
-            <LoginButton type="primary" htmlType="submit" size="large" block>
+            <LoginButton
+              type="primary"
+              htmlType="submit"
+              size="large"
+              block
+              loading={loading}
+            >
               Login
             </LoginButton>
             <Divider plain>or</Divider>

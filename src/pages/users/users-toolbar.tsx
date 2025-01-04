@@ -86,7 +86,7 @@ const UsersToolbar: React.FC<{
   return (
     <ToolbarContainer>
       <CountContainer>
-        <CountNumber>{userCount}</CountNumber> trainers listed
+        <CountNumber>{userCount}</CountNumber> users listed
       </CountContainer>
       <ActionContainer>
         <CompanyDropdown

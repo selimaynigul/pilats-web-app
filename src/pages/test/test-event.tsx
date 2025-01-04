@@ -9,8 +9,8 @@ import {
   EditFilled,
   UserOutlined,
 } from "@ant-design/icons";
+import { EventWrapperProps } from "react-big-calendar"; // Import EventWrapperProps for compatibility
 import styled from "styled-components";
-import dayjs from "dayjs";
 
 const Container = styled.div<{ more?: boolean }>`
   background: #5d46e5;
@@ -18,9 +18,9 @@ const Container = styled.div<{ more?: boolean }>`
   color: white;
   padding: 10px;
   border-radius: ${(props) => (props.more ? "0 15px 15px 15px" : "15px")};
-  border-radius: 15px;
   cursor: pointer;
   position: relative;
+  height: 75px;
   box-sizing: border-box;
 
   &:hover {
@@ -90,6 +90,23 @@ const TrainerDetailButton = styled.div`
   align-items: center;
   /* color: #5d46e5; */
   color: gray;
+`;
+
+const MoreButton = styled.div`
+  border: 1px solid #412bc4;
+  color: #412bc4;
+  border-radius: 10px 10px 0 0;
+  padding: 1px 5px 10px 5px;
+  cursor: pointer;
+  position: absolute;
+  bottom: 65px;
+  left: 5px;
+  width: fit-content;
+  transition: 0.1s;
+
+  &:hover {
+    bottom: 67px;
+  }
 `;
 
 const ActionButtons = styled.div`
@@ -211,27 +228,31 @@ const content = (
     </div>
   </div>
 );
+const moreContent = <div>elma</div>;
 
-const CustomEvent: React.FC<{
-  event: any;
-  dayEvents: any[]; // Add a prop to pass all events of the day
-}> = ({ event, dayEvents }) => {
-  const more = dayEvents.length > 1; // Example: Adjust if more events should show "+More" button
-  const moreEventsCount = dayEvents.length - 1; // Number of additional events
+const CustomEvent: React.FC<{ event: any }> = ({ event }) => {
+  const more = true;
+
   return (
     <div style={{ position: "relative" }}>
+      {more && (
+        <Popover
+          trigger="click"
+          content={moreContent}
+          title={event.title}
+          arrow={false}
+        >
+          <MoreButton>+2 daha</MoreButton>
+        </Popover>
+      )}
       <Popover trigger="click" content={content} arrow={false}>
-        <div>
+        <div style={{ margin: 5 }}>
           <Container more={more}>
-            <strong style={{ display: "block" }}>
-              {(event as any)?.title}
-            </strong>
-            {moreEventsCount === 0 && (
-              <small>
-                {dayjs(event.start).format("HH:mm")} -{" "}
-                {dayjs(event.end).format("HH:mm")}
-              </small>
-            )}
+            <strong style={{ display: "block" }}>{(event as any).title}</strong>
+            <small>
+              {event.start.toLocaleTimeString()} -{" "}
+              {event.end.toLocaleTimeString()}
+            </small>
           </Container>
         </div>
       </Popover>

@@ -13,14 +13,7 @@ import {
   Checkbox,
 } from "antd";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import {
-  BsBuilding,
-  BsEnvelopeFill,
-  BsWhatsapp,
-  BsPencil,
-  BsTrash,
-  BsPersonFillDash,
-} from "react-icons/bs";
+import { BsBuilding, BsEnvelopeFill, BsWhatsapp } from "react-icons/bs";
 import {
   ArrowRightOutlined,
   DeleteOutlined,

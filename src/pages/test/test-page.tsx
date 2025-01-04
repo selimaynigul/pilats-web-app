@@ -1,184 +1,112 @@
-import React, { useState } from "react";
-import { Card, Body } from "components";
+import React, { useState, useRef } from "react";
+import { Calendar, momentLocalizer, Views } from "react-big-calendar";
+import moment from "moment";
+import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
+import CustomEvent from "./test-event";
 import styled from "styled-components";
-import { Row, Col, Segmented } from "antd";
 
-const MeasurementDiv = styled.div<{ isHovered: boolean }>`
-  box-shadow: ${({ isHovered }) =>
-    isHovered ? "rgba(149, 157, 165, 0.2) 0px 8px 12px" : "none"};
+const DragAndDropCalendar = withDragAndDrop(Calendar);
+const localizer = momentLocalizer(moment);
 
-  scale: ${({ isHovered }) => (isHovered ? "1.1" : "1")};
-  background: ${({ isHovered }) =>
-    isHovered ? "rgba(255, 255, 255, 0.5)" : "transparent"};
-  backdrop-filter: ${({ isHovered }) => (isHovered ? "blur(8px) " : "none")};
-  border: ${({ isHovered }) =>
-    isHovered ? "1px solid white" : "1px solid transparent"};
-
-  transition: all 0.2s ease;
-  margin-bottom: 60px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  padding: 10px;
-  border-radius: 20px;
-`;
-const PersonInfo = styled.div`
-  background: white;
-  border-radius: 30px;
-  padding: 20px;
-  height: 100%;
-`;
-const BodyMeasurements = styled.div`
-  display: flex;
-  gap: 40px;
-  height: 600px;
-  padding: 20px;
-`;
-const TabsContainer = styled.div`
-  .ant-segmented {
-    background: #e6e3ff;
-    color: #4d3abd;
-    border-radius: 15px;
-    padding: 5px;
-    &-item {
-      height: 35px;
-      display: flex;
-      align-items: center;
-
-      &:hover {
-        background: transparent !important;
-      }
-    }
-
-    &-item-selected {
-      background: #f6f5ff;
-      color: inherit;
-      border-radius: 12px;
-    }
+const CalendarWrapper = styled.div`
+  .rbc-toolbar {
+    margin-bottom: 1rem;
   }
 `;
 
-const UsersPage: React.FC = () => {
-  const [hoveredPart, setHoveredPart] = useState<string | null>(null);
+const TestCalendar: React.FC = () => {
+  const [events, setEvents] = useState([
+    {
+      id: 0,
+      title: "Meeting with Team",
+      start: new Date(2023, 10, 8, 10, 0),
+      end: new Date(2023, 10, 8, 11, 0),
+    },
+    {
+      id: 1,
+      title: "Lunch Break",
+      start: new Date(2023, 10, 8, 13, 0),
+      end: new Date(2023, 10, 8, 14, 0),
+    },
+  ]);
+  const [currentDate, setCurrentDate] = useState(new Date(2023, 10, 8)); // Current view date
+  const timerRef = useRef<NodeJS.Timeout | null>(null); // Timer reference
+
+  const moveEvent = ({ event, start, end }: any) => {
+    const updatedEvents = events.map((evt) =>
+      evt.id === event.id ? { ...evt, start, end } : evt
+    );
+    setEvents(updatedEvents);
+  };
+
+  const addNewEvent = ({ start, end }: any) => {
+    const newId = events.length
+      ? Math.max(...events.map((evt) => evt.id)) + 1
+      : 0;
+    const newEvent = {
+      id: newId,
+      title: "New Event",
+      start,
+      end,
+    };
+    setEvents([...events, newEvent]);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    const calendarWidth = e.currentTarget.clientWidth;
+    const mouseX = e.clientX;
+    console.log(mouseX, calendarWidth);
+
+    // If near the right edge, start a timer to navigate to the next month
+    if (mouseX > calendarWidth - 100) {
+      console.log("Near the right edge");
+      if (!timerRef.current) {
+        timerRef.current = setTimeout(() => {
+          setCurrentDate(moment(currentDate).add(1, "month").toDate());
+          timerRef.current = null; // Reset the timer
+        }, 1000); // 1 second delay
+      }
+    } else {
+      // Clear the timer if the mouse moves away from the right edge
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    }
+  };
+
+  const eventPropGetter = (event: any) => {
+    return {
+      style: {
+        backgroundColor: "transparent", // Remove default background
+        border: "none", // Remove border
+        boxShadow: "none", // Remove shadows
+      },
+    };
+  };
 
   return (
-    <Card
-      toolbar={
-        /*  <span>
-          <TabsContainer>
-            <Segmented<string>
-              options={["Dersler", "Paketler", "Ölçümler"]}
-              onChange={(value) => {
-                console.log(value); // string
-              }}
-            />
-          </TabsContainer>
-        </span> */ <div></div>
-      }
-    >
-      <Row>
-        <Col style={{ padding: "20px 0 0 0" }} xs={24} md={8}>
-          <PersonInfo></PersonInfo>
-        </Col>
-        <Col xs={24} md={16} style={{}}>
-          {/* <h3>Vücut Ölçümleri</h3> */}
-          <BodyMeasurements>
-            <div>
-              <div>
-                <MeasurementDiv isHovered={hoveredPart === "left-arm"}>
-                  <div
-                    style={{
-                      background: "#e6e3ff",
-
-                      borderRadius: 15,
-                      padding: "10px 20px",
-                      width: "fit-content",
-                    }}
-                  >
-                    Sol Kol
-                  </div>
-                  <span>Yağ (kg):</span>
-                  <span>Yağ (kg):</span>
-                  <span>Yağ (kg):</span>
-                </MeasurementDiv>
-                <MeasurementDiv isHovered={hoveredPart === "body"}>
-                  <div
-                    style={{
-                      background: "#e6e3ff",
-                      display: "flex",
-                      flexDirection: "column",
-                      borderRadius: 15,
-                      padding: "10px 20px",
-                      width: "fit-content",
-                    }}
-                  >
-                    Gövde
-                  </div>
-                  <span>Yağ (kg):</span>
-                  <span>Yağ (kg):</span>
-                  <span>Yağ (kg):</span>
-                </MeasurementDiv>
-                <MeasurementDiv isHovered={hoveredPart === "left-leg"}>
-                  <div
-                    style={{
-                      background: "#e6e3ff",
-                      display: "flex",
-                      flexDirection: "column",
-                      borderRadius: 15,
-                      padding: "10px 20px",
-                      width: "fit-content",
-                    }}
-                  >
-                    Sol Bacak
-                  </div>
-                  <span>Yağ (kg):</span>
-                  <span>Yağ (kg):</span>
-                  <span>Yağ (kg):</span>
-                </MeasurementDiv>
-              </div>
-            </div>
-            <Body setHoveredPart={setHoveredPart} />
-            <div>
-              <MeasurementDiv isHovered={hoveredPart === "right-arm"}>
-                <div
-                  style={{
-                    background: "#e6e3ff",
-                    display: "flex",
-                    flexDirection: "column",
-                    borderRadius: 15,
-                    padding: "10px 20px",
-                    width: "fit-content",
-                  }}
-                >
-                  Sağ Kol
-                </div>
-                <span>Yağ (kg):</span>
-                <span>Yağ (kg):</span>
-                <span>Yağ (kg):</span>
-              </MeasurementDiv>
-              <MeasurementDiv isHovered={hoveredPart === "right-leg"}>
-                <div
-                  style={{
-                    background: "#e6e3ff",
-                    display: "flex",
-                    flexDirection: "column",
-                    borderRadius: 15,
-                    padding: "10px 20px",
-                    width: "fit-content",
-                  }}
-                >
-                  Sağ Bacak
-                </div>
-                <span>Yağ (kg):</span>
-                <span>Yağ (kg):</span>
-                <span>Yağ (kg):</span>
-              </MeasurementDiv>
-            </div>
-          </BodyMeasurements>
-        </Col>
-      </Row>
-      <div style={{ width: 30, height: 2000 }}></div>
-    </Card>
+    <CalendarWrapper>
+      <DragAndDropCalendar
+        events={events}
+        localizer={localizer}
+        date={currentDate} // Controlled date for navigation
+        onNavigate={(date) => setCurrentDate(date)} // Update current date on manual navigation
+        selectable
+        onDragOver={handleDragOver} // Track dragging over the calendar
+        onEventDrop={moveEvent}
+        onSelectSlot={addNewEvent}
+        components={{
+          event: CustomEvent, // Custom event component
+        }}
+        eventPropGetter={eventPropGetter} // Apply custom styles
+        style={{ height: 700 }}
+        defaultView={Views.MONTH}
+      />
+    </CalendarWrapper>
   );
 };
-export default UsersPage;
+
+export default TestCalendar;

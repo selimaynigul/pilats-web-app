@@ -49,6 +49,7 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
 
   const handleFinish = (values: any) => {
     onSubmit(values);
+    console.log(values);
     form.resetFields();
     setRepeat(false);
     setRepeatFrequency("weekly");
@@ -142,13 +143,18 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
           </Form.Item>
 
           {repeatFrequency === "custom" && (
-            <Form.Item label="Custom Days Interval">
-              <InputNumber
-                min={1}
-                value={customDays}
-                onChange={(value) => setCustomDays(value || 2)}
-              />
-              <span style={{ marginLeft: 8 }}>day(s)</span>
+            <Form.Item
+              name="customDays"
+              label="Custom Days Interval"
+              rules={[
+                {
+                  required: true,
+                  message: "Please enter a valid number of days",
+                },
+              ]}
+              initialValue={2} // Default value for customDays
+            >
+              <InputNumber min={1} />
             </Form.Item>
           )}
 
@@ -163,7 +169,7 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
       )}
 
       <Form.Item>
-        <Button key="cancel" onClick={onCancel}>
+        <Button key="cancel" onClick={onCancel} style={{ marginRight: 8 }}>
           Cancel
         </Button>
         <Button key="submit" type="primary" htmlType="submit">

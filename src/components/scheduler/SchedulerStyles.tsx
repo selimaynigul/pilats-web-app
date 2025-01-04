@@ -67,9 +67,40 @@ export const CalendarWrapper = styled.div`
   .rbc-month-row + .rbc-month-row {
     border-top: none;
   }
+
+  .rbc-ellipsis,
+  .rbc-show-more,
+  .rbc-row-segment .rbc-event-content,
+  .rbc-event-label {
+    white-space: normal;
+    overflow: none;
+  }
 `;
 
 export const EventTitle = styled.h3`
   font-size: 1.5rem;
   color: #333;
+`;
+
+export const LoadingOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.5); /* Semi-transparent background */
+  z-index: 10; /* Above all content */
+  display: flex;
+  transition: 0.3s;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const MoreButton = styled.div`
+  margin-top: 6px;
+  margin-bottom: 6px;
+  color: #412bc4;
+  cursor: pointer;
+  text-align: center;
+  transition: 0.1s;
 `;
