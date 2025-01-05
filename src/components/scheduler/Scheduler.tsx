@@ -55,6 +55,10 @@ const MyCalendar: React.FC = () => {
     const params = {
       startDate: dayjs(startDate).toISOString(), // Use ISO 8601 with time
       endDate: dayjs(endDate).toISOString(),
+
+      searchByPageDto: {
+        pageSize: 200,
+      },
     };
 
     sessionService
@@ -88,6 +92,16 @@ const MyCalendar: React.FC = () => {
       fetchSessions(visibleRange.start, visibleRange.end);
     }
   }, [visibleRange]);
+
+  useEffect(() => {
+    const start: Date = dayjs(defaultDate)
+      .startOf("month")
+      .subtract(7, "day")
+      .toDate();
+    const end: Date = dayjs(defaultDate).endOf("month").add(7, "day").toDate();
+
+    fetchSessions(start, end);
+  }, []);
 
   const events = data.map((event: any) => ({
     ...event,
