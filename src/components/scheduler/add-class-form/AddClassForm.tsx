@@ -9,6 +9,7 @@ import {
   InputNumber,
   Button,
   TimePicker,
+  message,
 } from "antd";
 import { addClassFormItems as formItems } from "./add-class-form-items";
 import dayjs from "dayjs";
@@ -20,6 +21,7 @@ import {
   AlignLeftOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
+import { trainerService } from "services";
 
 const StyleOverrides = styled.div`
   .trainer-select {
@@ -88,6 +90,7 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
   const [showDescription, setShowDescription] = useState(false);
   const [trainerExpanded, setTrainerExpanded] = useState(false);
   const descRef = useRef<any>(null);
+  const [trainers, setTrainers] = useState<any>([]);
 
   useEffect(() => {
     const isSingleDay = selectedRange
@@ -114,10 +117,6 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
     setShowDescription(false);
   };
 
-  const trainerOptions = [
-    { label: "Trainer 1", value: "trainer1" },
-    { label: "Trainer 2", value: "trainer2" },
-  ];
   const dateFormat = (value: dayjs.Dayjs) => value.format("MMMM D, YYYY"); // Custom format
   useEffect(() => {
     if (showDescription) {
@@ -127,13 +126,18 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
     }
   }, [showDescription]);
 
-  /*   // Reset state when modal closes
-  useEffect(() => {
-    if (!visible) {
-      setShowDescription(false); // Reset `showDescription` when modal closes
-      form.resetFields(); // Optionally reset form fields
-    }
-  }, [visible]); */
+  const handleTrainerSearch = (value: string) => {
+    if (!value) return;
+    trainerService
+      .search({ ucSearchRequest: { name: value } })
+      .then((res) => {
+        setTrainers(res?.data);
+      })
+      .catch((error) => {
+        console.log(error);
+        message.error("Error searching trainer");
+      });
+  };
 
   return (
     <StyleOverrides>
@@ -223,26 +227,40 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
           </Form.Item>
         </div>
 
-        <Form.Item
-          name="trainer"
-          rules={formItems.trainer.rules}
-          className={
-            trainerExpanded ? "trainer-select-expanded" : "trainer-select"
-          }
+        <div
+          className="custom-input"
+          style={{
+            display: "flex",
+            alignItems: "start",
+          }}
         >
-          <div className="custom-input">
-            <CustomIcon>
-              <UserOutlined />
-            </CustomIcon>
+          <CustomIcon style={{ marginTop: 8 }}>
+            <CalendarOutlined />
+          </CustomIcon>
+          <Form.Item
+            style={{ width: "100%" }}
+            name="trainer"
+            rules={formItems.trainer.rules}
+            className={
+              trainerExpanded ? "trainer-select-expanded" : "trainer-select"
+            }
+          >
             <Select
               showSearch
               placeholder="Select a trainer"
-              options={trainerOptions}
+              onSearch={handleTrainerSearch}
+              filterOption={false}
               onFocus={() => setTrainerExpanded(true)}
               onBlur={() => setTrainerExpanded(false)}
-            />
-          </div>
-        </Form.Item>
+            >
+              {trainers.map((trainer: any) => (
+                <Select.Option key={trainer.id} value={trainer.id}>
+                  {trainer.ucGetResponse.name} {trainer.ucGetResponse.surname}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+        </div>
 
         <Form.Item
           style={{ marginLeft: 24 }}

@@ -12,6 +12,7 @@ import {
 import styled from "styled-components";
 import dayjs from "dayjs";
 import { sessionService } from "services";
+import { Link } from "react-router-dom";
 
 const Container = styled.div<{ more?: boolean }>`
   background: #5d46e5;
@@ -188,18 +189,22 @@ const CustomEvent: React.FC<{
 
       <strong style={{ display: "block", marginTop: 15 }}>Eğitmen</strong>
       <div style={{ marginTop: 0 }}>
-        <TrainerInfo>
-          <TrainerPhoto>
-            <UserOutlined style={{ fontSize: 20 }} />
-          </TrainerPhoto>
-          <TrainerName>
-            <strong>Ahmet Yiğit</strong>
-            <small> Uzman Yoga Eğitmeni</small>
-          </TrainerName>
-          <TrainerDetailButton>
-            <ArrowRightOutlined />
-          </TrainerDetailButton>
-        </TrainerInfo>
+        <Link to={`/trainers/${event.trainerId}`}>
+          <TrainerInfo>
+            <TrainerPhoto>
+              <UserOutlined style={{ fontSize: 20 }} />
+            </TrainerPhoto>
+            <TrainerName>
+              <strong>
+                {event.trainerName} {event.trainerSurname}{" "}
+              </strong>
+              <small> Uzman Yoga Eğitmeni</small>
+            </TrainerName>
+            <TrainerDetailButton>
+              <ArrowRightOutlined />
+            </TrainerDetailButton>
+          </TrainerInfo>
+        </Link>
         <strong style={{ display: "block", marginTop: 15 }}>
           Katılımcılar
         </strong>

@@ -1,7 +1,12 @@
 import { createGlobalStyle } from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
+ a {
+ color: black;
 
+ &:hover {
+ color: black}
+ }
   .ant-layout {
   background-color: ${({ theme }) => theme.bodyBg};
 }
@@ -15,7 +20,7 @@ const GlobalStyle = createGlobalStyle`
   }
   
   */
- 
+
  .ant-modal-content {
   border-radius: 20px !important;
   }

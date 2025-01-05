@@ -99,7 +99,7 @@ const MyCalendar: React.FC = () => {
       .subtract(7, "day")
       .toDate();
     const end: Date = dayjs(defaultDate).endOf("month").add(7, "day").toDate();
-
+    setVisibleRange({ start, end });
     fetchSessions(start, end);
   }, []);
 
@@ -140,7 +140,7 @@ const MyCalendar: React.FC = () => {
         .minute(dayjs(endTime).minute())
         .format("YYYY-MM-DDTHH:mm:ss"), // Format end date and time
       branchId: 16,
-      trainerId: 24,
+      trainerId: values.trainer,
       isRepeat: values.repeat || false, // Indicate if it is a repeating event
       repeatDay:
         values.repeatFrequency === "weekly"
