@@ -4,6 +4,7 @@ import styled from "styled-components";
 
 export const CalendarWrapper = styled.div`
   background: transparent;
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -90,7 +91,6 @@ export const LoadingOverlay = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.5); /* Semi-transparent background */
   z-index: 10; /* Above all content */
   display: flex;
   transition: 0.3s;

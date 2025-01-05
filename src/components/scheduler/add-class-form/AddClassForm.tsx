@@ -23,7 +23,7 @@ import {
 
 const StyleOverrides = styled.div`
   .trainer-select {
-    width: 200px;
+    max-width: 180px;
   }
 
   .trainer-select-expanded {
@@ -105,6 +105,7 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
   }, [selectedRange, form]);
 
   const handleFinish = (values: any) => {
+    values = { ...values, repeatFrequency };
     onSubmit(values);
     form.resetFields();
     setRepeat(false);
@@ -202,19 +203,25 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
           </Form.Item>
         </div>
 
-        <Form.Item name="timeRange">
-          <div className="custom-input">
-            <CustomIcon>
-              <ClockCircleOutlined />
-            </CustomIcon>
+        <div
+          className="custom-input"
+          style={{
+            display: "flex",
+            alignItems: "start",
+          }}
+        >
+          <CustomIcon style={{ marginTop: 8 }}>
+            <ClockCircleOutlined />
+          </CustomIcon>
+          <Form.Item style={{ width: "100%" }} name="timeRange">
             <TimePicker.RangePicker
               format="HH:mm"
               minuteStep={5}
               style={{ width: "100%" }}
               suffixIcon={null}
             />
-          </div>
-        </Form.Item>
+          </Form.Item>
+        </div>
 
         <Form.Item
           name="trainer"

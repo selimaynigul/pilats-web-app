@@ -13,7 +13,9 @@ import AddButton from "components/AddButton";
 import { CompanyDropdown } from "components";
 import { ToolbarProps, View } from "react-big-calendar";
 
-const Toolbar: React.FC<ToolbarProps & { setCompany: any }> = ({
+const Toolbar: React.FC<
+  ToolbarProps & { setCompany: any; setIsModalVisible: any }
+> = ({
   label,
   onNavigate,
   onView,
@@ -21,9 +23,9 @@ const Toolbar: React.FC<ToolbarProps & { setCompany: any }> = ({
   view,
   date,
   setCompany,
+  setIsModalVisible,
 }) => {
   const [selectedCompany, setSelectedCompany] = useState("MacFit - Gebze");
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
 
   const handleModalToggle = (visible: boolean) => {
@@ -88,69 +90,6 @@ const Toolbar: React.FC<ToolbarProps & { setCompany: any }> = ({
         ))}
         <AddButton onClick={() => handleModalToggle(true)} />
       </NavButtons>
-
-      <Modal
-        title="Add New Class"
-        visible={isModalVisible}
-        onCancel={() => handleModalToggle(false)}
-        footer={[
-          <Button key="cancel" onClick={() => handleModalToggle(false)}>
-            Cancel
-          </Button>,
-          <Button key="add" type="primary" onClick={handleClassSubmit}>
-            Add
-          </Button>,
-        ]}
-      >
-        <Form form={form} layout="vertical">
-          <Form.Item
-            name="className"
-            label="Class Name"
-            rules={[{ required: true, message: "Please enter the class name" }]}
-          >
-            <Input placeholder="Enter class name" />
-          </Form.Item>
-          <Form.Item
-            name="description"
-            label="Description"
-            rules={[{ required: true, message: "Please enter a description" }]}
-          >
-            <Input.TextArea rows={3} placeholder="Enter description" />
-          </Form.Item>
-          <Form.Item
-            name="startDate"
-            label="Start Date"
-            rules={[
-              { required: true, message: "Please select the start date" },
-            ]}
-          >
-            <DatePicker style={{ width: "100%" }} />
-          </Form.Item>
-          <Form.Item
-            name="endDate"
-            label="End Date"
-            rules={[{ required: true, message: "Please select the end date" }]}
-          >
-            <DatePicker style={{ width: "100%" }} />
-          </Form.Item>
-          <Form.Item
-            name="trainer"
-            label="Trainer"
-            rules={[{ required: true, message: "Please select a trainer" }]}
-          >
-            <Select
-              showSearch
-              placeholder="Select a trainer"
-              options={trainerOptions}
-              filterOption={(input, option) =>
-                (option?.label ?? "")
-                  .toLowerCase()
-                  .includes(input.toLowerCase())
-              }
-            />
-          </Form.Item>
-        </Form>
-      </Modal>
     </ToolbarContainer>
   );
 };

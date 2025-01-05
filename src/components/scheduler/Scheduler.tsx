@@ -16,7 +16,6 @@ import {
   MoreButton,
   StyledModal,
 } from "components/scheduler/SchedulerStyles";
-import { usePagination } from "hooks";
 import { sessionService } from "services";
 
 const DragAndDropCalendar = withDragAndDrop(Calendar);
@@ -37,19 +36,32 @@ const MyCalendar: React.FC = () => {
     id: null,
   });
 
-  const params = useMemo(
-    () => ({
-      companyId: company?.id,
-    }),
-    [company?.id]
-  );
-  const fetchSessions = () => {
-    // Fetch events from API
+  const handleRangeChange = (range: { start: Date; end: Date } | Date[]) => {
+    const startDate = Array.isArray(range) ? range[0] : range.start;
+    const endDate = Array.isArray(range) ? range[range.length - 1] : range.end;
+
+    setVisibleRange({ start: startDate, end: endDate });
+
+    // Save the middle date of the range to local storage
+    const middleDate = new Date(
+      (new Date(startDate).getTime() + new Date(endDate).getTime()) / 2
+    );
+    localStorage.setItem("savedCalendarDate", middleDate.toISOString());
+  };
+
+  const fetchSessions = (startDate: Date, endDate: Date) => {
     setLoading(true);
+
+    const params = {
+      startDate: dayjs(startDate).toISOString(), // Use ISO 8601 with time
+      endDate: dayjs(endDate).toISOString(),
+    };
+
     sessionService
       .search(params)
       .then((response) => {
-        setData(response.data); // Set the fetched data
+        console.log("Fetched Sessions:", response.data); // Debugging
+        setData(response.data); // Update the state with fetched data
       })
       .catch((error) => {
         console.error("Error fetching events:", error);
@@ -59,9 +71,23 @@ const MyCalendar: React.FC = () => {
         setLoading(false);
       });
   };
+
+  const [visibleRange, setVisibleRange] = useState<{
+    start: Date;
+    end: Date;
+  } | null>(null);
+
+  const [defaultDate, setDefaultDate] = useState<Date>(() => {
+    // Retrieve the saved date from local storage or default to today
+    const savedDate = localStorage.getItem("savedCalendarDate");
+    return savedDate ? new Date(savedDate) : new Date();
+  });
+
   useEffect(() => {
-    fetchSessions();
-  }, [params]);
+    if (visibleRange) {
+      fetchSessions(visibleRange.start, visibleRange.end);
+    }
+  }, [visibleRange]);
 
   const events = data.map((event: any) => ({
     ...event,
@@ -77,22 +103,7 @@ const MyCalendar: React.FC = () => {
   } | null>(null);
 
   const handleSelectSlot = (slotInfo: { start: Date; end: Date }) => {
-    const isSingleDay = dayjs(slotInfo.end)
-      .subtract(1, "day")
-      .isSame(slotInfo.start, "day");
-
-    const hasEvent = events.some(
-      (event) =>
-        (slotInfo.start >= event.startDate && slotInfo.start < event.endDate) || // Overlap start
-        (slotInfo.end > event.startDate && slotInfo.end <= event.endDate) || // Overlap end
-        (slotInfo.start <= event.startDate && slotInfo.end >= event.endDate) // Event completely within selected range
-    );
-
-    /*   if (!isSingleDay || !hasEvent) {
-      setSelectedRange(slotInfo);
-      setIsModalVisible(true);
-      }  */
-    if (loading) return; // Prevent actions while loading
+    if (loading) return;
     setSelectedRange(slotInfo);
     setIsModalVisible(true);
   };
@@ -100,69 +111,56 @@ const MyCalendar: React.FC = () => {
   const handleAddEvent = (values: any) => {
     setLoading(true); // Start loading
 
-    const startDateTime = dayjs(values.startDate)
-      .hour(dayjs(values.startTime).hour())
-      .minute(dayjs(values.startTime).minute())
-      .toDate();
+    const [startTime, endTime] = values.timeRange || [null, null];
 
-    const eventDurationMinutes = dayjs(values.endTime).diff(
-      dayjs(values.startTime),
-      "minute"
-    );
+    // Prepare the payload to send to the backend
+    const payload = {
+      name: values.className,
+      description: values.description || "No description provided.",
+      startDate: dayjs(values.startDate)
+        .hour(dayjs(startTime).hour())
+        .minute(dayjs(startTime).minute())
+        .format("YYYY-MM-DDTHH:mm:ss"), // Format start date and time
+      endDate: dayjs(values.startDate)
+        .hour(dayjs(endTime).hour())
+        .minute(dayjs(endTime).minute())
+        .format("YYYY-MM-DDTHH:mm:ss"), // Format end date and time
+      branchId: 16,
+      trainerId: 24,
+      isRepeat: values.repeat || false, // Indicate if it is a repeating event
+      repeatDay:
+        values.repeatFrequency === "weekly"
+          ? 7
+          : values.repeatFrequency === "monthly"
+            ? 30
+            : values.repeatFrequency === "custom"
+              ? values.customDays
+              : 1, // Days between repeats
+      repeatEndDate: values.endDate
+        ? dayjs(values.endDate).format("YYYY-MM-DD")
+        : null, // Optional repeat end date
+    };
 
-    const endDateTime = dayjs(values.endDate || values.startDate)
-      .hour(dayjs(values.endTime).hour())
-      .minute(dayjs(values.endTime).minute())
-      .toDate();
+    console.log("payload", payload);
 
-    const repeatFrequency = values.repeatFrequency;
-    const customDaysInterval = values.customDays || 2;
-
-    const newEvents: any = [];
-    let currentStart = startDateTime;
-
-    // Generate repeated events
-    if (values.repeat) {
-      while (currentStart <= endDateTime) {
-        const calculatedEnd = dayjs(currentStart)
-          .add(eventDurationMinutes, "minute")
-          .toDate();
-
-        newEvents.push({
-          id: events.length + newEvents.length + 1,
-          title: values.className,
-          start: currentStart,
-          end: calculatedEnd, // Use the calculated end time
-          allDay: false,
-        });
-
-        // Update the currentStart based on frequency
-        if (repeatFrequency === "daily") {
-          currentStart = dayjs(currentStart).add(1, "day").toDate();
-        } else if (repeatFrequency === "weekly") {
-          currentStart = dayjs(currentStart).add(1, "week").toDate();
-        } else if (repeatFrequency === "monthly") {
-          currentStart = dayjs(currentStart).add(1, "month").toDate();
-        } else if (repeatFrequency === "custom") {
-          currentStart = dayjs(currentStart)
-            .add(customDaysInterval, "day")
-            .toDate();
+    // Call the backend API to add the event
+    sessionService
+      .add(payload)
+      .then(() => {
+        message.success("Event added successfully!");
+        // Refetch sessions for the current visible range
+        if (visibleRange) {
+          fetchSessions(visibleRange.start, visibleRange.end);
         }
-      }
-    } else {
-      // If no repeat, add a single event
-      newEvents.push({
-        id: events.length + 1,
-        title: values.className,
-        start: startDateTime,
-        end: dayjs(startDateTime).add(eventDurationMinutes, "minute").toDate(),
-        allDay: false,
+      })
+      .catch((error) => {
+        console.error("Failed to add event:", error);
+        message.error("Failed to add event. Please try again.");
+      })
+      .finally(() => {
+        setLoading(false); // Stop loading
+        setIsModalVisible(false); // Close the modal
       });
-    }
-
-    /*     setEvents((prev) => [...prev, ...newEvents]);
-     */ setLoading(false); // Stop loading
-    setIsModalVisible(false);
   };
 
   const moveEvent = ({ event, start, end }: EventDropArgs) => {
@@ -188,7 +186,10 @@ const MyCalendar: React.FC = () => {
         endDate: dayjs(end).format("YYYY-MM-DDTHH:mm:ss"),
       })
       .then(() => {
-        fetchSessions(); // Refetch the events after updating
+        // Refetch sessions for the current visible range
+        if (visibleRange) {
+          fetchSessions(visibleRange.start, visibleRange.end);
+        }
       })
       .catch((error) => {
         message.error("Failed to update event. Please try again.");
@@ -232,7 +233,15 @@ const MyCalendar: React.FC = () => {
     return (
       <div>
         {/* Render the first event */}
-        <CustomEvent event={firstEvent} dayEvents={dayEvents} />
+        <CustomEvent
+          event={firstEvent}
+          dayEvents={dayEvents}
+          fetch={() => {
+            if (visibleRange) {
+              return fetchSessions(visibleRange.start, visibleRange.end);
+            }
+          }}
+        />
 
         {/* Render the "More Button" if there are additional events */}
         {moreEventsCount > 0 && (
@@ -262,10 +271,11 @@ const MyCalendar: React.FC = () => {
     <CalendarWrapper>
       {loading && (
         <LoadingOverlay>
-          <Spin tip="Loading..." /> {/* Spinner */}
+          <Spin tip="Loading..." />
         </LoadingOverlay>
       )}
       <DragAndDropCalendar
+        defaultDate={defaultDate} // Use saved date as default
         events={events}
         localizer={localizer}
         selectable
@@ -273,9 +283,14 @@ const MyCalendar: React.FC = () => {
         onEventDrop={moveEvent}
         resizable={false} // Disable resizing entirely
         style={{ height: 700 }}
+        onRangeChange={handleRangeChange}
         components={{
           toolbar: (props) => (
-            <CustomToolbar {...props} setCompany={setCompany} />
+            <CustomToolbar
+              {...props}
+              setCompany={setCompany}
+              setIsModalVisible={setIsModalVisible}
+            />
           ),
           event: ({ event }) => {
             const dayEvents = getDayEvents((event as any).startDate);

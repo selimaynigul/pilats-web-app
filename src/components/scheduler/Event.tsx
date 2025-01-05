@@ -1,5 +1,5 @@
 import React from "react";
-import { Popover, Avatar, Tooltip, Button } from "antd";
+import { Popover, Avatar, Tooltip, Button, message } from "antd";
 import {
   AntDesignOutlined,
   ArrowRightOutlined,
@@ -11,6 +11,7 @@ import {
 } from "@ant-design/icons";
 import styled from "styled-components";
 import dayjs from "dayjs";
+import { sessionService } from "services";
 
 const Container = styled.div<{ more?: boolean }>`
   background: #5d46e5;
@@ -136,9 +137,20 @@ const AttendeeInfo = styled.div`
 
 const CustomEvent: React.FC<{
   event: any;
-  dayEvents: any[]; // Add a prop to pass all events of the day
-}> = ({ event, dayEvents }) => {
-  console.log(event);
+  dayEvents: any[];
+  fetch: () => any;
+}> = ({ event, dayEvents, fetch }) => {
+  const handleDelete = () => {
+    sessionService
+      .delete(event.id)
+      .then(() => {
+        fetch();
+        message.success("Deleted successfully!");
+      })
+      .catch((error) => {
+        message.error("Failed to delete the event.");
+      });
+  };
 
   const content = (
     <div style={{ position: "relative", maxWidth: 300 }}>
@@ -148,7 +160,7 @@ const CustomEvent: React.FC<{
           <EditButton type="primary">
             <EditFilled />
           </EditButton>
-          <DeleteButton type="primary">
+          <DeleteButton onClick={handleDelete} type="primary">
             <DeleteOutlined />
           </DeleteButton>
         </ActionButtons>
