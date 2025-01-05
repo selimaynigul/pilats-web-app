@@ -73,8 +73,9 @@ export const CalendarWrapper = styled.div`
   .rbc-show-more,
   .rbc-row-segment .rbc-event-content,
   .rbc-event-label {
-    white-space: normal;
-    overflow: none;
+    white-space: nowrap; /* Prevents text from wrapping */
+    overflow: hidden; /* Hides the overflowing text */
+    text-overflow: ellipsis;
   }
 `;
 

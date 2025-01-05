@@ -29,7 +29,6 @@ export function usePagination<T>({
     })
       .then((response) => {
         const newItems = response.data;
-        console.log(response.data);
         if (resetItems) {
           setItems(newItems);
         } else {

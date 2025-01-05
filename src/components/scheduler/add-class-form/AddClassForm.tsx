@@ -106,7 +106,6 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
 
   const handleFinish = (values: any) => {
     onSubmit(values);
-    console.log(values);
     form.resetFields();
     setRepeat(false);
     setRepeatFrequency("weekly");

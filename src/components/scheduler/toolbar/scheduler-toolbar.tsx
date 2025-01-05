@@ -13,13 +13,14 @@ import AddButton from "components/AddButton";
 import { CompanyDropdown } from "components";
 import { ToolbarProps, View } from "react-big-calendar";
 
-const Toolbar: React.FC<ToolbarProps> = ({
+const Toolbar: React.FC<ToolbarProps & { setCompany: any }> = ({
   label,
   onNavigate,
   onView,
   views,
   view,
   date,
+  setCompany,
 }) => {
   const [selectedCompany, setSelectedCompany] = useState("MacFit - Gebze");
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -69,7 +70,10 @@ const Toolbar: React.FC<ToolbarProps> = ({
 
       <CompanyDropdown
         selectedCompany={selectedCompany}
-        onCompanySelect={(company) => setSelectedCompany(company)}
+        onCompanySelect={(company) => {
+          setSelectedCompany(company);
+          setCompany(company);
+        }}
       />
 
       <NavButtons>

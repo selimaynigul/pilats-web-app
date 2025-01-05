@@ -134,88 +134,91 @@ const AttendeeInfo = styled.div`
   align-items: center;
 `;
 
-const content = (
-  <div style={{ position: "relative", maxWidth: 300 }}>
-    <div style={{ marginBottom: 20 }}>
-      <strong>Yoga Dersi</strong>
-      <ActionButtons>
-        <EditButton type="primary">
-          <EditFilled />
-        </EditButton>
-        <DeleteButton type="primary">
-          <DeleteOutlined />
-        </DeleteButton>
-      </ActionButtons>
-    </div>
-    <div style={{ display: "flex", gap: 5 }}>
-      <DateInfo>
-        <CalendarOutlined style={{ color: "grey  " }} />
-        <strong style={{ display: "block" }}>
-          <small>14 Ekim 2024</small>
-        </strong>
-      </DateInfo>
-      <DateInfo>
-        <ClockCircleOutlined style={{ color: "grey  " }} />
-        <strong style={{ display: "block" }}>
-          <small>09.00-17.00</small>
-        </strong>
-      </DateInfo>
-    </div>
-
-    <strong style={{ display: "block", marginTop: 15 }}>Açıklama</strong>
-    <small>
-      Lorem ismallsum dolor, sit amet consectetur adipisicing elit. Officiis,
-      eius. Ratione dolorem rerum beatae, recusandae voluptatem eaque maiores
-      veniam.
-    </small>
-
-    <strong style={{ display: "block", marginTop: 15 }}>Eğitmen</strong>
-    <div style={{ marginTop: 0 }}>
-      <TrainerInfo>
-        <TrainerPhoto>
-          <UserOutlined style={{ fontSize: 20 }} />
-        </TrainerPhoto>
-        <TrainerName>
-          <strong>Ahmet Yiğit</strong>
-          <small> Uzman Yoga Eğitmeni</small>
-        </TrainerName>
-        <TrainerDetailButton>
-          <ArrowRightOutlined />
-        </TrainerDetailButton>
-      </TrainerInfo>
-      <strong style={{ display: "block", marginTop: 15 }}>Katılımcılar</strong>
-      <AttendeeInfo>
-        <Avatar.Group
-          style={{ marginTop: 7 }}
-          max={{
-            count: 3,
-            style: { color: "#f56a00", backgroundColor: "#fde3cf" },
-          }}
-        >
-          <Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=2" />
-          <Avatar style={{ backgroundColor: "#f56a00" }}>K</Avatar>
-          <Tooltip title="Ant User" placement="top">
-            <Avatar
-              style={{ backgroundColor: "#87d068" }}
-              icon={<UserOutlined />}
-            />
-          </Tooltip>
-          <Avatar
-            style={{ backgroundColor: "#1677ff" }}
-            icon={<AntDesignOutlined />}
-          />
-        </Avatar.Group>
-
-        <strong>12/15</strong>
-      </AttendeeInfo>
-    </div>
-  </div>
-);
-
 const CustomEvent: React.FC<{
   event: any;
   dayEvents: any[]; // Add a prop to pass all events of the day
 }> = ({ event, dayEvents }) => {
+  console.log(event);
+
+  const content = (
+    <div style={{ position: "relative", maxWidth: 300 }}>
+      <div style={{ marginBottom: 20 }}>
+        <strong>{event.name}</strong>
+        <ActionButtons>
+          <EditButton type="primary">
+            <EditFilled />
+          </EditButton>
+          <DeleteButton type="primary">
+            <DeleteOutlined />
+          </DeleteButton>
+        </ActionButtons>
+      </div>
+      <div style={{ display: "flex", gap: 5 }}>
+        <DateInfo>
+          <CalendarOutlined style={{ color: "grey  " }} />
+          <strong style={{ display: "block" }}>
+            <small>{dayjs(event.start).format("DD.MM.YYYY")}</small>
+          </strong>
+        </DateInfo>
+        <DateInfo>
+          <ClockCircleOutlined style={{ color: "grey  " }} />
+          <strong style={{ display: "block" }}>
+            <small>
+              {dayjs(event.start).format("HH:mm")} -{" "}
+              {dayjs(event.end).format("HH:mm")}
+            </small>{" "}
+          </strong>
+        </DateInfo>
+      </div>
+
+      <strong style={{ display: "block", marginTop: 15 }}>Açıklama</strong>
+      <small>{event.description}</small>
+
+      <strong style={{ display: "block", marginTop: 15 }}>Eğitmen</strong>
+      <div style={{ marginTop: 0 }}>
+        <TrainerInfo>
+          <TrainerPhoto>
+            <UserOutlined style={{ fontSize: 20 }} />
+          </TrainerPhoto>
+          <TrainerName>
+            <strong>Ahmet Yiğit</strong>
+            <small> Uzman Yoga Eğitmeni</small>
+          </TrainerName>
+          <TrainerDetailButton>
+            <ArrowRightOutlined />
+          </TrainerDetailButton>
+        </TrainerInfo>
+        <strong style={{ display: "block", marginTop: 15 }}>
+          Katılımcılar
+        </strong>
+        <AttendeeInfo>
+          <Avatar.Group
+            style={{ marginTop: 7 }}
+            max={{
+              count: 3,
+              style: { color: "#f56a00", backgroundColor: "#fde3cf" },
+            }}
+          >
+            <Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=2" />
+            <Avatar style={{ backgroundColor: "#f56a00" }}>K</Avatar>
+            <Tooltip title="Ant User" placement="top">
+              <Avatar
+                style={{ backgroundColor: "#87d068" }}
+                icon={<UserOutlined />}
+              />
+            </Tooltip>
+            <Avatar
+              style={{ backgroundColor: "#1677ff" }}
+              icon={<AntDesignOutlined />}
+            />
+          </Avatar.Group>
+
+          <strong>12/15</strong>
+        </AttendeeInfo>
+      </div>
+    </div>
+  );
+
   const more = dayEvents.length > 1; // Example: Adjust if more events should show "+More" button
   const moreEventsCount = dayEvents.length - 1; // Number of additional events
   return (

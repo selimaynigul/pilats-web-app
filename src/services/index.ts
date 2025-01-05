@@ -5,3 +5,5 @@ export { default as companyAdminService } from "./company-admin-service";
 export { default as branchService } from "./branch-service";
 export { default as branchAdminService } from "./branch-admin-service";
 export { default as userService } from "./user-service";
+export { default as sessionService } from "./session-service";
+export { default as companyPackageService } from "./company-package-service";
