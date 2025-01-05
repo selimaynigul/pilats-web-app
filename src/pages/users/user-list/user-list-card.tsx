@@ -150,7 +150,7 @@ const UserCard: React.FC<{ user: any }> = ({ user }) => {
           >
             <Avatar
               size={60}
-              src={user.avatarUrl}
+              src={user.imageUrl}
               style={{ background: "lightgrey" }}
             >
               {user.ucGetResponse.name[0].toUpperCase()}

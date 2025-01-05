@@ -370,7 +370,7 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
           <AvatarContainer>
             <Avatar
               size={150}
-              src={user.avatarUrl || null}
+              src={user.imageUrl || null}
               icon={<UserOutlined />}
               style={{ marginBottom: 8 }}
             />

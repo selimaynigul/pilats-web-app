@@ -129,7 +129,7 @@ const CompanyInfo: React.FC<{ setBranches: any }> = ({ setBranches }) => {
       <ProfileSection>
         <Avatar
           size={150}
-          src={company.avatarUrl || null}
+          src={company.imageUrl || null}
           icon={<BsBuilding />}
           style={{ marginBottom: 8 }}
         />

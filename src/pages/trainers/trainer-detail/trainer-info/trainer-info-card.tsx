@@ -367,7 +367,7 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
             {!trainer.active && <InactiveIcon title="Not working" />}
             <Avatar
               size={150}
-              src={trainer.avatarUrl || null}
+              src={trainer.imageUrl || null}
               icon={<UserOutlined />}
               style={{ marginBottom: 8 }}
             />
