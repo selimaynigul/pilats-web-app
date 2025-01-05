@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Calendar, momentLocalizer, Views } from "react-big-calendar";
 import moment from "moment";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
@@ -14,6 +14,7 @@ import {
   CalendarWrapper,
   LoadingOverlay,
   MoreButton,
+  StyledModal,
 } from "components/scheduler/SchedulerStyles";
 
 const DragAndDropCalendar = withDragAndDrop(Calendar);
@@ -212,6 +213,8 @@ const MyCalendar: React.FC = () => {
     );
   };
 
+  const nameInputRef = useRef<any>(null); // Create a ref for the name input field
+
   return (
     <CalendarWrapper>
       {loading && (
@@ -237,19 +240,25 @@ const MyCalendar: React.FC = () => {
         eventPropGetter={eventPropGetter} // Apply custom styles
       />
 
-      <Modal
-        title="Add New Class"
+      <StyledModal
         visible={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
         footer={null}
+        closable={false} // Removes the close icon
+        afterOpenChange={(open) => {
+          if (open) {
+            nameInputRef.current?.focus();
+          }
+        }}
       >
         <AddClassForm
           visible={isModalVisible}
           onCancel={() => setIsModalVisible(false)}
           onSubmit={handleAddEvent}
           selectedRange={selectedRange}
+          nameRef={nameInputRef}
         />
-      </Modal>
+      </StyledModal>
     </CalendarWrapper>
   );
 };

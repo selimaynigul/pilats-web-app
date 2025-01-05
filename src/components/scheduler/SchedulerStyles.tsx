@@ -1,4 +1,5 @@
 // SchedulerStyles.ts
+import { Modal, Popover } from "antd";
 import styled from "styled-components";
 
 export const CalendarWrapper = styled.div`
@@ -103,4 +104,13 @@ export const MoreButton = styled.div`
   cursor: pointer;
   text-align: center;
   transition: 0.1s;
+`;
+
+export const StyledModal = styled(Modal)`
+  .ant-modal-content {
+    padding-bottom: 1px;
+    max-width: 400px;
+    /*     max-height: 420px;
+    overflow-y: scroll; */
+  }
 `;

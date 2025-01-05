@@ -17,7 +17,9 @@ export const addClassFormItems = {
   },
   trainer: {
     label: "Trainer",
-    rules: [{ required: true, message: "Please select a trainer" }],
+    rules: [
+      /* { required: true, message: "Please select a trainer" } */
+    ],
   },
   customDays: {
     label: "Custom Days Interval",
