@@ -28,8 +28,10 @@ import {
   PhoneFilled,
   UserOutlined,
 } from "@ant-design/icons";
-import { imageService, trainerService, userService } from "services";
+import { imageService, jobService, trainerService, userService } from "services";
 import moment from "moment";
+import { PlusOutlined } from '@ant-design/icons';
+import { Divider } from 'antd';
 
 const Container = styled.div`
   background: white;
@@ -256,6 +258,11 @@ const Status = styled.div`
 
 const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [jobs, setJobs] = useState<any[]>([]);
+  const [isAddingJob, setIsAddingJob] = useState(false);
+  const [newJobName, setNewJobName] = useState('');
+  const [newJobDesc, setNewJobDesc] = useState('');
+  const [jobLoading, setJobLoading] = useState(false);
 
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isActive, setIsActive] = useState(user?.active);
@@ -272,6 +279,42 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
     setIsEditModalVisible(true);
   };
 
+  useEffect(() => {
+    if (isEditModalVisible) {
+      fetchJobs();
+    }
+  }, [isEditModalVisible]);
+
+  const fetchJobs = async () => {
+    setJobLoading(true);
+    try {
+      const response = await jobService.getAll(); // Implement this API call
+      setJobs(response.data);
+    } catch (error) {
+      message.error('Failed to fetch jobs');
+    } finally {
+      setJobLoading(false);
+    }
+  };
+
+  const handleAddNewJob = async () => {
+    try {
+      if(!newJobName) return message.error('Please enter a job name');
+      if(!newJobDesc) return message.error('Please enter a job name');
+      await jobService.add({ 
+          jobName:newJobName,
+          jobDesc:"Designs, develops, tests and deploys software products."
+      }); 
+      message.success('Job added successfully');
+      setIsAddingJob(false);
+      setNewJobName('');
+      setNewJobDesc('');
+      fetchJobs(); // Refresh jobs list
+    } catch (error) {
+      message.error('Failed to add job');
+    }
+  };
+
   const handleEditSubmit = (values: any) => {
     const payload = {
       id: user.id,
@@ -284,6 +327,7 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
       ucUpdateRequest: {
         birthdate: values.birthdate.format("YYYY-MM-DD"), // Birthdate in "YYYY-MM-DD" format
       },
+      jobId: jobs.find(job => job.jobName === values.jobId)?.id,
     };
 
     userService
@@ -407,7 +451,7 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
           <Name>
             {user.ucGetResponse.name} {user.ucGetResponse.surname}
           </Name>
-          <Title>Pilates Eğitmeni</Title>
+          <Title>{user.jobName}</Title>
         </ProfileSection>
 
         <Link to={`/companies/${user.companyId}`}>
@@ -511,6 +555,68 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
                 <Select.Option value="FEMALE">Female</Select.Option>
               </Select>
             </Form.Item>
+            <Form.Item
+              name="jobId"
+              label="Job"
+              rules={[{ required: true, message: "Please select or add a job" }]}
+            >
+          {isAddingJob ? (
+            <Input.Group compact>
+              <Input 
+                style={{ width: 'calc(100% - 90px)' }}
+                value={newJobName}
+                onChange={(e) => setNewJobName(e.target.value)}
+                placeholder="Enter new job name"
+              />
+              <Input 
+                style={{ width: 'calc(100% - 90px)', marginTop: '7px', marginBottom: '7px' }}
+                value={newJobDesc}
+                onChange={(e) => setNewJobDesc(e.target.value)}
+                placeholder="Enter new job description"
+              />
+              <br/>
+              <Button 
+                type="primary" 
+                onClick={handleAddNewJob}
+                loading={jobLoading}
+              >
+                Add
+              </Button>
+              <Button 
+                onClick={() => setIsAddingJob(false)}
+                style={{ marginLeft: '8px' }}
+              >
+                Cancel
+              </Button>
+            </Input.Group>
+          ) : (
+            <Select
+              loading={jobLoading}
+              placeholder="Select job"
+              dropdownRender={(menu) => (
+                <>
+                  {menu}
+                  <Divider style={{ margin: '8px 0' }} />
+                  <Button 
+                    type="text" 
+                    icon={<PlusOutlined />}
+                    onClick={() => setIsAddingJob(true)}
+                    style={{ paddingLeft: 8 }}
+                  >
+                    Add new job
+                  </Button>
+                </>
+              )}
+            >
+              {jobs.map(job => (
+                <Select.Option key={job.id} value={job.jobName}>
+                  {job.jobName}
+                </Select.Option>
+              ))}
+            </Select>
+          )}
+        </Form.Item>
+
             <Form.Item
               name="active"
               label="Is Active"
