@@ -306,6 +306,8 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
       birthdate: moment(trainer.ucGetResponse.birthdate),
       active: trainer.active,
       endDate: trainer.passiveEndDate,
+      jobId: trainer.jobName,
+      location: trainer.location,
     });
     setIsEditModalVisible(true);
   };
@@ -323,6 +325,7 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
         birthdate: values.birthdate.format("YYYY-MM-DD"), // Birthdate in "YYYY-MM-DD" format
       },
       jobId: jobs.find(job => job.jobName === values.jobId)?.id,
+      location: values.location,
     };
 
     trainerService
@@ -477,6 +480,10 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
             <span>Birthdate:</span>{" "}
             {moment(trainer.ucGetResponse.birthdate).format("DD MMMM YYYY")}
           </InfoItem>
+          <InfoItem>
+            <span>Location:</span>{" "}
+            {trainer.location ? trainer.location : "Not specified"}
+          </InfoItem>
         </InfoSection>
         <ContactInfo>
           <a href={`mailto:${trainer.email}`} style={{ color: "#4a4a4a" }}>
@@ -614,6 +621,13 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
                 <Select.Option value="FEMALE">Female</Select.Option>
               </Select>
             </Form.Item>
+            < Form.Item
+                            name="location"
+                            label="Location"
+                            rules={[{ required: true, message: "Please enter the location" }]}
+                          >
+                            <Input />
+                          </Form.Item>
             <Form.Item
               name="active"
               label="Is Active"

@@ -275,6 +275,8 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
       birthdate: moment(user.ucGetResponse.birthdate),
       active: user.active,
       endDate: user.passiveEndDate,
+      jobId: user.jobName,
+      location: user.location,
     });
     setIsEditModalVisible(true);
   };
@@ -328,6 +330,7 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
         birthdate: values.birthdate.format("YYYY-MM-DD"), // Birthdate in "YYYY-MM-DD" format
       },
       jobId: jobs.find(job => job.jobName === values.jobId)?.id,
+      location: values.location,
     };
 
     userService
@@ -480,6 +483,10 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
             <span>Birthdate:</span>{" "}
             {moment(user.ucGetResponse.birthdate).format("DD MMMM YYYY")}
           </InfoItem>
+          <InfoItem>
+            <span>Location:</span>{" "}
+            {user.location ? user.location : "Not specified"}
+          </InfoItem>
         </InfoSection>
         <ContactInfo>
           <a href={`mailto:${user.email}`} style={{ color: "#4a4a4a" }}>
@@ -616,7 +623,13 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
             </Select>
           )}
         </Form.Item>
-
+          < Form.Item
+                name="location"
+                label="Location"
+                rules={[{ required: true, message: "Please enter the location" }]}
+              >
+                <Input />
+              </Form.Item>
             <Form.Item
               name="active"
               label="Is Active"

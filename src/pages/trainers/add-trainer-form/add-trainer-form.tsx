@@ -1,7 +1,9 @@
-import React, { useState } from "react";
-import { Form, Input, DatePicker, Select, Button, Modal } from "antd";
+import React, { useState, useEffect } from "react";
+import { Form, Input, DatePicker, Select, Button, Modal, message } from "antd";
 import { addTrainerFormItems } from "./add-trainer-form-items";
-import { companyService, branchService } from "services";
+import { companyService, branchService, jobService } from "services";
+import { PlusOutlined } from '@ant-design/icons';
+import { Divider } from 'antd';
 
 interface AddTrainerFormProps {
   visible: boolean;
@@ -19,6 +21,11 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
   const [branches, setBranches] = useState([]);
   const [companySearchLoading, setCompanySearchLoading] = useState(false);
   const [branchLoading, setBranchLoading] = useState(false);
+  const [jobs, setJobs] = useState<any[]>([]);
+  const [isAddingJob, setIsAddingJob] = useState(false);
+  const [newJobName, setNewJobName] = useState('');
+  const [newJobDesc, setNewJobDesc] = useState('');
+  const [jobLoading, setJobLoading] = useState(false);
 
   const handleCompanySearch = async (value: string) => {
     if (!value) return;
@@ -33,6 +40,39 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
     }
   };
 
+  useEffect(() => {
+      fetchJobs();
+  }, []);
+
+  const fetchJobs = async () => {
+    setJobLoading(true);
+    try {
+      const response = await jobService.getAll(); // Implement this API call
+      setJobs(response.data);
+    } catch (error) {
+      message.error('Failed to fetch jobs');
+    } finally {
+      setJobLoading(false);
+    }
+  };
+
+  const handleAddNewJob = async () => {
+    try {
+      if(!newJobName) return message.error('Please enter a job name');
+      if(!newJobDesc) return message.error('Please enter a job name');
+      await jobService.add({ 
+          jobName:newJobName,
+          jobDesc:"Designs, develops, tests and deploys software products."
+      }); 
+      message.success('Job added successfully');
+      setIsAddingJob(false);
+      setNewJobName('');
+      setNewJobDesc('');
+      fetchJobs(); // Refresh jobs list
+    } catch (error) {
+      message.error('Failed to add job');
+    }
+  };
   const handleCompanySelect = async (companyId: string) => {
     setBranchLoading(true);
     try {
@@ -118,7 +158,75 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
         <Form.Item {...addTrainerFormItems.phoneNumber} name="phoneNumber">
           <Input placeholder="Enter phone number" />
         </Form.Item>
-
+        <Form.Item
+              name="jobId"
+              label="Job"
+              rules={[{ required: true, message: "Please select or add a job" }]}
+            >
+          {isAddingJob ? (
+            <Input.Group compact>
+              <Input 
+                style={{ width: 'calc(100% - 90px)' }}
+                value={newJobName}
+                onChange={(e) => setNewJobName(e.target.value)}
+                placeholder="Enter new job name"
+              />
+              <Input 
+                style={{ width: 'calc(100% - 90px)', marginTop: '7px', marginBottom: '7px' }}
+                value={newJobDesc}
+                onChange={(e) => setNewJobDesc(e.target.value)}
+                placeholder="Enter new job description"
+              />
+              <br/>
+              <Button 
+                type="primary" 
+                onClick={handleAddNewJob}
+                loading={jobLoading}
+              >
+                Add
+              </Button>
+              <Button 
+                onClick={() => setIsAddingJob(false)}
+                style={{ marginLeft: '8px' }}
+              >
+                Cancel
+              </Button>
+            </Input.Group>
+          ) : (
+            <Select
+              loading={jobLoading}
+              placeholder="Select job"
+              dropdownRender={(menu) => (
+                <>
+                  {menu}
+                  <Divider style={{ margin: '8px 0' }} />
+                  <Button 
+                    type="text" 
+                    icon={<PlusOutlined />}
+                    onClick={() => setIsAddingJob(true)}
+                    style={{ paddingLeft: 8 }}
+                  >
+                    Add new job
+                  </Button>
+                </>
+              )}
+            >
+              {jobs.map(job => (
+                <Select.Option key={job.id} value={job.id}>
+                                  {job.jobName}
+                </Select.Option>
+              ))}
+            </Select>
+          )}
+        </Form.Item>
+          < Form.Item
+                name="location"
+                label="Location"
+                rules={[{ required: true, message: "Please enter the location" }]}
+              >
+                <Input />
+              </Form.Item>
+              
         <Form.Item>
           <Button type="primary" htmlType="submit">
             Submit

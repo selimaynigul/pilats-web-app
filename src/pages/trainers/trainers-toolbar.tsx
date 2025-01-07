@@ -68,6 +68,8 @@ const TrainersToolbar: React.FC<{
       branchId: parseInt(values.branch, 10), // Ensure this is a valid integer
       /*       jobId: values.jobId || null, // If jobId is optional, send null when not provided
        */
+      jobId: values.jobId,
+      location: values.location,
     };
 
     trainerService
