@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
 import {
   Avatar,
@@ -21,7 +21,7 @@ import {
   PhoneFilled,
   UserOutlined,
 } from "@ant-design/icons";
-import { trainerService } from "services";
+import { imageService, trainerService } from "services";
 import moment from "moment";
 
 const Container = styled.div`
@@ -255,6 +255,7 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
   const [isActive, setIsActive] = useState(trainer?.active);
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleEdit = () => {
     form.setFieldsValue({
@@ -349,6 +350,27 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
 
   const whatsappLink = "https://wa.me/+905077845678";
 
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click(); // File input'u tıklanmış gibi tetikle
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+  
+    const confirm = window.confirm('Do you want to upload this image?');
+    if (!confirm) return;
+  
+    const formData = new FormData();
+    formData.append("name", file.name);
+    formData.append("type", file.type);
+    formData.append("data", file);
+    formData.append("id", trainer.id);
+  
+    await imageService.postTrainerImage(formData);
+    window.location.reload();
+  };
   return (
     <>
       <Container>
@@ -363,13 +385,20 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
         </ActionButtons>
 
         <ProfileSection>
-          <AvatarContainer>
+          <AvatarContainer onClick={handleAvatarClick}>
             {!trainer.active && <InactiveIcon title="Not working" />}
             <Avatar
               size={150}
-              src={trainer.imageUrl || null}
+              src={"http://localhost:8000/api/v1/images/"+trainer.imageUrl}
               icon={<UserOutlined />}
               style={{ marginBottom: 8 }}
+            />
+            <input 
+              type="file"
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+              accept=".png"
+              onChange={handleFileChange}
             />
           </AvatarContainer>
           <Name>

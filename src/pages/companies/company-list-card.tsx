@@ -43,7 +43,7 @@ const CompanyListCard: React.FC<{ company: any }> = ({ company }) => {
           >
             <Avatar
               size={60}
-              src={company.imageUrl}
+              src={"http://localhost:8000/api/v1/images/"+company.imageUrl}
               style={{
                 background: "lightgrey",
                 fontSize: 24,

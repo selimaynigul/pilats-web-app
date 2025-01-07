@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
 import {
   Avatar,
@@ -28,7 +28,7 @@ import {
   PhoneFilled,
   UserOutlined,
 } from "@ant-design/icons";
-import { trainerService, userService } from "services";
+import { imageService, trainerService, userService } from "services";
 import moment from "moment";
 
 const Container = styled.div`
@@ -255,6 +255,8 @@ const Status = styled.div`
 `;
 
 const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isActive, setIsActive] = useState(user?.active);
   const [form] = Form.useForm();
@@ -352,7 +354,26 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
  */
 
   const whatsappLink = "https://wa.me/+905077845678";
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click(); // File input'u tıklanmış gibi tetikle
+  };
 
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+  
+    const confirm = window.confirm('Do you want to upload this image?');
+    if (!confirm) return;
+  
+    const formData = new FormData();
+    formData.append("name", file.name);
+    formData.append("type", file.type);
+    formData.append("data", file);
+    formData.append("id", user.id);
+  
+    await imageService.postCustomerImage(formData);
+    window.location.reload();
+  };
   return (
     <>
       <Container>
@@ -367,12 +388,20 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
         </ActionButtons>
 
         <ProfileSection>
-          <AvatarContainer>
+          <AvatarContainer onClick={handleAvatarClick}>
             <Avatar
               size={150}
-              src={user.imageUrl || null}
+              src={"http://localhost:8000/api/v1/images/"+user.imageUrl}
               icon={<UserOutlined />}
               style={{ marginBottom: 8 }}
+              
+            />
+            <input 
+              type="file"
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+              accept=".png"
+              onChange={handleFileChange}
             />
           </AvatarContainer>
           <Name>

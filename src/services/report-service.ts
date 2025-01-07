@@ -1,7 +1,7 @@
 import { apiClient } from "config";
 
 const reportService = {
-  getReports: () => apiClient.get("/reports"),
+  getReports: (params = {}) => apiClient.post("/changeAudit/search", params),
 };
 
 export default reportService;

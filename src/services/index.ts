@@ -6,3 +6,4 @@ export { default as branchService } from "./branch-service";
 export { default as branchAdminService } from "./branch-admin-service";
 export { default as userService } from "./user-service";
 export { default as reportService } from "./report-service";
+export { default as imageService } from "./image-service";

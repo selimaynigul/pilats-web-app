@@ -173,7 +173,7 @@ const TrainerCard: React.FC<{ trainer: any }> = ({ trainer }) => {
           >
             <Avatar
               size={60}
-              src={trainer.imageUrl}
+              src={"http://localhost:8000/api/v1/images/"+trainer.imageUrl}
               style={{ background: "lightgrey" }}
             >
               {trainer.ucGetResponse.name[0].toUpperCase()}
@@ -182,7 +182,7 @@ const TrainerCard: React.FC<{ trainer: any }> = ({ trainer }) => {
               title={
                 trainer.ucGetResponse.name + " " + trainer.ucGetResponse.surname
               }
-              description="Yoga Trainer"
+              description={trainer.jobName}
             />
           </div>
         </Link>
