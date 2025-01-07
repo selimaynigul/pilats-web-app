@@ -22,6 +22,7 @@ import {
   PlusOutlined,
 } from "@ant-design/icons";
 import { trainerService } from "services";
+import { getBranchId } from "utils/permissionUtils";
 
 const StyleOverrides = styled.div`
   .trainer-select {
@@ -128,8 +129,9 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
 
   const handleTrainerSearch = (value: string) => {
     if (!value) return;
+
     trainerService
-      .search({ ucSearchRequest: { name: value } })
+      .search({ ucSearchRequest: { name: value, branchId: getBranchId() } })
       .then((res) => {
         setTrainers(res?.data);
       })
@@ -253,11 +255,16 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
               onFocus={() => setTrainerExpanded(true)}
               onBlur={() => setTrainerExpanded(false)}
             >
-              {trainers.map((trainer: any) => (
-                <Select.Option key={trainer.id} value={trainer.id}>
-                  {trainer.ucGetResponse.name} {trainer.ucGetResponse.surname}
-                </Select.Option>
-              ))}
+              {trainers.map((trainer: any) => {
+                if (trainer.active) {
+                  return (
+                    <Select.Option key={trainer.id} value={trainer.id}>
+                      {trainer.ucGetResponse.name}{" "}
+                      {trainer.ucGetResponse.surname}
+                    </Select.Option>
+                  );
+                }
+              })}
             </Select>
           </Form.Item>
         </div>

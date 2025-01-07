@@ -12,6 +12,7 @@ import dayjs from "dayjs";
 import AddButton from "components/AddButton";
 import { CompanyDropdown } from "components";
 import { ToolbarProps, View } from "react-big-calendar";
+import { hasRole } from "utils/permissionUtils";
 
 const Toolbar: React.FC<
   ToolbarProps & { setCompany: any; setIsModalVisible: any }
@@ -88,7 +89,9 @@ const Toolbar: React.FC<
             {v.charAt(0).toUpperCase() + v.slice(1)}
           </ToggleViewButton>
         ))}
-        <AddButton onClick={() => handleModalToggle(true)} />
+        {hasRole(["BRANCH_ADMIN"]) && (
+          <AddButton onClick={() => handleModalToggle(true)} />
+        )}
       </NavButtons>
     </ToolbarContainer>
   );

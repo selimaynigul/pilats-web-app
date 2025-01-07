@@ -9,7 +9,7 @@ const branchAdminService = {
 
   delete: (id: any) => apiClient.delete(`/branchAdmin/${id}`),
 
-  getById: (id: any) => apiClient.get(`/branchAdmin/${id}`),
+  getById: (id: any) => apiClient.get(`/branchAdmin/userid/${id}`),
 };
 
 export default branchAdminService;

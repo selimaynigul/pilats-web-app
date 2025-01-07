@@ -8,6 +8,7 @@ import React, {
 import { useNavigate } from "react-router-dom";
 import { message } from "antd";
 import { branchAdminService, companyAdminService } from "services";
+import { updateUser } from "utils/permissionUtils";
 
 interface AuthContextType {
   user: User | null;
@@ -45,22 +46,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = (user: any) => {
     localStorage.setItem("user", JSON.stringify(user));
-
-    /*  const role = user.role;
-    if (role === "ADMIN") {
-    } else if (role === "COMPANY_ADMIN") {
-      companyAdminService
-        .getById(user.userId)
-        .then((res) => {})
-        .catch((err) => {});
-    } else if (role === "BRANCH_ADMIN") {
-      branchAdminService
-        .getById(user.userId)
-        .then((res) => {})
-        .catch((err) => {});
-    } */
-
-    setUser(user);
+    updateUser();
     message.success("Login successful");
     navigate("/");
   };

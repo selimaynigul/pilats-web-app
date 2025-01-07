@@ -17,6 +17,7 @@ import {
   StyledModal,
 } from "components/scheduler/SchedulerStyles";
 import { sessionService } from "services";
+import { getBranchId, hasRole } from "utils/permissionUtils";
 
 const DragAndDropCalendar = withDragAndDrop(Calendar);
 const localizer = momentLocalizer(moment);
@@ -55,7 +56,7 @@ const MyCalendar: React.FC = () => {
     const params = {
       startDate: dayjs(startDate).toISOString(), // Use ISO 8601 with time
       endDate: dayjs(endDate).toISOString(),
-
+      branchId: getBranchId(),
       searchByPageDto: {
         pageSize: 200,
       },
@@ -118,8 +119,10 @@ const MyCalendar: React.FC = () => {
 
   const handleSelectSlot = (slotInfo: { start: Date; end: Date }) => {
     if (loading) return;
-    setSelectedRange(slotInfo);
-    setIsModalVisible(true);
+    if (hasRole(["BRANCH_ADMIN"])) {
+      setSelectedRange(slotInfo);
+      setIsModalVisible(true);
+    }
   };
 
   const handleAddEvent = (values: any) => {
@@ -139,7 +142,7 @@ const MyCalendar: React.FC = () => {
         .hour(dayjs(endTime).hour())
         .minute(dayjs(endTime).minute())
         .format("YYYY-MM-DDTHH:mm:ss"), // Format end date and time
-      branchId: 16,
+      branchId: getBranchId(),
       trainerId: values.trainer,
       isRepeat: values.repeat || false, // Indicate if it is a repeating event
       repeatDay:
@@ -292,7 +295,7 @@ const MyCalendar: React.FC = () => {
         defaultDate={defaultDate} // Use saved date as default
         events={events}
         localizer={localizer}
-        selectable
+        selectable={hasRole(["BRANCH_ADMIN"])}
         onSelectSlot={handleSelectSlot}
         onEventDrop={moveEvent}
         resizable={false} // Disable resizing entirely
