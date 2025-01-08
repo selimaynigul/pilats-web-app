@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
 import {
   Avatar,
@@ -21,8 +21,10 @@ import {
   PhoneFilled,
   UserOutlined,
 } from "@ant-design/icons";
-import { trainerService } from "services";
+import { imageService, jobService, trainerService } from "services";
 import moment from "moment";
+import { PlusOutlined } from '@ant-design/icons';
+import { Divider } from 'antd';
 
 const Container = styled.div`
   background: white;
@@ -255,6 +257,48 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
   const [isActive, setIsActive] = useState(trainer?.active);
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [jobs, setJobs] = useState<any[]>([]);
+  const [isAddingJob, setIsAddingJob] = useState(false);
+  const [newJobName, setNewJobName] = useState('');
+  const [newJobDesc, setNewJobDesc] = useState('');
+  const [jobLoading, setJobLoading] = useState(false);
+
+  useEffect(() => {
+    if (isEditModalVisible) {
+      fetchJobs();
+    }
+  }, [isEditModalVisible]);
+
+  const fetchJobs = async () => {
+    setJobLoading(true);
+    try {
+      const response = await jobService.getAll(); // Implement this API call
+      setJobs(response.data);
+    } catch (error) {
+      message.error('Failed to fetch jobs');
+    } finally {
+      setJobLoading(false);
+    }
+  };
+
+  const handleAddNewJob = async () => {
+    try {
+      if(!newJobName) return message.error('Please enter a job name');
+      if(!newJobDesc) return message.error('Please enter a job name');
+      await jobService.add({ 
+          jobName:newJobName,
+          jobDesc:"Designs, develops, tests and deploys software products."
+      }); 
+      message.success('Job added successfully');
+      setIsAddingJob(false);
+      setNewJobName('');
+      setNewJobDesc('');
+      fetchJobs(); // Refresh jobs list
+    } catch (error) {
+      message.error('Failed to add job');
+    }
+  };
 
   const handleEdit = () => {
     form.setFieldsValue({
@@ -262,6 +306,8 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
       birthdate: moment(trainer.ucGetResponse.birthdate),
       active: trainer.active,
       endDate: trainer.passiveEndDate,
+      jobId: trainer.jobName,
+      location: trainer.location,
     });
     setIsEditModalVisible(true);
   };
@@ -278,6 +324,8 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
       ucUpdateRequest: {
         birthdate: values.birthdate.format("YYYY-MM-DD"), // Birthdate in "YYYY-MM-DD" format
       },
+      jobId: jobs.find(job => job.jobName === values.jobId)?.id,
+      location: values.location,
     };
 
     trainerService
@@ -349,6 +397,27 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
 
   const whatsappLink = "https://wa.me/+905077845678";
 
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click(); // File input'u tıklanmış gibi tetikle
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+  
+    const confirm = window.confirm('Do you want to upload this image?');
+    if (!confirm) return;
+  
+    const formData = new FormData();
+    formData.append("name", file.name);
+    formData.append("type", file.type);
+    formData.append("data", file);
+    formData.append("id", trainer.id);
+  
+    await imageService.postTrainerImage(formData);
+    window.location.reload();
+  };
   return (
     <>
       <Container>
@@ -363,19 +432,26 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
         </ActionButtons>
 
         <ProfileSection>
-          <AvatarContainer>
+          <AvatarContainer onClick={handleAvatarClick}>
             {!trainer.active && <InactiveIcon title="Not working" />}
             <Avatar
               size={150}
-              src={trainer.avatarUrl || null}
+              src={"http://localhost:8000/api/v1/images/"+trainer.imageUrl}
               icon={<UserOutlined />}
               style={{ marginBottom: 8 }}
+            />
+            <input 
+              type="file"
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+              accept=".png"
+              onChange={handleFileChange}
             />
           </AvatarContainer>
           <Name>
             {trainer.ucGetResponse.name} {trainer.ucGetResponse.surname}
           </Name>
-          <Title>Pilates Eğitmeni</Title>
+          <Title>{trainer.jobName}</Title>
         </ProfileSection>
 
         <Link to={`/companies/${trainer.companyId}`}>
@@ -403,6 +479,10 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
           <InfoItem>
             <span>Birthdate:</span>{" "}
             {moment(trainer.ucGetResponse.birthdate).format("DD MMMM YYYY")}
+          </InfoItem>
+          <InfoItem>
+            <span>Location:</span>{" "}
+            {trainer.location ? trainer.location : "Not specified"}
           </InfoItem>
         </InfoSection>
         <ContactInfo>
@@ -470,6 +550,68 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
               <Input />
             </Form.Item>
             <Form.Item
+                          name="jobId"
+                          label="Job"
+                          rules={[{ required: true, message: "Please select or add a job" }]}
+                        >
+                      {isAddingJob ? (
+                        <Input.Group compact>
+                          <Input 
+                            style={{ width: 'calc(100% - 90px)' }}
+                            value={newJobName}
+                            onChange={(e) => setNewJobName(e.target.value)}
+                            placeholder="Enter new job name"
+                          />
+                          
+                          <Input 
+                            style={{ width: 'calc(100% - 90px)', marginTop: '7px', marginBottom: '7px' }}
+                            value={newJobDesc}
+                            onChange={(e) => setNewJobDesc(e.target.value)}
+                            placeholder="Enter new job description"
+                          />
+                          <br />
+                          <Button 
+                            type="primary" 
+                            onClick={handleAddNewJob}
+                            loading={jobLoading}
+                          >
+                            Add
+                          </Button>
+                          <Button 
+                            onClick={() => setIsAddingJob(false)}
+                            style={{ marginLeft: '8px' }}
+                          >
+                            Cancel
+                          </Button>
+                        </Input.Group>
+                      ) : (
+                        <Select
+                          loading={jobLoading}
+                          placeholder="Select job"
+                          dropdownRender={(menu) => (
+                            <>
+                              {menu}
+                              <Divider style={{ margin: '8px 0' }} />
+                              <Button 
+                                type="text" 
+                                icon={<PlusOutlined />}
+                                onClick={() => setIsAddingJob(true)}
+                                style={{ paddingLeft: 8 }}
+                              >
+                                Add new job
+                              </Button>
+                            </>
+                          )}
+                        >
+                          {jobs.map(job => (
+                            <Select.Option key={job.id} value={job.jobName}>
+                              {job.jobName}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      )}
+                    </Form.Item>
+            <Form.Item
               name="gender"
               label="Gender"
               rules={[{ required: true, message: "Please select the gender" }]}
@@ -479,6 +621,13 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
                 <Select.Option value="FEMALE">Female</Select.Option>
               </Select>
             </Form.Item>
+            < Form.Item
+                            name="location"
+                            label="Location"
+                            rules={[{ required: true, message: "Please enter the location" }]}
+                          >
+                            <Input />
+                          </Form.Item>
             <Form.Item
               name="active"
               label="Is Active"

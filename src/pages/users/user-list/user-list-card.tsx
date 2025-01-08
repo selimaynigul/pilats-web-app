@@ -150,14 +150,14 @@ const UserCard: React.FC<{ user: any }> = ({ user }) => {
           >
             <Avatar
               size={60}
-              src={user.avatarUrl}
+              src={"http://localhost:8000/api/v1/images/"+user.imageUrl}
               style={{ background: "lightgrey" }}
             >
               {user.ucGetResponse.name[0].toUpperCase()}
             </Avatar>
             <Meta
               title={user.ucGetResponse.name + " " + user.ucGetResponse.surname}
-              description="Yoga user"
+              description={user.jobName}
             />
           </div>
         </Link>

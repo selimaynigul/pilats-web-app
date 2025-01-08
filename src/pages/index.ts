@@ -11,3 +11,4 @@ export { default as TrainerDetailsPage } from "./trainers/trainer-detail/trainer
 export { default as PackagesPage } from "./packages/packages-page";
 export { default as UnauthorizedPage } from "./unauthorized/unauthorized-page";
 export { default as RoleManagementPage } from "./role-management/role-management-page";
+export { default as ReportsPage } from "./reports/reports-page";
