@@ -79,7 +79,6 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
       setResponse([]);
       return;
     }
-
     setLoading(true);
     try {
       const response = await branchService.search({

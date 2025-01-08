@@ -12,6 +12,7 @@ import {
   PackagesPage,
   UserDetailsPage,
   UnauthorizedPage,
+  RoleManagementPage,
 } from "pages";
 import AppLayout from "components/layout/Layout";
 import AuthGuard from "components/guards/AuthGuard";
@@ -26,7 +27,24 @@ const AppNavigation = () => {
       {/* Protected Routes within the App Layout */}
       <Route element={<AppLayout />}>
         {/* Home Page (accessible to all authenticated users) */}
-        <Route path="/" element={<HomePage />} />
+
+        <Route
+          path="/"
+          element={
+            <AuthGuard requiredRoles={["COMPANY_ADMIN", "ADMIN"]}>
+              <HomePage />
+            </AuthGuard>
+          }
+        />
+
+        <Route
+          path="/role-management"
+          element={
+            <AuthGuard requiredRoles={["ADMIN"]}>
+              <RoleManagementPage />
+            </AuthGuard>
+          }
+        />
 
         {/* Company Admin-only Routes */}
         <Route

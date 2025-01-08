@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Layout, Dropdown, Avatar, Menu } from "antd";
 import Sidebar from "./Sider";
 import Header from "./Header";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   StyledContent,
   Heading,
@@ -21,6 +21,7 @@ const AppLayout: React.FC = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [searchActive, setSearchActive] = useState(false);
   const [userName, setUserName] = useState("");
+  const navigate = useNavigate();
 
   const { user } = useAuth();
   const location = useLocation();
@@ -44,8 +45,12 @@ const AppLayout: React.FC = () => {
 
   const profileMenu = (
     <Menu>
-      <Menu.Item key="settings" icon={<SettingOutlined />}>
-        Settings
+      <Menu.Item
+        onClick={() => navigate("/role-management")}
+        key="settings"
+        icon={<SettingOutlined />}
+      >
+        Role Management
       </Menu.Item>
       <Menu.Item
         onClick={handleLogout}
@@ -78,6 +83,7 @@ const AppLayout: React.FC = () => {
   const pathSegments = location.pathname.split("/").filter(Boolean);
   const basePath = `/${pathSegments[0] || ""}`;
   const pageTitle = pathTitles[basePath] || "Dashboard";
+
   return (
     <Layout style={{ height: "100vh" }}>
       {!collapsed && isMobile && (

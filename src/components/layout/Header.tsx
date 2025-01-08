@@ -81,7 +81,7 @@ const AppHeader: React.FC<HeaderProps> = ({
   const profileMenu = (
     <Menu>
       <Menu.Item key="settings" icon={<SettingOutlined />}>
-        Settings
+        Role Management
       </Menu.Item>
       <Menu.Item
         key="logout"
