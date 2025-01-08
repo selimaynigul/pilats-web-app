@@ -111,7 +111,7 @@ const SessionCard = styled.div`
 `;
 
 const TrainerClassesList: React.FC<{ trainer: any }> = ({ trainer }) => {
-  const [params, setParams] = useState({ trainerId: trainer.id });
+  const [params, setParams] = useState({ trainerId: trainer?.id });
 
   const {
     items: sessions,
