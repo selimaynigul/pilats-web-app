@@ -17,7 +17,7 @@ import {
   StyledModal,
 } from "components/scheduler/SchedulerStyles";
 import { sessionService } from "services";
-import { getBranchId, hasRole } from "utils/permissionUtils";
+import { getBranchId, getCompanyId, hasRole } from "utils/permissionUtils";
 
 const DragAndDropCalendar = withDragAndDrop(Calendar);
 const localizer = momentLocalizer(moment);
@@ -57,6 +57,7 @@ const MyCalendar: React.FC = () => {
       startDate: dayjs(startDate).toISOString(), // Use ISO 8601 with time
       endDate: dayjs(endDate).toISOString(),
       branchId: getBranchId(),
+      companyId: getCompanyId() || company.id || null,
       searchByPageDto: {
         pageSize: 200,
       },

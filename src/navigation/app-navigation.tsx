@@ -21,6 +21,7 @@ const AppNavigation = () => {
     <Routes>
       {/* Public Route */}
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<LoginPage />} />
 
       {/* Protected Routes within the App Layout */}
       <Route element={<AppLayout />}>

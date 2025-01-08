@@ -22,10 +22,12 @@ import {
 import styled, { keyframes } from "styled-components";
 import { useTheme } from "contexts/ThemeProvider";
 import { useAuth } from "contexts/AuthProvider";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { authService } from "services";
+import LoginForm from "./login-form";
+import RegisterForm from "pages/register/register-form";
 
-const { Title, Text, Link } = Typography;
+const { Title, Text } = Typography;
 const { Option } = Select;
 
 const LoginFormContainer = styled.div`
@@ -48,81 +50,6 @@ const HeaderContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-`;
-
-const StyledForm = styled(Form)`
-  width: 100%;
-  max-width: 400px;
-  padding: 40px;
-  background-color: transparent;
-
-  @media (max-width: 768px) {
-    padding: 20px;
-  }
-`;
-
-const StyledTitle = styled(Title)`
-  margin-bottom: 20px !important;
-  box-sizing: content-box;
-
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  height: 30px;
-  color: ${({ theme }) => theme.text} !important;
-
-  .words {
-    overflow: hidden;
-  }
-
-  span {
-    display: block;
-    height: 100%;
-    animation: spin_words 20s infinite;
-
-    text-align: end;
-  }
-
-  @keyframes spin_words {
-    44% {
-      transform: translateY(0%);
-    }
-
-    50% {
-      transform: translateY(-100%);
-    }
-    94% {
-      transform: translateY(-100%);
-    }
-
-    100% {
-      transform: translateY(-200%);
-    }
-  }
-`;
-
-const PurpleText = styled.div`
-  color: #5d46e5;
-`;
-
-const Catchword = styled(Text)`
-  display: block;
-  text-align: center;
-  margin-bottom: 24px;
-  color: ${({ theme }) => theme.text};
-`;
-
-const ButtonContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  margin-top: 16px;
-`;
-
-const ForgotPasswordLink = styled(Link)`
-  display: block;
-  text-align: right;
-  margin-top: 8px;
 `;
 
 const Wrapper = styled.div`
@@ -221,9 +148,6 @@ const TextSkeletonWrapper = styled.div`
 `;
 
 const FirstSlideContent = styled.div``;
-const LoginButton = styled(Button)`
-  background: ${({ theme }) => theme.primary};
-`;
 
 const Box = styled.div`
   width: 242px;
@@ -275,36 +199,11 @@ const LoginPage: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const location = useLocation();
 
-  const mockResponses = {
-    "mainadmin@test.com": {
-      token: "mock-main-admin-token",
-      user: {
-        id: "1",
-        name: "Main Admin",
-        email: "mainadmin@test.com",
-        role: "mainAdmin",
-      },
-    },
-    "companyadmin@test.com": {
-      token: "mock-company-admin-token",
-      user: {
-        id: "2",
-        name: "Company Admin",
-        email: "companyadmin@test.com",
-        role: "companyAdmin",
-      },
-    },
-    "branchadmin@test.com": {
-      token: "mock-branch-admin-token",
-      user: {
-        id: "3",
-        name: "Branch Admin",
-        email: "branchadmin@test.com",
-        role: "branchAdmin",
-      },
-    },
-  };
+  // Check if the path is /login or /register
+  const isLogin = location.pathname === "/login";
+  const isRegister = location.pathname === "/register";
 
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -329,16 +228,22 @@ const LoginPage: React.FC = () => {
       });
     setLoading(false);
   };
-  /* 
-    authService
-      .adminRegister({ email: "selim@test.com", password: "1234" })
-      .then(() => {
-        message.success("register successful");
-      })
-      .catch(() => {
-        message.error("register failed");
-      }); */
 
+  const handleRegister = async (values: {
+    email: string;
+    password: string;
+  }) => {
+    setLoading(true);
+    try {
+      await authService.adminRegister(values);
+      message.success("Registration successful! Redirecting to login...");
+      navigate("/login");
+    } catch (error: any) {
+      message.error(error.response?.data?.message || "Registration failed");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <Wrapper>
       <Cover>
@@ -438,53 +343,11 @@ const LoginPage: React.FC = () => {
             {/* Add more language options if needed */}
           </Select>
         </HeaderContainer>
-        <StyledForm name="login_form" onFinish={handleFinish} layout="vertical">
-          <StyledTitle level={3}>
-            <div className="words">
-              <span>Welcome</span>
-              <span>Sign in</span>
-              <span>Welcome</span>
-            </div>
-            to <PurpleText>Pilats</PurpleText>
-          </StyledTitle>
-
-          <Catchword>Please log in to your account or sign up!</Catchword>
-
-          <Form.Item
-            name="email"
-            rules={[{ required: true, message: "Please input your username!" }]}
-          >
-            <Input placeholder="Username" size="large" />
-          </Form.Item>
-
-          <Form.Item
-            name="password"
-            rules={[{ required: true, message: "Please input your password!" }]}
-          >
-            <Input.Password placeholder="Password" size="large" />
-          </Form.Item>
-
-          <ForgotPasswordLink href="#">
-            Forgot your password?
-          </ForgotPasswordLink>
-
-          <ButtonContainer>
-            <LoginButton
-              type="primary"
-              htmlType="submit"
-              size="large"
-              block
-              loading={loading}
-            >
-              Login
-            </LoginButton>
-            <Divider plain>or</Divider>
-
-            <Button size="large" block style={{ color: "#5d46e5" }}>
-              Sign Up
-            </Button>
-          </ButtonContainer>
-        </StyledForm>
+        {isLogin ? (
+          <LoginForm onFinish={handleFinish} />
+        ) : (
+          <RegisterForm onFinish={handleRegister} />
+        )}
       </LoginFormContainer>
     </Wrapper>
   );
