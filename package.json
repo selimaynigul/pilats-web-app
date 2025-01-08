@@ -2,6 +2,7 @@
   "name": "pilates",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:8000",
   "dependencies": {
     "@ant-design/icons": "^5.5.1",
     "@nivo/bar": "^0.87.0",

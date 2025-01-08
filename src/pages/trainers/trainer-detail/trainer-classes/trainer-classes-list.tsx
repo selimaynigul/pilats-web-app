@@ -1,14 +1,17 @@
-import { Col, Dropdown, Row, theme } from "antd";
+import { Col, Dropdown, Row, Spin, theme } from "antd";
 import Alert from "antd/es/alert/Alert";
 import AddButton from "components/AddButton";
-import React from "react";
+import { usePagination } from "hooks";
+import React, { useMemo, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
+import { sessionService } from "services";
 import styled from "styled-components";
+import { CalendarOutlined, ClockCircleOutlined } from "@ant-design/icons";
 
 const Container = styled.div`
-  height: 100%;
   border-radius: 20px;
   padding: 12px;
+  height: 100%;
 
   h2 {
     color: ${({ theme }) => theme.primary};
@@ -19,14 +22,28 @@ const Container = styled.div`
     color: ${({ theme }) => theme.primary};
   }
 `;
-const ClassContainer = styled.div``;
+
+const Sessions = styled.div`
+  max-height: 71vh;
+  overflow: scroll;
+  overflow-x: hidden;
+
+  @media (max-width: 768px) {
+    height: 100%;
+    overflow: auto;
+  }
+`;
 
 const Header = styled.div`
   width: 100%;
   display: flex;
   justify-content: space-between;
+  margin-bottom: 20px;
   align-items: center;
-  margin-bottom: 24px;
+
+  h2 {
+    margin: 0;
+  }
 `;
 
 const EditButton = styled.div`
@@ -43,7 +60,24 @@ const EditButton = styled.div`
   }
 `;
 
-const BranchCard = styled.div`
+const DateTimeBox = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+  background: #f9f9f9;
+  font-size: 0.9em;
+  color: #555;
+
+  .icon {
+    color: ${({ theme }) => theme.primary};
+    font-size: 1.2em;
+  }
+`;
+
+const SessionCard = styled.div`
   border: 1px solid #e6e6e6;
   border-radius: 12px;
   padding: 16px;
@@ -54,15 +88,20 @@ const BranchCard = styled.div`
   align-items: center;
 
   h3 {
-    margin: 0;
+    margin-bottom: 12px;
     font-size: 1.1em;
     color: #333;
   }
 
   p {
-    margin: 4px 0 0;
+    margin: 4px 0 12px;
     font-size: 0.9em;
     color: #666;
+  }
+
+  .date-time {
+    display: flex;
+    gap: 8px;
   }
 
   &:hover {
@@ -72,50 +111,94 @@ const BranchCard = styled.div`
 `;
 
 const TrainerClassesList: React.FC<{ trainer: any }> = ({ trainer }) => {
+  const [params, setParams] = useState({ trainerId: trainer.id });
+
+  const {
+    items: sessions,
+    loading,
+    hasMore,
+    loadMore,
+  } = usePagination({
+    fetchService: sessionService.search,
+    params,
+  });
+
+  const formatDateTime = (startDate: string, endDate: string) => {
+    const parsedStart = new Date(startDate);
+    const parsedEnd = new Date(endDate);
+
+    const date = parsedStart.toLocaleDateString(undefined, {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+    });
+    const start = parsedStart.toLocaleTimeString(undefined, {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    const end = parsedEnd.toLocaleTimeString(undefined, {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    return { date, start, end };
+  };
+
   return (
     <Container>
       <Header>
         <h2>Classes</h2>
-        <AddButton onClick={() => {}} />
       </Header>
-      <Row gutter={[16, 16]}>
-        {trainer && !trainer?.active ? (
-          <Alert
-            message="Deactive trainers cannot have classes!"
-            type="info"
-            showIcon
-            closable
-            style={{
-              width: "100%",
-              borderRadius: "15px",
-              border: "1px solid #e6e3ff",
-              background: "#e6e3ff",
-            }}
-          />
-        ) : (
-          <div></div>
-        )}
-        {/* {branches.map((branch, index) => (
-          <Col xs={24} sm={12} key={index}>
-            <BranchCard>
-              <div>
-                <h3>{branch.branchName}</h3>
-                <p>{branch.address || "No address available"}</p>
-              </div>
-              <Dropdown
-                overlay={renderMenu(branch)}
-                trigger={["click"]}
-                placement="bottomRight"
-              >
-                <EditButton>
-                  <BsThreeDotsVertical />
-                </EditButton>
-              </Dropdown>
-            </BranchCard>
-          </Col>
-        ))} */}
-      </Row>
+      {trainer && !trainer?.active && (
+        <Alert
+          message="Deactive trainers cannot have classes!"
+          type="info"
+          showIcon
+          closable
+          style={{
+            width: "100%",
+            borderRadius: "15px",
+            border: "1px solid #e6e3ff",
+            background: "#e6e3ff",
+          }}
+        />
+      )}
+      {loading ? (
+        <Spin />
+      ) : (
+        <Sessions>
+          <Row gutter={[16, 16]}>
+            {sessions.map((session: any, index) => {
+              const { date, start, end } = formatDateTime(
+                session.startDate,
+                session.endDate
+              );
+
+              return (
+                <Col xs={24} sm={12} key={index}>
+                  <SessionCard>
+                    <div>
+                      <h3>{session.name}</h3>
+                      <p>{session.description || "No description available"}</p>
+                      <div className="date-time">
+                        <DateTimeBox>
+                          <CalendarOutlined className="icon" />
+                          {date}
+                        </DateTimeBox>
+                        <DateTimeBox>
+                          <ClockCircleOutlined className="icon" />
+                          {start} - {end}
+                        </DateTimeBox>
+                      </div>
+                    </div>
+                  </SessionCard>
+                </Col>
+              );
+            })}
+          </Row>
+        </Sessions>
+      )}
     </Container>
   );
 };
+
 export default TrainerClassesList;

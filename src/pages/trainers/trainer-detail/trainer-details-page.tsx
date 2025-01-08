@@ -38,7 +38,6 @@ const TrainerDetailPage: React.FC = () => {
           <Col xs={24} sm={24} md={8}>
             <TrainerInfo trainer={trainer} loading={loading} />
           </Col>
-
           <Col xs={24} sm={24} md={16}>
             <TrainerClassesList trainer={trainer} />
           </Col>
