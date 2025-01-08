@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import AddButton from "components/AddButton";
 import AddUserModal from "./add-user-form/add-user-form";
-import { trainerService } from "services";
+import { trainerService, userService } from "services";
 import { handleError } from "utils/apiHelpers";
 import { message } from "antd";
 import { CompanyDropdown } from "components";
@@ -68,9 +68,11 @@ const UsersToolbar: React.FC<{
       branchId: parseInt(values.branch, 10), // Ensure this is a valid integer
       /*       jobId: values.jobId || null, // If jobId is optional, send null when not provided
        */
+      jobId: values.jobId,
+      location: values.location,
     };
 
-    trainerService
+    userService
       .register(payload)
       .then(() => {
         message.success("Trainer is added");
