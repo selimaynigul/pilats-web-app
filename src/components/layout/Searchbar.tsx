@@ -12,6 +12,7 @@ import {
 } from "./layoutStyles";
 import { SearchOutlined } from "@ant-design/icons";
 import { companyService, trainerService } from "services";
+import { hasRole } from "utils/permissionUtils";
 
 interface SearchBarProps {
   isMobile: boolean;
@@ -147,12 +148,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const dropdownOverlay = (
     <DropdownOverlay>
       <TransparentMenu>
-        <CategoryItem
-          isSelected={selectedCategory === "companies"}
-          onClick={() => setSelectedCategory("companies")}
-        >
-          Company
-        </CategoryItem>
+        {hasRole(["ADMIN"]) && (
+          <CategoryItem
+            isSelected={selectedCategory === "companies"}
+            onClick={() => setSelectedCategory("companies")}
+          >
+            Company
+          </CategoryItem>
+        )}
         <CategoryItem
           isSelected={selectedCategory === "trainers"}
           onClick={() => setSelectedCategory("trainers")}

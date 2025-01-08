@@ -20,19 +20,35 @@ export const getCompanyId = () => {
   return user?.companyId || null;
 };
 
+export const capitalize = (str: string) =>
+  str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
+export const getUserName = () => {
+  const user = getUser();
+  if (!user || !user.ucGetResponse) return null;
+
+  const name = capitalize(user.ucGetResponse.name || "");
+  const surname = capitalize(user.ucGetResponse.surname || "");
+
+  return `${name} ${surname}`.trim();
+};
+
+export const getToken = () => {
+  const user = getUser();
+  return user?.token || null;
+};
+
 export const updateUser = () => {
   const user = getUser();
   const role = user?.role;
 
   if (role === "ADMIN") {
-    // Handle ADMIN case, if needed
   } else if (role === "COMPANY_ADMIN") {
     companyAdminService
       .getById(user.userId)
       .then((res) => {
         const combinedData = { ...user, ...res.data };
-        console.log("Combined Data (COMPANY_ADMIN):", combinedData);
-        // Use combinedData as needed
+        localStorage.setItem("user", JSON.stringify(combinedData));
       })
       .catch((err) => {
         console.error("Error fetching company admin data:", err);
@@ -42,9 +58,7 @@ export const updateUser = () => {
       .getById(user.userId)
       .then((res) => {
         const combinedData = { ...user, ...res.data };
-        console.log("Combined Data (BRANCH_ADMIN):", combinedData);
         localStorage.setItem("user", JSON.stringify(combinedData));
-        // Use combinedData as needed
       })
       .catch((err) => {
         console.error("Error fetching branch admin data:", err);

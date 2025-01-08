@@ -14,11 +14,13 @@ import {
 import { SettingOutlined, LogoutOutlined } from "@ant-design/icons";
 import { useAuth } from "contexts/AuthProvider";
 import SearchBar from "./Searchbar"; // Import the new SearchBar component
+import { getUser, getUserName, updateUser } from "utils/permissionUtils";
 
 const AppLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(window.innerWidth <= 768);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [searchActive, setSearchActive] = useState(false);
+  const [userName, setUserName] = useState("");
 
   const { user } = useAuth();
   const location = useLocation();
@@ -64,6 +66,13 @@ const AppLayout: React.FC = () => {
     "/users": "Users",
     "/packages": "Packages",
     "/reports": "Reports",
+  };
+
+  const getUserInfo = (info: string) => {
+    if (info === "name") {
+      updateUser();
+      return getUserName();
+    }
   };
 
   const pathSegments = location.pathname.split("/").filter(Boolean);
@@ -113,7 +122,7 @@ const AppLayout: React.FC = () => {
           {!isMobile && (
             <ProfileContainer>
               <ProfileInfo>
-                <h4>John Doe</h4>
+                <h4>{getUserInfo("name")}</h4>
                 <span>Software Engineer</span>
               </ProfileInfo>
               <Dropdown

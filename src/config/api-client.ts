@@ -31,8 +31,7 @@ apiClient.interceptors.request.use(
   },
   (error) => {
     if (error.response && error.response.status === 403) {
-      localStorage.clear();
-      window.location.href = "/login";
+      window.location.href = "/unauthorized";
     }
 
     return Promise.reject(error);

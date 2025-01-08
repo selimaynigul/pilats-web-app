@@ -14,7 +14,7 @@ export function usePagination<T>({
   const [items, setItems] = useState<T[]>([]);
   const [page, setPage] = useState(initialPage);
   const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
+  const [hasMore, setHasMore] = useState(false);
 
   const fetchItems = (pageToFetch: number, resetItems = false) => {
     setLoading(true);
@@ -35,7 +35,7 @@ export function usePagination<T>({
           setItems((prev) => [...prev, ...newItems]);
         }
 
-        setHasMore(newItems.length > 0);
+        setHasMore(newItems.length > 7);
       })
       .catch((error) => {
         console.error("Error fetching items:", error);

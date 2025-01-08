@@ -120,7 +120,7 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
       ) : response.length > 0 ? (
         response.map((item: any, index: number) => (
           <Menu.Item key={item.id || index} onClick={() => onSelect(item)}>
-            {item.companyName}{" "}
+            {item.companyName}
             {hasRole(["ADMIN", "COMPANY_ADMIN"]) && `- ${item.branchName}`}
           </Menu.Item>
         ))

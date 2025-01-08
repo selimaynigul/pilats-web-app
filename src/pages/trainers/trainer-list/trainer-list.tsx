@@ -5,6 +5,7 @@ import TrainerCard from "./trainer-list-card";
 import { usePagination } from "hooks";
 import { trainerService } from "services";
 import { Link } from "react-router-dom";
+import { hasRole } from "utils/permissionUtils";
 
 const LoadMoreContainer = styled.div`
   text-align: center;
@@ -24,7 +25,8 @@ const TrainerList: React.FC<TrainerListProps> = ({
     () => ({
       pageSize: 8,
       sort: "DESC",
-      companyId: company?.id,
+      companyId: hasRole(["ADMIN"]) ? company?.id : null,
+      branchId: hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN"]) ? company?.id : null,
     }),
     [company?.id]
   );

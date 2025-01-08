@@ -79,7 +79,7 @@ const TrainerClassesList: React.FC<{ trainer: any }> = ({ trainer }) => {
         <AddButton onClick={() => {}} />
       </Header>
       <Row gutter={[16, 16]}>
-        {!trainer?.active ? (
+        {trainer && !trainer?.active ? (
           <Alert
             message="Deactive trainers cannot have classes!"
             type="info"

@@ -16,6 +16,7 @@ import {
   BsBarChartFill,
 } from "react-icons/bs";
 import styled from "styled-components";
+import { getCompanyId, hasRole } from "utils/permissionUtils";
 
 const { Sider } = Layout;
 const { Option } = Select;
@@ -98,7 +99,12 @@ const Sidebar: React.FC<SiderProps> = ({
     if (isMobile) {
       closeSider();
     }
-    navigate(routes[key]);
+
+    if (hasRole(["COMPANY_ADMIN", "BRANCH_ADMIN"]) && key === "companies") {
+      navigate(`/companies/${getCompanyId()}`);
+    } else {
+      navigate(routes[key]);
+    }
   };
 
   const menuItems = [

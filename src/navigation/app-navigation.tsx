@@ -11,6 +11,7 @@ import {
   TrainerDetailsPage,
   PackagesPage,
   UserDetailsPage,
+  UnauthorizedPage,
 } from "pages";
 import AppLayout from "components/layout/Layout";
 import AuthGuard from "components/guards/AuthGuard";
@@ -47,11 +48,12 @@ const AppNavigation = () => {
           }
         />
 
-        {/* Main Admin-only Routes */}
         <Route
           path="/users"
           element={
-            <AuthGuard requiredRoles={["ADMIN"]}>
+            <AuthGuard
+              requiredRoles={["ADMIN", "BRANCH_ADMIN", "COMPANY_ADMIN"]}
+            >
               <UsersPage />
             </AuthGuard>
           }
@@ -68,17 +70,17 @@ const AppNavigation = () => {
           }
         />
 
-        {/* Classes (accessible to ADMIN and BRANCH_ADMIN) */}
         <Route
           path="/classes"
           element={
-            <AuthGuard requiredRoles={["ADMIN", "BRANCH_ADMIN"]}>
+            <AuthGuard
+              requiredRoles={["ADMIN", "COMPANY_ADMIN", "BRANCH_ADMIN"]}
+            >
               <ClassesPage />
             </AuthGuard>
           }
         />
 
-        {/* Trainers (accessible to ADMIN and BRANCH_ADMIN) */}
         <Route
           path="/trainers"
           element={
@@ -101,7 +103,6 @@ const AppNavigation = () => {
           }
         />
 
-        {/* Packages (accessible to ADMIN and BRANCH_ADMIN) */}
         <Route
           path="/packages"
           element={
@@ -115,7 +116,7 @@ const AppNavigation = () => {
 
         {/* Test Page (publicly accessible or add roles as needed) */}
         <Route path="/test" element={<TestPage />} />
-        <Route path="/unauthorized" element={<TestPage />} />
+        <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
         {/* Redirect for non-existent routes */}
         <Route path="*" element={<Navigate to="/" />} />
