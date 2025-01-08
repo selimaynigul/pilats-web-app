@@ -90,7 +90,7 @@ const CompanyInfo: React.FC<{ setBranches: any }> = ({ setBranches }) => {
 
         // Fetch branches using company ID
         if (fetchedCompany?.id) {
-          return branchService.getByPagination({
+          return branchService.search({
             companyId: fetchedCompany.id,
           });
         }

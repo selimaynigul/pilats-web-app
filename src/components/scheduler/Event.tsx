@@ -13,6 +13,7 @@ import styled from "styled-components";
 import dayjs from "dayjs";
 import { sessionService } from "services";
 import { Link } from "react-router-dom";
+import { hasRole } from "utils/permissionUtils";
 
 const Container = styled.div<{ more?: boolean }>`
   background: #5d46e5;
@@ -157,14 +158,16 @@ const CustomEvent: React.FC<{
     <div style={{ position: "relative", maxWidth: 300 }}>
       <div style={{ marginBottom: 20 }}>
         <strong>{event.name}</strong>
-        <ActionButtons>
-          <EditButton type="primary">
-            <EditFilled />
-          </EditButton>
-          <DeleteButton onClick={handleDelete} type="primary">
-            <DeleteOutlined />
-          </DeleteButton>
-        </ActionButtons>
+        {hasRole(["BRANCH_ADMIN"]) && (
+          <ActionButtons>
+            <EditButton type="primary">
+              <EditFilled />
+            </EditButton>
+            <DeleteButton onClick={handleDelete} type="primary">
+              <DeleteOutlined />
+            </DeleteButton>
+          </ActionButtons>
+        )}
       </div>
       <div style={{ display: "flex", gap: 5 }}>
         <DateInfo>

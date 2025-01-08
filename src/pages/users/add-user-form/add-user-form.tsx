@@ -36,7 +36,7 @@ const AddUserForm: React.FC<AddTrainerFormProps> = ({
   const handleCompanySelect = async (companyId: string) => {
     setBranchLoading(true);
     try {
-      const res = await branchService.getByPagination({ companyId });
+      const res = await branchService.search({ companyId });
       setBranches(res.data);
     } catch (error) {
       console.error("Error fetching branches:", error);

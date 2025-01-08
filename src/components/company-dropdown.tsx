@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Dropdown, Input, Menu, Spin } from "antd";
 import styled from "styled-components";
 import { IoIosArrowDown } from "react-icons/io";
-import { companyService } from "services";
+import { branchService, companyService } from "services";
+import { getCompanyId, hasRole } from "utils/permissionUtils";
 
 const CompanyDropdownButton = styled.button`
   position: relative;
@@ -43,28 +44,29 @@ const IconWrapper = styled.div`
 `;
 
 interface CompanyDropdownProps {
-  selectedCompany: any;
-  onCompanySelect: (company: string) => void;
+  selectedItem: any;
+  onSelect: (company: string) => void;
 }
 
 const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
-  selectedCompany,
-  onCompanySelect,
+  selectedItem,
+  onSelect,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
-  const [companies, setCompanies] = useState<any>([]);
+  const [response, setResponse] = useState<any>([]);
 
   const fetchCompanies = useCallback(async (query: string) => {
     if (!query) {
-      setCompanies([]);
+      setResponse([]);
       return;
     }
 
     setLoading(true);
     try {
       const response = await companyService.search({ companyName: query });
-      setCompanies(response.data || []);
+      setResponse(response.data || []);
+      console.log("company response: ", response.data);
     } catch (error) {
       console.error("Error fetching companies:", error);
     } finally {
@@ -72,8 +74,33 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
     }
   }, []);
 
+  const fetchBranches = useCallback(async (query: string) => {
+    if (!query) {
+      setResponse([]);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await branchService.search({
+        branchName: query,
+        companyId: getCompanyId(),
+      });
+      setResponse(response.data || []);
+      console.log("branch response: ", response.data);
+    } catch (error) {
+      console.error("Error fetching branches:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
-    fetchCompanies(searchQuery);
+    if (hasRole(["COMPANY_ADMIN"])) {
+      fetchBranches(searchQuery);
+    } else if (hasRole(["ADMIN"])) {
+      fetchCompanies(searchQuery);
+    }
   }, [searchQuery]);
 
   const companyMenu = (
@@ -90,13 +117,11 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
         <Menu.Item key="loading" disabled>
           <Spin size="small" /> Loading...
         </Menu.Item>
-      ) : companies.length > 0 ? (
-        companies.map((company: any, index: number) => (
-          <Menu.Item
-            key={company.id || index}
-            onClick={() => onCompanySelect(company)}
-          >
-            {company.companyName}
+      ) : response.length > 0 ? (
+        response.map((item: any, index: number) => (
+          <Menu.Item key={item.id || index} onClick={() => onSelect(item)}>
+            {item.companyName}{" "}
+            {hasRole(["ADMIN", "COMPANY_ADMIN"]) && `- ${item.branchName}`}
           </Menu.Item>
         ))
       ) : (
@@ -110,7 +135,7 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
   return (
     <Dropdown overlay={companyMenu} trigger={["click"]}>
       <CompanyDropdownButton>
-        {selectedCompany.companyName || "Select Company"}
+        {selectedItem.companyName || "Select Company"}
         <IconWrapper>
           <IoIosArrowDown />
         </IconWrapper>

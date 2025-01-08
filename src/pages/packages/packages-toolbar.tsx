@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import AddButton from "components/AddButton";
-import AddTrainerModal from "./add-trainer-form/add-trainer-form";
-import { trainerService } from "services";
+import AddPackageForm from "./add-package-form/add-package-form";
+import {
+  companyAdminService,
+  companyPackageService,
+  trainerService,
+} from "services";
 import { handleError } from "utils/apiHelpers";
 import { message } from "antd";
 import { CompanyDropdown } from "components";
@@ -42,43 +46,36 @@ const CountNumber = styled.span`
   color: ${({ theme }) => theme.primary}; /* Primary color for the number */
 `;
 
-const TrainersToolbar: React.FC<{
-  trainerCount: number;
+const PackagesToolbar: React.FC<{
+  packageCount: number;
   selectedCompany: any;
   setSelectedCompany: any;
-}> = ({ trainerCount, selectedCompany, setSelectedCompany }) => {
+}> = ({ packageCount, selectedCompany, setSelectedCompany }) => {
   const [isModalVisible, setIsModalVisible] = React.useState(false);
 
-  const handleAddTrainer = (values: any) => {
+  const handleAddPackage = (values: any) => {
     const payload = {
-      uaRegisterRequest: {
-        email: values.email,
-        password: "1234",
-        // role: "USER_ROLE", // Replace with a valid RoleEnum value if required
-      },
-      ucRegisterRequest: {
-        name: values.name,
-        surname: values.surname,
-        birthdate: values.birthdate
-          ? moment(values.birthdate).format("YYYY-MM-DD")
-          : null,
-        gender: values.gender.toUpperCase(),
-        telNo1: values.phoneNumber,
-      },
-      branchId: parseInt(values.branch, 10), // Ensure this is a valid integer
-      /*       jobId: values.jobId || null, // If jobId is optional, send null when not provided
-       */
+      name: values.name, // Map the name field
+      description: values.description, // Map the description field
+      price: values.price ? parseFloat(values.price) : null, // Ensure price is a valid BigDecimal
+      discount: values.discount ? parseFloat(values.discount) : null, // Ensure discount is a valid BigDecimal
+      bonusCount: parseInt(values.bonusCount, 10) || 0, // Map bonus count, defaulting to 0 if not provided
+      changeCount: parseInt(values.changeCount, 10) || 0, // Map change count, defaulting to 0 if not provided
+      creditCount: parseInt(values.creditCount, 10) || 0, // Map credit count, defaulting to 0 if not provided
+      companyId: parseInt(values.companyId, 10), // Ensure companyId is a valid integer
+      isBranchSpecific: values.isBranchSpecific === true, // Map isBranchSpecific field
+      branchId: values.branchId ? parseInt(values.branchId, 10) : null, // Optional branchId
     };
 
-    trainerService
-      .register(payload)
+    companyPackageService
+      .add(payload)
       .then(() => {
-        message.success("Trainer is added");
+        message.success("Package is added");
         setIsModalVisible(false);
         window.location.reload();
       })
       .catch((err) => {
-        console.error("Error adding trainer:", err);
+        console.error("Error adding package:", err);
         handleError(err);
       });
   };
@@ -86,7 +83,7 @@ const TrainersToolbar: React.FC<{
   return (
     <ToolbarContainer>
       <CountContainer>
-        <CountNumber>{trainerCount}</CountNumber> trainers listed
+        <CountNumber>{packageCount}</CountNumber> packages listed
       </CountContainer>
       <ActionContainer>
         <CompanyDropdown
@@ -95,13 +92,13 @@ const TrainersToolbar: React.FC<{
         />
         <AddButton onClick={() => setIsModalVisible(true)} />
       </ActionContainer>
-      <AddTrainerModal
+      <AddPackageForm
         visible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
-        onSubmit={handleAddTrainer}
+        onSubmit={handleAddPackage}
       />
     </ToolbarContainer>
   );
 };
 
-export default TrainersToolbar;
+export default PackagesToolbar;

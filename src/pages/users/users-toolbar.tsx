@@ -90,8 +90,8 @@ const UsersToolbar: React.FC<{
       </CountContainer>
       <ActionContainer>
         <CompanyDropdown
-          selectedCompany={selectedCompany}
-          onCompanySelect={(company) => setSelectedCompany(company)}
+          selectedItem={selectedCompany}
+          onSelect={(company) => setSelectedCompany(company)}
         />
         <AddButton onClick={() => setIsModalVisible(true)} />
       </ActionContainer>

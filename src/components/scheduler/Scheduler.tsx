@@ -292,13 +292,14 @@ const MyCalendar: React.FC = () => {
         </LoadingOverlay>
       )}
       <DragAndDropCalendar
-        defaultDate={defaultDate} // Use saved date as default
+        defaultDate={defaultDate}
+        draggableAccessor={() => hasRole(["BRANCH_ADMIN"])} // Disable dragging for all events
         events={events}
         localizer={localizer}
         selectable={hasRole(["BRANCH_ADMIN"])}
         onSelectSlot={handleSelectSlot}
         onEventDrop={moveEvent}
-        resizable={false} // Disable resizing entirely
+        resizable={false}
         style={{ height: 700 }}
         onRangeChange={handleRangeChange}
         components={{
@@ -314,7 +315,7 @@ const MyCalendar: React.FC = () => {
             return renderDayEvents(dayEvents);
           },
         }}
-        eventPropGetter={eventPropGetter} // Apply custom styles
+        eventPropGetter={eventPropGetter}
       />
 
       <StyledModal

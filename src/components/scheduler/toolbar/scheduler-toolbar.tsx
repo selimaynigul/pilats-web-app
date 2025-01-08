@@ -70,15 +70,15 @@ const Toolbar: React.FC<
         </ActionButton>
         <TitleButton>{dayjs(date).format("MMMM YYYY")}</TitleButton>
       </NavButtons>
-
-      <CompanyDropdown
-        selectedCompany={selectedCompany}
-        onCompanySelect={(company) => {
-          setSelectedCompany(company);
-          setCompany(company);
-        }}
-      />
-
+      {hasRole(["ADMIN", "COMPANY_ADMIN"]) && (
+        <CompanyDropdown
+          selectedItem={selectedCompany}
+          onSelect={(company) => {
+            setSelectedCompany(company);
+            setCompany(company);
+          }}
+        />
+      )}
       <NavButtons>
         {viewArray.map((v: any) => (
           <ToggleViewButton

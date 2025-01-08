@@ -7,7 +7,7 @@ const branchService = {
 
   delete: (branchId: any) => apiClient.delete(`/branch/${branchId}`),
 
-  getByPagination: (params = {}) => apiClient.post("/branch/search", params),
+  search: (params = {}) => apiClient.post("/branch/search", params),
 };
 
 export default branchService;

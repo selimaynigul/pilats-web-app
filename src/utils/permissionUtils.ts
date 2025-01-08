@@ -12,7 +12,6 @@ export const getUser = () => {
 
 export const getBranchId = () => {
   const user = getUser();
-  console.log("branch id:", user);
   return user?.branchId || null;
 };
 

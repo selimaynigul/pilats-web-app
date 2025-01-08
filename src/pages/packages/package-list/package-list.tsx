@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from "react";
 import styled from "styled-components";
 import { Row, Col, Spin, Button } from "antd";
 import { usePagination } from "hooks";
-import { trainerService } from "services";
+import { companyPackageService, trainerService } from "services";
 import { Link } from "react-router-dom";
 import PackageCard from "./packages-list-card";
 
@@ -35,7 +35,7 @@ const PackageList: React.FC<PackageListProps> = ({
     hasMore,
     loadMore,
   } = usePagination({
-    fetchService: trainerService.search,
+    fetchService: companyPackageService.search,
     params,
   });
 
@@ -49,13 +49,13 @@ const PackageList: React.FC<PackageListProps> = ({
         {packages.map((item: any, index: number) => (
           <Col xs={24} sm={12} md={12} lg={6} key={index}>
             <PackageCard
-              title="Yoga Dersi"
-              price="7200"
-              description="Lorem ipsum dolor si amet text falan filan inter milan lorem impsum dolor si amet"
+              title={item.name}
+              price={item.price}
+              description={item.description}
               features={[
-                { value: "16", label: "katılım hakkı" },
-                { value: "2", label: "iptal hakkı" },
-                { value: "2", label: "bonus hakkı" },
+                { value: item.creditCount, label: "katılım hakkı" },
+                { value: item.changeCount, label: "iptal hakkı" },
+                { value: item.bonusCount, label: "bonus hakkı" },
               ]}
             />
           </Col>
