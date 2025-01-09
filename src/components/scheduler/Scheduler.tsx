@@ -1,14 +1,14 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Calendar, momentLocalizer, Views } from "react-big-calendar";
 import moment from "moment";
+import { useParams } from "react-router-dom"; // Import useParams
+import dayjs from "dayjs";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import CustomEvent from "./Event";
-import { Modal, Popover, Spin, message } from "antd";
+import { message, Modal, Popover, Spin } from "antd";
 import AddClassForm from "components/scheduler/add-class-form/AddClassForm";
-import styled from "styled-components";
-import dayjs from "dayjs";
 import CustomToolbar from "components/scheduler/toolbar/scheduler-toolbar";
 import {
   CalendarWrapper,
@@ -18,6 +18,7 @@ import {
 } from "components/scheduler/SchedulerStyles";
 import { sessionService } from "services";
 import { getBranchId, getCompanyId, hasRole } from "utils/permissionUtils";
+import { useNavigate } from "react-router-dom";
 
 const DragAndDropCalendar = withDragAndDrop(Calendar);
 const localizer = momentLocalizer(moment);
@@ -29,13 +30,60 @@ type EventDropArgs = {
 };
 
 const MyCalendar: React.FC = () => {
-  const [loading, setLoading] = useState(false); // Loading state
-  const [data, setData] = useState<any[]>([]); // Fetched event data
+  const { date } = useParams<{ date?: string }>();
+  const navigate = useNavigate(); // Hook for programmatic navigation
 
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<any[]>([]);
   const [company, setCompany] = useState({
     companyName: "All",
     id: null,
   });
+  const [visibleRange, setVisibleRange] = useState<{
+    start: Date;
+    end: Date;
+  } | null>(null);
+
+  const [defaultDate, setDefaultDate] = useState<Date>(() => {
+    // Check if the date parameter exists and is valid
+    if (date && dayjs(date, "YYYY-MM", true).isValid()) {
+      return dayjs(date).toDate();
+    }
+
+    // Fallback to saved date from local storage or today's date
+    const savedDate = localStorage.getItem("savedCalendarDate");
+    return savedDate ? new Date(savedDate) : new Date();
+  });
+
+  useEffect(() => {
+    // Update defaultDate dynamically if URL parameter changes
+    if (date && dayjs(date, "YYYY-MM", true).isValid()) {
+      setDefaultDate(dayjs(date).toDate());
+    } else if (!date) {
+      const savedDate = localStorage.getItem("savedCalendarDate");
+      setDefaultDate(savedDate ? new Date(savedDate) : new Date());
+    }
+  }, [date]);
+
+  useEffect(() => {
+    if (defaultDate) {
+      const start: Date = dayjs(defaultDate)
+        .startOf("month")
+        .subtract(7, "day")
+        .toDate();
+      const end: Date = dayjs(defaultDate)
+        .endOf("month")
+        .add(7, "day")
+        .toDate();
+      setVisibleRange({ start, end });
+    }
+  }, [defaultDate]);
+
+  useEffect(() => {
+    if (visibleRange) {
+      fetchSessions(visibleRange.start, visibleRange.end);
+    }
+  }, [visibleRange]);
 
   const handleRangeChange = (range: { start: Date; end: Date } | Date[]) => {
     const startDate = Array.isArray(range) ? range[0] : range.start;
@@ -43,13 +91,17 @@ const MyCalendar: React.FC = () => {
 
     setVisibleRange({ start: startDate, end: endDate });
 
-    // Save the middle date of the range to local storage
+    // Calculate the middle date of the range
     const middleDate = new Date(
       (new Date(startDate).getTime() + new Date(endDate).getTime()) / 2
     );
-    localStorage.setItem("savedCalendarDate", middleDate.toISOString());
-  };
 
+    // Save the middle date to local storage
+    localStorage.setItem("savedCalendarDate", middleDate.toISOString());
+
+    // Update the URL with the new middle date
+    navigate(`/classes/${dayjs(middleDate).format("YYYY-MM")}`);
+  };
   const fetchSessions = (startDate: Date, endDate: Date) => {
     setLoading(true);
 
@@ -77,33 +129,6 @@ const MyCalendar: React.FC = () => {
         setLoading(false);
       });
   };
-
-  const [visibleRange, setVisibleRange] = useState<{
-    start: Date;
-    end: Date;
-  } | null>(null);
-
-  const [defaultDate, setDefaultDate] = useState<Date>(() => {
-    // Retrieve the saved date from local storage or default to today
-    const savedDate = localStorage.getItem("savedCalendarDate");
-    return savedDate ? new Date(savedDate) : new Date();
-  });
-
-  useEffect(() => {
-    if (visibleRange) {
-      fetchSessions(visibleRange.start, visibleRange.end);
-    }
-  }, [visibleRange]);
-
-  useEffect(() => {
-    const start: Date = dayjs(defaultDate)
-      .startOf("month")
-      .subtract(7, "day")
-      .toDate();
-    const end: Date = dayjs(defaultDate).endOf("month").add(7, "day").toDate();
-    setVisibleRange({ start, end });
-    fetchSessions(start, end);
-  }, []);
 
   const events = data.map((event: any) => ({
     ...event,
