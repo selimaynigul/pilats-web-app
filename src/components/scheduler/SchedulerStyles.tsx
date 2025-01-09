@@ -94,8 +94,9 @@ export const LoadingOverlay = styled.div`
   z-index: 10; /* Above all content */
   display: flex;
   transition: 0.3s;
-  background: white;
-  opacity: 0.2;
+  background: ${({ theme }) => theme.contentBg};
+  opacity: 0.5;
+
   justify-content: center;
   align-items: center;
 `;

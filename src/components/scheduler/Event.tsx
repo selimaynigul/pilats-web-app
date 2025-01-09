@@ -241,8 +241,6 @@ const CustomEvent: React.FC<{
     </div>
   );
 
-  console.log("hight", highlightedEventId, event.id);
-
   const more = dayEvents.length > 1; // Example: Adjust if more events should show "+More" button
   const moreEventsCount = dayEvents.length - 1; // Number of additional events
   return (
@@ -255,9 +253,7 @@ const CustomEvent: React.FC<{
             }
             more={more}
           >
-            <strong style={{ display: "block" }}>
-              {(event as any)?.title}
-            </strong>
+            <strong style={{ display: "block" }}>{(event as any)?.name}</strong>
             {moreEventsCount === 0 && (
               <small>
                 {dayjs(event.start).format("HH:mm")} -{" "}

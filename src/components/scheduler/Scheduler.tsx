@@ -24,117 +24,90 @@ import styled from "styled-components";
 const DragAndDropCalendar = withDragAndDrop(Calendar);
 const localizer = momentLocalizer(moment);
 type EventDropArgs = {
-  event: any; // The event being dragged
-  start: Date | string; // New start time (stringOrDate in react-big-calendar)
-  end: Date | string; // New end time (stringOrDate in react-big-calendar)
-  isAllDay?: boolean; // Indicates if the event was dropped on an all-day slot
+  event: any;
+  start: Date | string;
+  end: Date | string;
+  isAllDay?: boolean;
 };
 
-const HighlightedEvent = styled.div`
-  animation: highlight 1s ease-out;
-  transform: scale(1.1);
-  background-color: yellow !important;
-  @keyframes highlight {
-    0% {
-      transform: scale(1.1);
-      background-color: yellow;
-    }
-    100% {
-      transform: scale(1);
-      background-color: transparent;
-    }
-  }
-`;
-
-const MyCalendar: React.FC = () => {
-  const { date } = useParams<{ date?: string }>();
+const Scheduler: React.FC = () => {
+  const { date: urlDate } = useParams<{ date?: string }>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const nameInputRef = useRef<any>(null);
   const sessionId = searchParams.get("session");
   const [highlightedEventId, setHighlightedEventId] = useState<string | null>(
     sessionId
   );
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<any[]>([]);
+  const [sessions, setSessions] = useState<any[]>([]);
   const [company, setCompany] = useState({
     companyName: "All",
     id: null,
   });
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedRange, setSelectedRange] = useState<{
+    start: Date;
+    end: Date;
+  } | null>(null);
+
   const [visibleRange, setVisibleRange] = useState<{
     start: Date;
     end: Date;
   } | null>(null);
 
-  useEffect(() => {
-    if (highlightedEventId) {
-      const timer = setTimeout(() => setHighlightedEventId(null), 5000); // Remove highlight after 1 second
-      return () => clearTimeout(timer);
+  const [date, setDate] = useState<Date>(() => {
+    if (urlDate && dayjs(urlDate, "YYYY-MM", true).isValid()) {
+      return dayjs(urlDate).toDate();
     }
-  }, [highlightedEventId]);
-
-  const [defaultDate, setDefaultDate] = useState<Date>(() => {
-    // Check if the date parameter exists and is valid
-    if (date && dayjs(date, "YYYY-MM", true).isValid()) {
-      return dayjs(date).toDate();
-    }
-
-    // Fallback to saved date from local storage or today's date
     const savedDate = localStorage.getItem("savedCalendarDate");
     return savedDate ? new Date(savedDate) : new Date();
   });
 
   useEffect(() => {
-    // Update defaultDate dynamically if URL parameter changes
-    if (date && dayjs(date, "YYYY-MM", true).isValid()) {
-      setDefaultDate(dayjs(date).toDate());
-    } else if (!date) {
-      const savedDate = localStorage.getItem("savedCalendarDate");
-      setDefaultDate(savedDate ? new Date(savedDate) : new Date());
+    if (highlightedEventId) {
+      const timer = setTimeout(() => setHighlightedEventId(null), 5000);
+      return () => clearTimeout(timer);
     }
+  }, [highlightedEventId]);
+
+  useEffect(() => {
+    const start: Date = dayjs(date)
+      .startOf("month")
+      .subtract(7, "day")
+      .toDate();
+    const end: Date = dayjs(date).endOf("month").add(7, "day").toDate();
+    setVisibleRange({ start, end });
   }, [date]);
 
   useEffect(() => {
-    if (defaultDate) {
-      const start: Date = dayjs(defaultDate)
-        .startOf("month")
-        .subtract(7, "day")
-        .toDate();
-      const end: Date = dayjs(defaultDate)
-        .endOf("month")
-        .add(7, "day")
-        .toDate();
-      setVisibleRange({ start, end });
-    }
-  }, [defaultDate]);
-
-  useEffect(() => {
     if (visibleRange) {
-      fetchSessions(visibleRange.start, visibleRange.end);
+      fetchSessions(visibleRange.start, visibleRange.end, true);
     }
   }, [visibleRange]);
 
-  const handleRangeChange = (range: { start: Date; end: Date } | Date[]) => {
+  const updateVisibleDate = (range: { start: Date; end: Date } | Date[]) => {
     const startDate = Array.isArray(range) ? range[0] : range.start;
     const endDate = Array.isArray(range) ? range[range.length - 1] : range.end;
 
-    setVisibleRange({ start: startDate, end: endDate });
-
-    // Calculate the middle date of the range
     const middleDate = new Date(
       (new Date(startDate).getTime() + new Date(endDate).getTime()) / 2
     );
+    setDate(middleDate);
 
-    // Save the middle date to local storage
     localStorage.setItem("savedCalendarDate", middleDate.toISOString());
-
-    // Update the URL with the new middle date
     navigate(`/classes/${dayjs(middleDate).format("YYYY-MM")}`);
   };
-  const fetchSessions = (startDate: Date, endDate: Date) => {
-    setLoading(true);
+
+  const fetchSessions = (
+    startDate: Date,
+    endDate: Date,
+    showLoading: boolean
+  ) => {
+    if (showLoading) setLoading(true);
 
     const params = {
-      startDate: dayjs(startDate).toISOString(), // Use ISO 8601 with time
+      startDate: dayjs(startDate).toISOString(),
       endDate: dayjs(endDate).toISOString(),
       branchId: getBranchId(),
       companyId: getCompanyId() || company.id || null,
@@ -146,32 +119,23 @@ const MyCalendar: React.FC = () => {
     sessionService
       .search(params)
       .then((response) => {
-        console.log("Fetched Sessions:", response.data); // Debugging
-        setData(response.data); // Update the state with fetched data
+        const formattedSessions = response.data.map((session: any) => ({
+          ...session,
+          start: new Date(session.startDate),
+          end: new Date(session.endDate),
+        }));
+        setSessions(formattedSessions);
       })
       .catch((error) => {
         console.error("Error fetching events:", error);
         message.error("Failed to load events.");
       })
       .finally(() => {
-        setLoading(false);
+        if (showLoading) setLoading(false);
       });
   };
 
-  const events = data.map((event: any) => ({
-    ...event,
-    start: new Date(event.startDate), // Convert to Date object
-    end: new Date(event.endDate), // Convert to Date object
-    title: event.name, // Use `title` for the event name
-  }));
-
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedRange, setSelectedRange] = useState<{
-    start: Date;
-    end: Date;
-  } | null>(null);
-
-  const handleSelectSlot = (slotInfo: { start: Date; end: Date }) => {
+  const selectSlot = (slotInfo: { start: Date; end: Date }) => {
     if (loading) return;
     if (hasRole(["BRANCH_ADMIN"])) {
       setSelectedRange(slotInfo);
@@ -179,26 +143,25 @@ const MyCalendar: React.FC = () => {
     }
   };
 
-  const handleAddEvent = (values: any) => {
-    setLoading(true); // Start loading
+  const addSession = (values: any) => {
+    setLoading(true);
 
     const [startTime, endTime] = values.timeRange || [null, null];
 
-    // Prepare the payload to send to the backend
     const payload = {
       name: values.className,
       description: values.description || "No description provided.",
       startDate: dayjs(values.startDate)
         .hour(dayjs(startTime).hour())
         .minute(dayjs(startTime).minute())
-        .format("YYYY-MM-DDTHH:mm:ss"), // Format start date and time
+        .format("YYYY-MM-DDTHH:mm:ss"),
       endDate: dayjs(values.startDate)
         .hour(dayjs(endTime).hour())
         .minute(dayjs(endTime).minute())
-        .format("YYYY-MM-DDTHH:mm:ss"), // Format end date and time
+        .format("YYYY-MM-DDTHH:mm:ss"),
       branchId: getBranchId(),
       trainerId: values.trainer,
-      isRepeat: values.repeat || false, // Indicate if it is a repeating event
+      isRepeat: values.repeat || false,
       repeatDay:
         values.repeatFrequency === "weekly"
           ? 7
@@ -209,19 +172,16 @@ const MyCalendar: React.FC = () => {
               : 1, // Days between repeats
       repeatEndDate: values.endDate
         ? dayjs(values.endDate).format("YYYY-MM-DD")
-        : null, // Optional repeat end date
+        : null,
     };
 
-    console.log("payload", payload);
-
-    // Call the backend API to add the event
     sessionService
       .add(payload)
       .then(() => {
         message.success("Event added successfully!");
         // Refetch sessions for the current visible range
         if (visibleRange) {
-          fetchSessions(visibleRange.start, visibleRange.end);
+          fetchSessions(visibleRange.start, visibleRange.end, true);
         }
       })
       .catch((error) => {
@@ -234,50 +194,44 @@ const MyCalendar: React.FC = () => {
       });
   };
 
-  const moveEvent = ({ event, start, end }: EventDropArgs) => {
-    // Optimistically update the event in the UI
-    const updatedEvent = {
+  const moveSession = ({ event, start, end }: EventDropArgs) => {
+    const updatedSession = {
       ...event,
-      start: new Date(start), // Update the start date
-      end: new Date(end), // Update the end date
+      startDate: dayjs(start).format("YYYY-MM-DDTHH:mm:ss"),
+      endDate: dayjs(end).format("YYYY-MM-DDTHH:mm:ss"),
+      start: new Date(start),
+      end: new Date(end),
     };
 
-    setData((prevData) => prevData.filter((e) => e.id !== event.id));
-
-    // Update the local state to reflect the changes immediately
-    setData((prevData) =>
-      prevData.map((e) => (e.id === event.id ? { ...e, ...updatedEvent } : e))
+    setSessions((prev) =>
+      prev.map((e) => (e.id === event.id ? updatedSession : e))
     );
 
-    // Call the backend API to update the event
     sessionService
       .update({
         ...event,
-        startDate: dayjs(start).format("YYYY-MM-DDTHH:mm:ss"), // Backend expects this format
+        startDate: dayjs(start).format("YYYY-MM-DDTHH:mm:ss"),
         endDate: dayjs(end).format("YYYY-MM-DDTHH:mm:ss"),
       })
       .then(() => {
-        // Refetch sessions for the current visible range
         if (visibleRange) {
-          fetchSessions(visibleRange.start, visibleRange.end);
+          fetchSessions(visibleRange.start, visibleRange.end, false);
         }
       })
       .catch((error) => {
         message.error("Failed to update event. Please try again.");
-
-        // Revert the UI to the original position on failure
-        setData((prevData) =>
-          prevData.map((e) =>
-            e.id === event.id
-              ? { ...e, start: new Date(event.start), end: new Date(event.end) }
-              : e
-          )
-        );
+        setSessions((prev) => prev.map((e) => (e.id === event.id ? event : e)));
       });
   };
 
   const eventPropGetter = (event: any) => {
-    if (event.id === highlightedEventId) {
+    const isHighlightedDay =
+      highlightedEventId &&
+      getDaySessions((event as any).startDate).some(
+        (dayEvent: any) => dayEvent.id === highlightedEventId
+      );
+
+    if (isHighlightedDay) {
       return {
         className: "highlighted-event",
         style: {
@@ -298,36 +252,34 @@ const MyCalendar: React.FC = () => {
     };
   };
 
-  const getDayEvents = (date: Date | string) => {
+  const getDaySessions = (date: Date | string) => {
     const validDate = typeof date === "string" ? new Date(date) : date;
 
     const dayStart = new Date(validDate.setHours(0, 0, 0, 0));
     const dayEnd = new Date(validDate.setHours(23, 59, 59, 999));
 
-    return events.filter(
-      (event) => event.start >= dayStart && event.start <= dayEnd
+    return sessions.filter(
+      (session) => session.start >= dayStart && session.start <= dayEnd
     );
   };
 
-  const renderDayEvents = (dayEvents: any[]) => {
+  const renderSessions = (dayEvents: any[]) => {
     const firstEvent = dayEvents[0];
     const moreEventsCount = dayEvents.length - 1;
 
     return (
       <div>
-        {/* Render the first event */}
         <CustomEvent
           event={firstEvent}
           dayEvents={dayEvents}
           fetch={() => {
             if (visibleRange) {
-              return fetchSessions(visibleRange.start, visibleRange.end);
+              return fetchSessions(visibleRange.start, visibleRange.end, true);
             }
           }}
           highlightedEventId={highlightedEventId}
         />
 
-        {/* Render the "More Button" if there are additional events */}
         {moreEventsCount > 0 && (
           <Popover
             trigger="click"
@@ -349,8 +301,6 @@ const MyCalendar: React.FC = () => {
     );
   };
 
-  const nameInputRef = useRef<any>(null);
-
   return (
     <CalendarWrapper>
       {loading && (
@@ -359,16 +309,16 @@ const MyCalendar: React.FC = () => {
         </LoadingOverlay>
       )}
       <DragAndDropCalendar
-        defaultDate={defaultDate}
-        draggableAccessor={() => hasRole(["BRANCH_ADMIN"])} // Disable dragging for all events
-        events={events}
+        defaultDate={date}
+        draggableAccessor={() => hasRole(["BRANCH_ADMIN"])}
+        events={sessions}
         localizer={localizer}
         selectable={hasRole(["BRANCH_ADMIN"])}
-        onSelectSlot={handleSelectSlot}
-        onEventDrop={moveEvent}
+        onSelectSlot={selectSlot}
+        onEventDrop={moveSession}
         resizable={false}
         style={{ height: 700 }}
-        onRangeChange={handleRangeChange}
+        onRangeChange={updateVisibleDate}
         components={{
           toolbar: (props) => (
             <CustomToolbar
@@ -378,8 +328,8 @@ const MyCalendar: React.FC = () => {
             />
           ),
           event: ({ event }) => {
-            const dayEvents = getDayEvents((event as any).startDate);
-            return renderDayEvents(dayEvents);
+            const dayEvents = getDaySessions((event as any).startDate);
+            return renderSessions(dayEvents);
           },
         }}
         eventPropGetter={eventPropGetter}
@@ -399,7 +349,7 @@ const MyCalendar: React.FC = () => {
         <AddClassForm
           visible={isModalVisible}
           onCancel={() => setIsModalVisible(false)}
-          onSubmit={handleAddEvent}
+          onSubmit={addSession}
           selectedRange={selectedRange}
           nameRef={nameInputRef}
         />
@@ -408,4 +358,4 @@ const MyCalendar: React.FC = () => {
   );
 };
 
-export default MyCalendar;
+export default Scheduler;
