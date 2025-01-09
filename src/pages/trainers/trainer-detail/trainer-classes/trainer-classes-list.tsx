@@ -7,6 +7,7 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { sessionService } from "services";
 import styled from "styled-components";
 import { CalendarOutlined, ClockCircleOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 const Container = styled.div`
   border-radius: 20px;
@@ -112,6 +113,7 @@ const SessionCard = styled.div`
 
 const TrainerClassesList: React.FC<{ trainer: any }> = ({ trainer }) => {
   const [params, setParams] = useState({ trainerId: trainer?.id });
+  const navigate = useNavigate();
 
   const {
     items: sessions,
@@ -141,6 +143,11 @@ const TrainerClassesList: React.FC<{ trainer: any }> = ({ trainer }) => {
       minute: "2-digit",
     });
     return { date, start, end };
+  };
+
+  const handleSessionClick = (session: any) => {
+    const sessionDate = new Date(session.startDate).toISOString().slice(0, 7); // Extract "YYYY-MM"
+    navigate(`/classes/${sessionDate}?session=${session.id}`);
   };
 
   return (
@@ -175,7 +182,7 @@ const TrainerClassesList: React.FC<{ trainer: any }> = ({ trainer }) => {
 
               return (
                 <Col xs={24} sm={12} key={index}>
-                  <SessionCard>
+                  <SessionCard onClick={() => handleSessionClick(session)}>
                     <div>
                       <h3>{session.name}</h3>
                       <p>{session.description || "No description available"}</p>

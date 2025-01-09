@@ -148,6 +148,31 @@ const GlobalStyle = createGlobalStyle`
   background-color: #555;
 }
 
+.highlighted-event {
+  animation: highlight 2s ease-in-out;
+}
+
+@keyframes highlight {
+  10% {
+    background-color: #5d46e5; /* Original color */
+  }
+
+  30% {
+    background-color:rgb(198, 192, 230);/* Highlight color */
+  }
+
+  50% {
+    background-color: #5d46e5; /* Gradually return to the original color */
+  }
+
+   70% {
+    background-color:rgb(198, 192, 230);/* Highlight color */
+  }
+
+  90% {
+    background-color: #5d46e5; /* Gradually return to the original color */
+  }
+
 `;
 
 export default GlobalStyle;

@@ -25,6 +25,7 @@ const Container = styled.div<{ more?: boolean }>`
   cursor: pointer;
   position: relative;
   box-sizing: border-box;
+  transition: 0.1s;
 
   &:hover {
     background: #4d3abd;
@@ -141,7 +142,8 @@ const CustomEvent: React.FC<{
   event: any;
   dayEvents: any[];
   fetch: () => any;
-}> = ({ event, dayEvents, fetch }) => {
+  highlightedEventId?: any;
+}> = ({ event, dayEvents, fetch, highlightedEventId }) => {
   const handleDelete = () => {
     sessionService
       .delete(event.id)
@@ -239,13 +241,20 @@ const CustomEvent: React.FC<{
     </div>
   );
 
+  console.log("hight", highlightedEventId, event.id);
+
   const more = dayEvents.length > 1; // Example: Adjust if more events should show "+More" button
   const moreEventsCount = dayEvents.length - 1; // Number of additional events
   return (
     <div style={{ position: "relative" }}>
       <Popover trigger="click" content={content} arrow={false}>
         <div>
-          <Container more={more}>
+          <Container
+            className={
+              event.id == highlightedEventId ? "highlighted-event" : ""
+            }
+            more={more}
+          >
             <strong style={{ display: "block" }}>
               {(event as any)?.title}
             </strong>

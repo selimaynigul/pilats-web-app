@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Calendar, momentLocalizer, Views } from "react-big-calendar";
 import moment from "moment";
-import { useParams } from "react-router-dom"; // Import useParams
+import { useParams, useSearchParams } from "react-router-dom"; // Import useParams
 import dayjs from "dayjs";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -19,6 +19,7 @@ import {
 import { sessionService } from "services";
 import { getBranchId, getCompanyId, hasRole } from "utils/permissionUtils";
 import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
 
 const DragAndDropCalendar = withDragAndDrop(Calendar);
 const localizer = momentLocalizer(moment);
@@ -29,10 +30,30 @@ type EventDropArgs = {
   isAllDay?: boolean; // Indicates if the event was dropped on an all-day slot
 };
 
+const HighlightedEvent = styled.div`
+  animation: highlight 1s ease-out;
+  transform: scale(1.1);
+  background-color: yellow !important;
+  @keyframes highlight {
+    0% {
+      transform: scale(1.1);
+      background-color: yellow;
+    }
+    100% {
+      transform: scale(1);
+      background-color: transparent;
+    }
+  }
+`;
+
 const MyCalendar: React.FC = () => {
   const { date } = useParams<{ date?: string }>();
-  const navigate = useNavigate(); // Hook for programmatic navigation
-
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const sessionId = searchParams.get("session");
+  const [highlightedEventId, setHighlightedEventId] = useState<string | null>(
+    sessionId
+  );
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
   const [company, setCompany] = useState({
@@ -43,6 +64,13 @@ const MyCalendar: React.FC = () => {
     start: Date;
     end: Date;
   } | null>(null);
+
+  useEffect(() => {
+    if (highlightedEventId) {
+      const timer = setTimeout(() => setHighlightedEventId(null), 5000); // Remove highlight after 1 second
+      return () => clearTimeout(timer);
+    }
+  }, [highlightedEventId]);
 
   const [defaultDate, setDefaultDate] = useState<Date>(() => {
     // Check if the date parameter exists and is valid
@@ -249,11 +277,23 @@ const MyCalendar: React.FC = () => {
   };
 
   const eventPropGetter = (event: any) => {
+    if (event.id === highlightedEventId) {
+      return {
+        className: "highlighted-event",
+        style: {
+          animation: "highlight 1s ease-out",
+          backgroundColor: "transparent",
+          border: "none",
+          boxShadow: "none",
+        },
+      };
+    }
+
     return {
       style: {
-        backgroundColor: "transparent", // Remove default background
-        border: "none", // Remove border
-        boxShadow: "none", // Remove shadows
+        backgroundColor: "transparent",
+        border: "none",
+        boxShadow: "none",
       },
     };
   };
@@ -284,6 +324,7 @@ const MyCalendar: React.FC = () => {
               return fetchSessions(visibleRange.start, visibleRange.end);
             }
           }}
+          highlightedEventId={highlightedEventId}
         />
 
         {/* Render the "More Button" if there are additional events */}
