@@ -66,10 +66,10 @@ const Scheduler: React.FC = () => {
 
   useEffect(() => {
     if (highlightedEventId) {
-      const timer = setTimeout(() => setHighlightedEventId(null), 5000);
+      const timer = setTimeout(() => setHighlightedEventId(null), 2000);
       return () => clearTimeout(timer);
     }
-  }, [highlightedEventId]);
+  }, []);
 
   useEffect(() => {
     const start: Date = dayjs(date)
