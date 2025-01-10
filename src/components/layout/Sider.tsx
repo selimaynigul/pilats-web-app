@@ -108,12 +108,12 @@ const Sidebar: React.FC<SiderProps> = ({
   };
 
   const menuItems = [
-    { key: "companies", icon: <BsFillHouseDoorFill />, label: "Şirketler" },
-    { key: "classes", icon: <BsFillCalendarRangeFill />, label: "Dersler" },
-    { key: "trainers", icon: <BsFillPeopleFill />, label: "Eğitmenler" },
-    { key: "users", icon: <BsFillPersonFill />, label: "Kullanıcılar" },
-    { key: "packages", icon: <BsCreditCard2FrontFill />, label: "Paketler" },
-    { key: "reports", icon: <BsBarChartFill />, label: "Raporlar" },
+    { key: "companies", icon: <BsFillHouseDoorFill />, label: "Companies" },
+    { key: "classes", icon: <BsFillCalendarRangeFill />, label: "Classes" },
+    { key: "trainers", icon: <BsFillPeopleFill />, label: "Trainers" },
+    { key: "users", icon: <BsFillPersonFill />, label: "Users" },
+    { key: "packages", icon: <BsCreditCard2FrontFill />, label: "Packages" },
+    { key: "reports", icon: <BsBarChartFill />, label: "Reports" },
   ];
 
   return (
