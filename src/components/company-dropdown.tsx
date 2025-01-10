@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Dropdown, Input, Menu, Spin } from "antd";
 import styled from "styled-components";
 import { IoIosArrowDown } from "react-icons/io";
+import { AiOutlineSearch } from "react-icons/ai";
+
 import { branchService, companyService } from "services";
 import { getCompanyId, hasRole } from "utils/permissionUtils";
 
@@ -19,7 +21,7 @@ const CompanyDropdownButton = styled.button`
   font-weight: bold;
   border: 1px solid #4d3abd;
   border-radius: 50px;
-  transition: padding-right 0.3s ease;
+  transition: all 0.3s ease;
 
   &:hover {
     padding-right: 35px;
@@ -28,7 +30,9 @@ const CompanyDropdownButton = styled.button`
 
 const IconWrapper = styled.div`
   position: absolute;
-  right: 15px;
+  right: 10px;
+  font-size: 15px;
+  font-weight: bold;
   display: flex;
   align-items: center;
   opacity: 0;
@@ -42,12 +46,28 @@ const IconWrapper = styled.div`
     transform: translateX(0);
   }
 `;
+const StyledInput = styled(Input)<{ inputWidth: string }>`
+  height: 35px;
+  border: 1px solid #4d3abd;
+  border-radius: 50px;
+  padding: 5px 15px;
+  font-weight: bold;
+  color: #4d3abd;
+  background: transparent;
+  transition: width 0.3s ease;
+  width: ${({ inputWidth }) => inputWidth};
+
+  &:focus {
+    outline: none; /* Removes the default blue outline */
+    box-shadow: none; /* Removes any box shadow */
+    border-color: #4d3abd !important; /* Keeps your desired border color */
+  }
+`;
 
 interface CompanyDropdownProps {
   selectedItem: any;
   onSelect: (company: string) => void;
 }
-
 const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
   selectedItem,
   onSelect,
@@ -55,6 +75,17 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<any>([]);
+  const [searchMode, setSearchMode] = useState(false);
+  const [dropdownVisible, setDropdownVisible] = useState(false); // Manage dropdown visibility
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [inputWidth, setInputWidth] = useState("0px");
+
+  useEffect(() => {
+    if (buttonRef.current) {
+      const buttonWidth = buttonRef.current.offsetWidth;
+      setInputWidth(`${buttonWidth + 35}px`);
+    }
+  }, [searchMode, buttonRef]);
 
   const fetchCompanies = useCallback(async (query: string) => {
     if (!query) {
@@ -66,7 +97,6 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
     try {
       const response = await companyService.search({ companyName: query });
       setResponse(response.data || []);
-      console.log("company response: ", response.data);
     } catch (error) {
       console.error("Error fetching companies:", error);
     } finally {
@@ -86,7 +116,6 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
         companyId: getCompanyId(),
       });
       setResponse(response.data || []);
-      console.log("branch response: ", response.data);
     } catch (error) {
       console.error("Error fetching branches:", error);
     } finally {
@@ -95,51 +124,84 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
   }, []);
 
   useEffect(() => {
-    if (hasRole(["COMPANY_ADMIN"])) {
-      fetchBranches(searchQuery);
-    } else if (hasRole(["ADMIN"])) {
-      fetchCompanies(searchQuery);
+    if (searchQuery) {
+      if (hasRole(["COMPANY_ADMIN"])) {
+        fetchBranches(searchQuery);
+      } else if (hasRole(["ADMIN"])) {
+        fetchCompanies(searchQuery);
+      }
+    } else {
+      setResponse([]);
     }
   }, [searchQuery]);
 
-  const companyMenu = (
+  const handleButtonClick = () => {
+    setSearchMode(true);
+    setDropdownVisible(true); // Open dropdown
+    setTimeout(() => {
+      setInputWidth("200px");
+    }, 10);
+  };
+
+  const handleInputBlur = () => {
+    setSearchMode(false);
+    setDropdownVisible(false); // Close dropdown
+    setSearchQuery("");
+    setInputWidth("0px"); // Reset input width
+  };
+
+  const handleSelect = (item: any) => {
+    console.log("AAAAA: ", item);
+    onSelect(item);
+    setSearchMode(false);
+    setDropdownVisible(false); // Close dropdown after selection
+    setSearchQuery("");
+  };
+
+  const menu = (
     <Menu>
-      <Menu.Item key="search">
-        <Input
-          placeholder="Search Company"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onClick={(e) => e?.stopPropagation()}
-        />
-      </Menu.Item>
-      {loading ? (
-        <Menu.Item key="loading" disabled>
-          <Spin size="small" /> Loading...
+      {response.map((item: any) => (
+        <Menu.Item key={item.id} onClick={() => handleSelect(item)}>
+          {item.companyName}
+          {hasRole(["ADMIN", "COMPANY_ADMIN"]) && ` - ${item.branchName}`}
         </Menu.Item>
-      ) : response.length > 0 ? (
-        response.map((item: any, index: number) => (
-          <Menu.Item key={item.id || index} onClick={() => onSelect(item)}>
-            {item.companyName}
-            {hasRole(["ADMIN", "COMPANY_ADMIN"]) && `- ${item.branchName}`}
-          </Menu.Item>
-        ))
-      ) : (
-        <Menu.Item key="no-results" disabled>
-          No companies found
-        </Menu.Item>
-      )}
+      ))}
     </Menu>
   );
 
   return (
-    <Dropdown overlay={companyMenu} trigger={["click"]}>
-      <CompanyDropdownButton>
-        {selectedItem.companyName || "Select Company"}
-        <IconWrapper>
-          <IoIosArrowDown />
-        </IconWrapper>
-      </CompanyDropdownButton>
-    </Dropdown>
+    <div style={{ position: "relative", width: "100%" }}>
+      {searchMode ? (
+        <Dropdown
+          overlay={menu}
+          open={dropdownVisible}
+          onOpenChange={(visible) => {
+            if (!visible) {
+              handleInputBlur();
+            }
+            setDropdownVisible(visible);
+          }}
+          trigger={["click"]}
+        >
+          <StyledInput
+            className="styled-input"
+            autoFocus
+            placeholder="Search Company"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            suffix={loading ? <Spin size="small" /> : null}
+            inputWidth={inputWidth}
+          />
+        </Dropdown>
+      ) : (
+        <CompanyDropdownButton ref={buttonRef} onClick={handleButtonClick}>
+          {selectedItem?.companyName || "Select Company"}
+          <IconWrapper>
+            <AiOutlineSearch style={{ strokeWidth: 30 }} />
+          </IconWrapper>
+        </CompanyDropdownButton>
+      )}
+    </div>
   );
 };
 

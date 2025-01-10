@@ -14,6 +14,7 @@ const Container = styled.div`
   cursor: pointer;
   color: white;
   transition: 0.2s;
+  flex-shrink: 0;
 
   &:hover {
     border: 1px solid #4d3abd;
