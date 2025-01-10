@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { Row, Col, Spin, Button } from "antd";
 import { usePagination } from "hooks";
@@ -20,6 +20,8 @@ const PackageList: React.FC<PackageListProps> = ({
   onTrainerCountChange,
   company,
 }) => {
+
+
   const params = useMemo(
     () => ({
       pageSize: 8,
@@ -49,6 +51,7 @@ const PackageList: React.FC<PackageListProps> = ({
         {packages.map((item: any, index: number) => (
           <Col xs={24} sm={12} md={12} lg={6} key={index}>
             <PackageCard
+              id={item.id}
               title={item.name}
               price={item.price}
               description={item.description}
@@ -57,6 +60,9 @@ const PackageList: React.FC<PackageListProps> = ({
                 { value: item.changeCount, label: "iptal hakkı" },
                 { value: item.bonusCount, label: "bonus hakkı" },
               ]}
+              onDelete={() => {
+                window.location.reload();
+              }}
             />
           </Col>
         ))}

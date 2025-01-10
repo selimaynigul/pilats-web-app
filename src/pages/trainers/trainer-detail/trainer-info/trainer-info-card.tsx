@@ -20,12 +20,52 @@ import {
   EditFilled,
   PhoneFilled,
   UserOutlined,
+  UploadOutlined,
+  PhoneOutlined,
 } from "@ant-design/icons";
 import { imageService, jobService, trainerService } from "services";
 import moment from "moment";
 import { PlusOutlined } from '@ant-design/icons';
 import { Divider } from 'antd';
 
+const countryCodes = [
+  { code: '+90', country: 'TR' },
+  { code: '+1', country: 'USA' },
+  { code: '+44', country: 'UK' },
+  { code: '+49', country: 'GR' },
+  { code: '+33', country: 'FR' },
+  // if need add more no necc mens1s
+];
+
+const UploadOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s;
+  cursor: pointer;
+
+  .upload-icon {
+    color: white;
+    font-size: 24px;
+  }
+`;
+
+const AvatarWrapper = styled.div`
+  position: relative;
+  display: inline-block;
+
+  &:hover ${UploadOverlay} {
+    opacity: 1;
+  }
+`;
 const Container = styled.div`
   background: white;
   border-radius: 20px;
@@ -313,6 +353,8 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
   };
 
   const handleEditSubmit = (values: any) => {
+    const formattedPhone = `${values.countryCode}${values.phoneNumber}`;
+
     const payload = {
       id: trainer.id,
       isActive: values.active, // Checkbox state for active status
@@ -322,9 +364,13 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
         : values.endDate?.format("YYYY-MM-DD"), // Null if active; otherwise, endDate */
       passiveEndDate: null,
       ucUpdateRequest: {
+        name: values.name,
+        surname: values.surname,
         birthdate: values.birthdate.format("YYYY-MM-DD"), // Birthdate in "YYYY-MM-DD" format
+        telNo1: formattedPhone,
       },
       jobId: jobs.find(job => job.jobName === values.jobId)?.id,
+      gender: values.gender.toUpperCase(),
       location: values.location,
     };
 
@@ -338,13 +384,33 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
       })
       .catch((error) => {
         console.error("Error updating trainer:", error);
-        message.error("Failed to update trainer");
+        message.error("Failed to update trainer. "+ error);
       });
   };
 
   useEffect(() => {
     setIsActive((prev: any) => !prev);
-  }, []);
+    if (trainer) {
+      var phoneNumber = trainer.ucGetResponse.telNo1 || '';
+      // Extract country code and number from phone number
+      for (const code of countryCodes) {
+        if (phoneNumber.startsWith(code.code)) {
+          phoneNumber = phoneNumber.replace(code.code, '');
+          form.setFieldsValue({ countryCode: code.code });
+          form.setFieldsValue({ phoneNumber: phoneNumber });
+          break;
+        }
+      }
+      form.setFieldsValue({
+        ...trainer.ucGetResponse,
+        birthdate: moment(trainer.ucGetResponse.birthdate),
+        active: trainer.active,
+        endDate: trainer.passiveEndDate,
+        jobId: trainer.jobName,
+        location: trainer.location
+      });
+    }
+  }, [trainer, form]);
 
   const handleDelete = () => {
     Modal.confirm({
@@ -434,12 +500,17 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
         <ProfileSection>
           <AvatarContainer onClick={handleAvatarClick}>
             {!trainer.active && <InactiveIcon title="Not working" />}
-            <Avatar
-              size={150}
-              src={"http://localhost:8000/api/v1/images/"+trainer.imageUrl}
-              icon={<UserOutlined />}
-              style={{ marginBottom: 8 }}
-            />
+            <AvatarWrapper>
+              <Avatar
+                size={150}
+                src={"http://localhost:8000/api/v1/images/"+trainer.imageUrl}
+                icon={<UserOutlined />}
+                style={{ marginBottom: 8 }}
+              />
+              <UploadOverlay>
+                <UploadOutlined className="upload-icon" />
+              </UploadOverlay>
+            </AvatarWrapper>
             <input 
               type="file"
               ref={fileInputRef}
@@ -541,18 +612,51 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
               <DatePicker style={{ width: "100%" }} />
             </Form.Item>
             <Form.Item
-              name="telNo1"
-              label="Phone Number"
-              rules={[
-                { required: true, message: "Please enter the phone number" },
-              ]}
-            >
-              <Input />
-            </Form.Item>
+                label="Phone Number"
+                required
+              >
+                <Input.Group compact>
+                  <Form.Item
+                    name="countryCode"
+                    noStyle
+                    initialValue="+90"
+                    rules={[{ required: true, message: 'Please select a country code!' }]}
+                  >
+                    <Select style={{ width: '30%' }}>
+                      {countryCodes.map(({ code, country }) => (
+                        <Select.Option key={code} value={code}>
+                          {`${code} ${country}`}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                  <Form.Item
+                    name="phoneNumber"
+                    noStyle
+                    rules={[
+                      { required: true, message: 'Please input your phone number!' },
+                      {
+                        pattern: /^\d{10}$/,
+                        message: 'Please enter a valid 10-digit phone number!',
+                      },
+                    ]}
+                  >
+                    <Input
+                      style={{ width: '70%' }}
+                      prefix={<PhoneOutlined />}
+                      maxLength={10}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, '');
+                        form.setFieldsValue({ phoneNumber: value });
+                      }}
+                    />
+                  </Form.Item>
+                </Input.Group>
+              </Form.Item>
             <Form.Item
                           name="jobId"
                           label="Job"
-                          rules={[{ required: true, message: "Please select or add a job" }]}
+                          rules={[{ required: false, message: "Please select or add a job" }]}
                         >
                       {isAddingJob ? (
                         <Input.Group compact>
@@ -624,7 +728,7 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
             < Form.Item
                             name="location"
                             label="Location"
-                            rules={[{ required: true, message: "Please enter the location" }]}
+                            rules={[{ required: false, message: "Please enter the location" }]}
                           >
                             <Input />
                           </Form.Item>
