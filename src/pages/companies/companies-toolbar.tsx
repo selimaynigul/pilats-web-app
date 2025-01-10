@@ -62,7 +62,7 @@ const CompaniesToolbar: React.FC<{
   return (
     <ToolbarContainer>
       <CountContainer>
-        <CountNumber>{trainerCount}</CountNumber> trainers listed
+        <CountNumber>{trainerCount}</CountNumber> companies listed
       </CountContainer>
       <ActionContainer>
         <AddButton onClick={() => setIsModalVisible(true)} />
