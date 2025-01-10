@@ -27,12 +27,42 @@ import {
   EditFilled,
   PhoneFilled,
   UserOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
 import { imageService, jobService, trainerService, userService } from "services";
 import moment from "moment";
 import { PlusOutlined } from '@ant-design/icons';
 import { Divider } from 'antd';
+// Add these styled components with your other styled components
+const UploadOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s;
+  cursor: pointer;
 
+  .upload-icon {
+    color: white;
+    font-size: 24px;
+  }
+`;
+
+const AvatarWrapper = styled.div`
+  position: relative;
+  display: inline-block;
+
+  &:hover ${UploadOverlay} {
+    opacity: 1;
+  }
+`;
 const Container = styled.div`
   background: white;
   border-radius: 20px;
@@ -435,14 +465,19 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
         </ActionButtons>
 
         <ProfileSection>
-          <AvatarContainer onClick={handleAvatarClick}>
-            <Avatar
-              size={150}
-              src={"http://localhost:8000/api/v1/images/"+user.imageUrl}
-              icon={<UserOutlined />}
-              style={{ marginBottom: 8 }}
-              
-            />
+        <AvatarContainer onClick={handleAvatarClick}>
+            {!user.active && <InactiveIcon title="Not working" />}
+            <AvatarWrapper>
+              <Avatar
+                size={150}
+                src={"http://localhost:8000/api/v1/images/"+user.imageUrl}
+                icon={<UserOutlined />}
+                style={{ marginBottom: 8 }}
+              />
+              <UploadOverlay>
+                <UploadOutlined className="upload-icon" />
+              </UploadOverlay>
+            </AvatarWrapper>
             <input 
               type="file"
               ref={fileInputRef}
