@@ -3,9 +3,11 @@ import React, { useState } from "react";
  */
 import { Card } from "components";
 import RoleManagementToolbar from "./role-management-toolbar";
+import AdminList from "./admin-list/admin-list";
 
 const RoleManagementPage: React.FC = () => {
   const [trainerCount, setTrainerCount] = useState(0);
+  const [isBranchMode, setIsBranchMode] = useState(true);
   const [company, setCompany] = useState({
     companyName: "All",
     id: null,
@@ -22,13 +24,16 @@ const RoleManagementPage: React.FC = () => {
           trainerCount={trainerCount}
           selectedCompany={company}
           setSelectedCompany={setCompany}
+          isBranchMode={isBranchMode}
+          setIsBranchMode={setIsBranchMode}
         />
       }
     >
-      {/*  <TrainerList
+      <AdminList
+        isBranchMode={isBranchMode}
         onTrainerCountChange={updateTrainerCount}
         company={company}
-      /> */}
+      />
       <div></div>
     </Card>
   );

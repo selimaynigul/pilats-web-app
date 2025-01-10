@@ -54,7 +54,7 @@ export function usePagination<T>({
   useEffect(() => {
     setPage(initialPage);
     fetchItems(initialPage, true);
-  }, [params]);
+  }, [params, fetchService]);
 
   return {
     items,

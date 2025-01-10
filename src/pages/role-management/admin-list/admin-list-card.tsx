@@ -155,7 +155,7 @@ interface Trainer {
   avatarUrl?: string;
 }
 
-const TrainerCard: React.FC<{ trainer: any }> = ({ trainer }) => {
+const AdminCard: React.FC<{ trainer: any }> = ({ trainer }) => {
   const whatsappLink = `https://wa.me/+905077845678`;
 
   return (
@@ -188,8 +188,6 @@ const TrainerCard: React.FC<{ trainer: any }> = ({ trainer }) => {
         </Link>
       }
     >
-      {!trainer.active && <Overlay />}
-
       <Container>
         <Link to={`/companies/${trainer.companyId}`}>
           <CompanyInfo>
@@ -239,4 +237,4 @@ const TrainerCard: React.FC<{ trainer: any }> = ({ trainer }) => {
   );
 };
 
-export default TrainerCard;
+export default AdminCard;

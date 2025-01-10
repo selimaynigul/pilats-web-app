@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import AddButton from "components/AddButton";
 import AddAdminModal from "./add-admin-modal";
-import { message, Switch, Tooltip } from "antd";
+import { Button, message, Tooltip } from "antd";
 import { CompanyDropdown } from "components";
 import { hasRole } from "utils/permissionUtils";
-import { BsBuilding, BsBuildings } from "react-icons/bs";
 import { companyAdminService, branchAdminService } from "services";
+import { AiOutlineSwap } from "react-icons/ai";
 
 const ToolbarContainer = styled.div`
   display: flex;
@@ -37,29 +37,43 @@ const ActionContainer = styled.div`
   padding: 10px;
 `;
 
-const CountNumber = styled.span`
-  color: ${({ theme }) => theme.primary}; /* Primary color for the number */
+export const TabButton = styled(Button)`
+  border: 1px solid transparent;
+  background: ${({ theme }) => theme.contentBg};
+  color: #4d3abd;
+  border-radius: 50px;
+  padding: 5px 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 35px;
+  cursor: pointer;
+  transition: border 0.2s;
+  font-weight: bold;
+
+  &:hover {
+    border: 1px solid #4d3abd;
+  }
 `;
 
-const SwitchContainer = styled.div`
-  .ant-switch-checked {
-    background-color: ${({ theme }) =>
-      theme.primary} !important; /* Active state */
-  }
-
-  .ant-switch {
-    height: 30px;
-    min-width: 100px;
-  }
+const CountNumber = styled.span`
+  color: ${({ theme }) => theme.primary}; /* Primary color for the number */
 `;
 
 const RoleManagementToolbar: React.FC<{
   trainerCount: number;
   selectedCompany: any;
   setSelectedCompany: any;
-}> = ({ trainerCount, selectedCompany, setSelectedCompany }) => {
+  isBranchMode: boolean;
+  setIsBranchMode: any;
+}> = ({
+  trainerCount,
+  selectedCompany,
+  setSelectedCompany,
+  isBranchMode,
+  setIsBranchMode,
+}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isBranchMode, setIsBranchMode] = useState(false); // Switch state
 
   const handleAddAdmin = async (values: any) => {
     const payload = {
@@ -78,8 +92,6 @@ const RoleManagementToolbar: React.FC<{
       ...(isBranchMode && { branchId: values.branch }), // Include branchId if branch mode
     };
 
-    console.log(payload);
-
     try {
       if (isBranchMode) {
         await branchAdminService.register(payload);
@@ -93,6 +105,10 @@ const RoleManagementToolbar: React.FC<{
       console.error("Error adding admin:", err);
       message.error("Failed to add admin. Please try again.");
     }
+  };
+
+  const changeTabs = () => {
+    setIsBranchMode((prev: any) => !prev);
   };
 
   return (
@@ -112,14 +128,10 @@ const RoleManagementToolbar: React.FC<{
             isBranchMode ? "Switch to Company Mode" : "Switch to Branch Mode"
           }
         >
-          <SwitchContainer>
-            <Switch
-              checked={isBranchMode}
-              onChange={setIsBranchMode}
-              checkedChildren={<BsBuilding />}
-              unCheckedChildren={<BsBuildings />}
-            />
-          </SwitchContainer>
+          <TabButton onClick={changeTabs}>
+            {isBranchMode ? "Branch Admins" : "Company Admins"}
+            <AiOutlineSwap />
+          </TabButton>
         </Tooltip>
         <AddButton onClick={() => setIsModalVisible(true)} />
       </ActionContainer>

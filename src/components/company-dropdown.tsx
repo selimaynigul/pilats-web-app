@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Dropdown, Input, Menu, Spin } from "antd";
 import styled from "styled-components";
-import { IoIosArrowDown } from "react-icons/io";
 import { AiOutlineSearch } from "react-icons/ai";
+import { flushSync } from "react-dom";
 
 import { branchService, companyService } from "services";
 import { getCompanyId, hasRole } from "utils/permissionUtils";
+import { AiOutlineReload } from "react-icons/ai";
 
 const CompanyDropdownButton = styled.button`
   position: relative;
@@ -47,6 +48,18 @@ const IconWrapper = styled.div`
   }
 `;
 const StyledInput = styled(Input)<{ inputWidth: string }>`
+  /* Remove default focus ring on the affix wrapper */
+  &&.ant-input-affix-wrapper {
+    &:hover {
+      border-color: #4d3abd;
+    }
+
+    /* When the affix wrapper is focused */
+    &.ant-input-affix-wrapper-focused {
+      border-color: #4d3abd;
+      box-shadow: none; /* Remove AntD's default box shadow */
+    }
+  }
   height: 35px;
   border: 1px solid #4d3abd;
   border-radius: 50px;
@@ -64,6 +77,9 @@ const StyledInput = styled(Input)<{ inputWidth: string }>`
   }
 `;
 
+const StyledReload = styled(AiOutlineReload)`
+  cursor: pointer;
+`;
 interface CompanyDropdownProps {
   selectedItem: any;
   onSelect: (company: string) => void;
@@ -76,9 +92,10 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<any>([]);
   const [searchMode, setSearchMode] = useState(false);
-  const [dropdownVisible, setDropdownVisible] = useState(false); // Manage dropdown visibility
+  const [dropdownVisible, setDropdownVisible] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [inputWidth, setInputWidth] = useState("0px");
+  const [ignoreNextClose, setIgnoreNextClose] = useState(false);
 
   useEffect(() => {
     if (buttonRef.current) {
@@ -95,7 +112,9 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
 
     setLoading(true);
     try {
-      const response = await companyService.search({ companyName: query });
+      const response = await companyService.search({
+        companyName: query || null,
+      });
       setResponse(response.data || []);
     } catch (error) {
       console.error("Error fetching companies:", error);
@@ -112,7 +131,7 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
     setLoading(true);
     try {
       const response = await branchService.search({
-        branchName: query,
+        branchName: query || null,
         companyId: getCompanyId(),
       });
       setResponse(response.data || []);
@@ -137,7 +156,7 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
 
   const handleButtonClick = () => {
     setSearchMode(true);
-    setDropdownVisible(true); // Open dropdown
+    setDropdownVisible(true);
     setTimeout(() => {
       setInputWidth("200px");
     }, 10);
@@ -145,25 +164,25 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
 
   const handleInputBlur = () => {
     setSearchMode(false);
-    setDropdownVisible(false); // Close dropdown
+    setDropdownVisible(false);
     setSearchQuery("");
-    setInputWidth("0px"); // Reset input width
+    setInputWidth("0px");
   };
 
   const handleSelect = (item: any) => {
-    console.log("AAAAA: ", item);
     onSelect(item);
     setSearchMode(false);
-    setDropdownVisible(false); // Close dropdown after selection
+    setDropdownVisible(false);
     setSearchQuery("");
   };
 
   const menu = (
     <Menu>
+      {/* Render fetched items */}
       {response.map((item: any) => (
         <Menu.Item key={item.id} onClick={() => handleSelect(item)}>
           {item.companyName}
-          {hasRole(["ADMIN", "COMPANY_ADMIN"]) && ` - ${item.branchName}`}
+          {hasRole(["COMPANY_ADMIN"]) && ` - ${item.branchName}`}
         </Menu.Item>
       ))}
     </Menu>
@@ -176,8 +195,10 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
           overlay={menu}
           open={dropdownVisible}
           onOpenChange={(visible) => {
-            if (!visible) {
+            if (!visible && ignoreNextClose) {
+              setIgnoreNextClose(false);
               handleInputBlur();
+              return;
             }
             setDropdownVisible(visible);
           }}
@@ -189,13 +210,33 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
             placeholder="Search Company"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            suffix={loading ? <Spin size="small" /> : null}
+            suffix={
+              loading ? (
+                <Spin size="small" />
+              ) : (
+                <StyledReload
+                  onClick={() => {
+                    flushSync(() => {
+                      setIgnoreNextClose(true);
+                    });
+                    handleSelect({ companyName: "All", branchName: null });
+                    if (hasRole(["COMPANY_ADMIN"])) {
+                      fetchBranches("");
+                    } else if (hasRole(["ADMIN"])) {
+                      fetchCompanies("");
+                    }
+                  }}
+                />
+              )
+            }
             inputWidth={inputWidth}
           />
         </Dropdown>
       ) : (
         <CompanyDropdownButton ref={buttonRef} onClick={handleButtonClick}>
-          {selectedItem?.companyName || "Select Company"}
+          {`${selectedItem?.companyName} ${selectedItem?.branchName ? `- ${selectedItem.branchName}` : ""}` ||
+            "Select Company"}
+
           <IconWrapper>
             <AiOutlineSearch style={{ strokeWidth: 30 }} />
           </IconWrapper>
