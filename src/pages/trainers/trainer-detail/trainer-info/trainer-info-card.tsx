@@ -20,14 +20,23 @@ import {
   EditFilled,
   PhoneFilled,
   UserOutlined,
-  UploadOutlined
+  UploadOutlined,
+  PhoneOutlined,
 } from "@ant-design/icons";
 import { imageService, jobService, trainerService } from "services";
 import moment from "moment";
 import { PlusOutlined } from '@ant-design/icons';
 import { Divider } from 'antd';
 
-// Add these styled components with your other styled components
+const countryCodes = [
+  { code: '+90', country: 'TR' },
+  { code: '+1', country: 'USA' },
+  { code: '+44', country: 'UK' },
+  { code: '+49', country: 'GR' },
+  { code: '+33', country: 'FR' },
+  // if need add more no necc mens1s
+];
+
 const UploadOverlay = styled.div`
   position: absolute;
   top: 0;
@@ -344,6 +353,8 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
   };
 
   const handleEditSubmit = (values: any) => {
+    const formattedPhone = `${values.countryCode}${values.phoneNumber}`;
+
     const payload = {
       id: trainer.id,
       isActive: values.active, // Checkbox state for active status
@@ -356,9 +367,10 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
         name: values.name,
         surname: values.surname,
         birthdate: values.birthdate.format("YYYY-MM-DD"), // Birthdate in "YYYY-MM-DD" format
-        telNo1: values.telNo1,
+        telNo1: formattedPhone,
       },
       jobId: jobs.find(job => job.jobName === values.jobId)?.id,
+      gender: values.gender.toUpperCase(),
       location: values.location,
     };
 
@@ -378,7 +390,27 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
 
   useEffect(() => {
     setIsActive((prev: any) => !prev);
-  }, []);
+    if (trainer) {
+      var phoneNumber = trainer.ucGetResponse.telNo1 || '';
+      // Extract country code and number from phone number
+      for (const code of countryCodes) {
+        if (phoneNumber.startsWith(code.code)) {
+          phoneNumber = phoneNumber.replace(code.code, '');
+          form.setFieldsValue({ countryCode: code.code });
+          form.setFieldsValue({ phoneNumber: phoneNumber });
+          break;
+        }
+      }
+      form.setFieldsValue({
+        ...trainer.ucGetResponse,
+        birthdate: moment(trainer.ucGetResponse.birthdate),
+        active: trainer.active,
+        endDate: trainer.passiveEndDate,
+        jobId: trainer.jobName,
+        location: trainer.location
+      });
+    }
+  }, [trainer, form]);
 
   const handleDelete = () => {
     Modal.confirm({
@@ -580,14 +612,47 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
               <DatePicker style={{ width: "100%" }} />
             </Form.Item>
             <Form.Item
-              name="telNo1"
-              label="Phone Number"
-              rules={[
-                { required: true, message: "Please enter the phone number" },
-              ]}
-            >
-              <Input />
-            </Form.Item>
+                label="Phone Number"
+                required
+              >
+                <Input.Group compact>
+                  <Form.Item
+                    name="countryCode"
+                    noStyle
+                    initialValue="+90"
+                    rules={[{ required: true, message: 'Please select a country code!' }]}
+                  >
+                    <Select style={{ width: '30%' }}>
+                      {countryCodes.map(({ code, country }) => (
+                        <Select.Option key={code} value={code}>
+                          {`${code} ${country}`}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                  <Form.Item
+                    name="phoneNumber"
+                    noStyle
+                    rules={[
+                      { required: true, message: 'Please input your phone number!' },
+                      {
+                        pattern: /^\d{10}$/,
+                        message: 'Please enter a valid 10-digit phone number!',
+                      },
+                    ]}
+                  >
+                    <Input
+                      style={{ width: '70%' }}
+                      prefix={<PhoneOutlined />}
+                      maxLength={10}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, '');
+                        form.setFieldsValue({ phoneNumber: value });
+                      }}
+                    />
+                  </Form.Item>
+                </Input.Group>
+              </Form.Item>
             <Form.Item
                           name="jobId"
                           label="Job"

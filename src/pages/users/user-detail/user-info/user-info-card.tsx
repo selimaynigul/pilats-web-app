@@ -28,12 +28,22 @@ import {
   PhoneFilled,
   UserOutlined,
   UploadOutlined,
+  PhoneOutlined,
 } from "@ant-design/icons";
 import { imageService, jobService, trainerService, userService } from "services";
 import moment from "moment";
 import { PlusOutlined } from '@ant-design/icons';
 import { Divider } from 'antd';
-// Add these styled components with your other styled components
+
+const countryCodes = [
+  { code: '+90', country: 'TR' },
+  { code: '+1', country: 'USA' },
+  { code: '+44', country: 'UK' },
+  { code: '+49', country: 'GR' },
+  { code: '+33', country: 'FR' },
+  // if need add more no necc mens1s
+];
+
 const UploadOverlay = styled.div`
   position: absolute;
   top: 0;
@@ -348,24 +358,23 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
   };
 
   const handleEditSubmit = (values: any) => {
+    const formattedPhone = `${values.countryCode}${values.phoneNumber}`;
+
     const payload = {
       id: user.id,
-      isActive: values.active, // Checkbox state for active status
-      temporarilyPassive: !values.active && values.endDate ? true : false, // Set to true only if inactive and endDate exists
-      /* passiveEndDate: values.active
-        ? null
-        : values.endDate?.format("YYYY-MM-DD"), // Null if active; otherwise, endDate */
+      temporarilyPassive: !values.active && values.endDate ? true : false,
       passiveEndDate: null,
       ucUpdateRequest: {
         name: values.name,
         surname: values.surname,
-        birthdate: values.birthdate.format("YYYY-MM-DD"), // Birthdate in "YYYY-MM-DD" format
-        telNo1: values.telNo1,
+        birthdate: values.birthdate.format("YYYY-MM-DD"),
+        gender: values.gender.toUpperCase(),
+        telNo1: formattedPhone,
       },
       jobId: jobs.find(job => job.jobName === values.jobId)?.id,
       location: values.location,
     };
-
+  
     userService
       .update(payload)
       .then(() => {
@@ -381,8 +390,27 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
   };
 
   useEffect(() => {
-    setIsActive((prev: any) => !prev);
-  }, []);
+    if (user) {
+      var phoneNumber = user.ucGetResponse.telNo1 || '';
+      // Extract country code and number from phone number
+      for (const code of countryCodes) {
+        if (phoneNumber.startsWith(code.code)) {
+          phoneNumber = phoneNumber.replace(code.code, '');
+          form.setFieldsValue({ countryCode: code.code });
+          form.setFieldsValue({ phoneNumber: phoneNumber });
+          break;
+        }
+      }
+      form.setFieldsValue({
+        ...user.ucGetResponse,
+        birthdate: moment(user.ucGetResponse.birthdate),
+        active: user.active,
+        endDate: user.passiveEndDate,
+        jobId: user.jobName,
+        location: user.location
+      });
+    }
+  }, [user, form]);
 
   const handleDelete = () => {
     Modal.confirm({
@@ -469,7 +497,6 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
 
         <ProfileSection>
         <AvatarContainer onClick={handleAvatarClick}>
-            {!user.active && <InactiveIcon title="Not working" />}
             <AvatarWrapper>
               <Avatar
                 size={150}
@@ -582,14 +609,48 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
               <DatePicker style={{ width: "100%" }} />
             </Form.Item>
             <Form.Item
-              name="telNo1"
               label="Phone Number"
-              rules={[
-                { required: true, message: "Please enter the phone number" },
-              ]}
+              required
             >
-              <Input />
+              <Input.Group compact>
+                <Form.Item
+                  name="countryCode"
+                  noStyle
+                  initialValue="+90"
+                  rules={[{ required: true, message: 'Please select a country code!' }]}
+                >
+                  <Select style={{ width: '30%' }}>
+                    {countryCodes.map(({ code, country }) => (
+                      <Select.Option key={code} value={code}>
+                        {`${code} ${country}`}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+                <Form.Item
+                  name="phoneNumber"
+                  noStyle
+                  rules={[
+                    { required: true, message: 'Please input your phone number!' },
+                    {
+                      pattern: /^\d{10}$/,
+                      message: 'Please enter a valid 10-digit phone number!',
+                    },
+                  ]}
+                >
+                  <Input
+                    style={{ width: '70%' }}
+                    prefix={<PhoneOutlined />}
+                    maxLength={10}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, '');
+                      form.setFieldsValue({ phoneNumber: value });
+                    }}
+                  />
+                </Form.Item>
+              </Input.Group>
             </Form.Item>
+
             <Form.Item
               name="gender"
               label="Gender"
@@ -668,19 +729,6 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
               >
                 <Input />
               </Form.Item>
-            <Form.Item
-              name="active"
-              label="Is Active"
-              valuePropName="checked"
-              rules={[{ required: true, message: "Please select the status" }]}
-            >
-              <Checkbox onChange={handleCheckboxChange}>Is Active</Checkbox>
-            </Form.Item>
-            {!isActive && (
-              <Form.Item name="endDate" label="End Date">
-                <DatePicker style={{ width: "100%" }} />
-              </Form.Item>
-            )}
           </Form>
         </Modal>
       </Container>
