@@ -353,7 +353,10 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
         : values.endDate?.format("YYYY-MM-DD"), // Null if active; otherwise, endDate */
       passiveEndDate: null,
       ucUpdateRequest: {
+        name: values.name,
+        surname: values.surname,
         birthdate: values.birthdate.format("YYYY-MM-DD"), // Birthdate in "YYYY-MM-DD" format
+        telNo1: values.telNo1,
       },
       jobId: jobs.find(job => job.jobName === values.jobId)?.id,
       location: values.location,
@@ -369,7 +372,7 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
       })
       .catch((error) => {
         console.error("Error updating trainer:", error);
-        message.error("Failed to update trainer");
+        message.error("Failed to update trainer. "+ error);
       });
   };
 
@@ -588,7 +591,7 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
             <Form.Item
                           name="jobId"
                           label="Job"
-                          rules={[{ required: true, message: "Please select or add a job" }]}
+                          rules={[{ required: false, message: "Please select or add a job" }]}
                         >
                       {isAddingJob ? (
                         <Input.Group compact>
@@ -660,7 +663,7 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
             < Form.Item
                             name="location"
                             label="Location"
-                            rules={[{ required: true, message: "Please enter the location" }]}
+                            rules={[{ required: false, message: "Please enter the location" }]}
                           >
                             <Input />
                           </Form.Item>
