@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import { Calendar, momentLocalizer, Views } from "react-big-calendar";
 import moment from "moment";
 import { useParams, useSearchParams } from "react-router-dom"; // Import useParams
@@ -40,7 +40,7 @@ const Scheduler: React.FC = () => {
   );
   const [loading, setLoading] = useState(false);
   const [sessions, setSessions] = useState<any[]>([]);
-  const [company, setCompany] = useState({
+  const [company, setCompany] = useState<any>({
     companyName: "All",
     id: null,
   });
@@ -62,6 +62,21 @@ const Scheduler: React.FC = () => {
     const savedDate = localStorage.getItem("savedCalendarDate");
     return savedDate ? new Date(savedDate) : new Date();
   });
+
+  const params = useMemo(() => {
+    const isAdmin = hasRole(["ADMIN"]);
+    return {
+      companyId: isAdmin
+        ? company?.branchName
+          ? company?.companyId
+          : company?.id
+        : getCompanyId(),
+      branchId: company.branchName ? company.id : null,
+      searchByPageDto: {
+        pageSize: 200,
+      },
+    };
+  }, [company]);
 
   useEffect(() => {
     if (highlightedEventId) {
@@ -102,7 +117,7 @@ const Scheduler: React.FC = () => {
     if (visibleRange) {
       fetchSessions(visibleRange.start, visibleRange.end, true);
     }
-  }, [visibleRange]);
+  }, [visibleRange, params]);
 
   const updateVisibleDate = (range: { start: Date; end: Date } | Date[]) => {
     const startDate = Array.isArray(range) ? range[0] : range.start;
@@ -124,18 +139,16 @@ const Scheduler: React.FC = () => {
   ) => {
     if (showLoading) setLoading(true);
 
-    const params = {
+    const finalParams = {
+      ...params,
       startDate: dayjs(startDate).toISOString(),
       endDate: dayjs(endDate).toISOString(),
-      branchId: getBranchId(),
-      companyId: getCompanyId() || company.id || null,
-      searchByPageDto: {
-        pageSize: 200,
-      },
     };
 
+    console.log("final", finalParams);
+
     sessionService
-      .search(params)
+      .search(finalParams)
       .then((response) => {
         const formattedSessions = response.data.map((session: any) => ({
           ...session,
@@ -197,7 +210,6 @@ const Scheduler: React.FC = () => {
       .add(payload)
       .then(() => {
         message.success("Event added successfully!");
-        // Refetch sessions for the current visible range
         if (visibleRange) {
           fetchSessions(visibleRange.start, visibleRange.end, true);
         }
@@ -343,6 +355,7 @@ const Scheduler: React.FC = () => {
             <CustomToolbar
               {...props}
               setCompany={setCompany}
+              company={company}
               setIsModalVisible={setIsModalVisible}
             />
           ),

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   ToolbarContainer,
   NavButtons,
@@ -7,7 +7,7 @@ import {
   ToggleViewButton,
 } from "./ToolbarStyles";
 import { RightOutlined, LeftOutlined } from "@ant-design/icons";
-import { DatePicker, Modal, Button, Form, Input, Select } from "antd";
+import { Form } from "antd";
 import dayjs from "dayjs";
 import AddButton from "components/AddButton";
 import { CompanyDropdown } from "components";
@@ -15,40 +15,23 @@ import { ToolbarProps, View } from "react-big-calendar";
 import { hasRole } from "utils/permissionUtils";
 
 const Toolbar: React.FC<
-  ToolbarProps & { setCompany: any; setIsModalVisible: any }
+  ToolbarProps & { company: any; setCompany: any; setIsModalVisible: any }
 > = ({
-  label,
   onNavigate,
   onView,
   views,
   view,
   date,
   setCompany,
+  company,
   setIsModalVisible,
 }) => {
-  const [selectedCompany, setSelectedCompany] = useState("MacFit - Gebze");
   const [form] = Form.useForm();
 
   const handleModalToggle = (visible: boolean) => {
     setIsModalVisible(visible);
     if (!visible) form.resetFields();
   };
-
-  const handleClassSubmit = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        /*         console.log("Class Data:", values);
-         */ handleModalToggle(false);
-      })
-      .catch((info) => console.log("Validation Failed:", info));
-  };
-
-  const trainerOptions = [
-    { label: "Alice Johnson", value: "alice" },
-    { label: "Bob Smith", value: "bob" },
-    { label: "Charlie Brown", value: "charlie" },
-  ];
 
   const viewArray = Array.isArray(views)
     ? views
@@ -73,11 +56,8 @@ const Toolbar: React.FC<
       <div>
         {hasRole(["ADMIN", "COMPANY_ADMIN"]) && (
           <CompanyDropdown
-            selectedItem={selectedCompany}
-            onSelect={(company) => {
-              setSelectedCompany(company);
-              setCompany(company);
-            }}
+            selectedItem={company}
+            onSelect={(selectedCompany) => setCompany(selectedCompany)}
           />
         )}
       </div>
