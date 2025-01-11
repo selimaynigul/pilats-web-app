@@ -41,7 +41,7 @@ const Scheduler: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [sessions, setSessions] = useState<any[]>([]);
   const [company, setCompany] = useState<any>({
-    companyName: "All",
+    companyName: hasRole(["ADMIN"]) ? "Select Company" : "Select Branch",
     id: null,
   });
   const [isModalVisible, setIsModalVisible] = useState(false);

@@ -96,9 +96,9 @@ const CompanyInfo: React.FC<{ setBranches: any }> = ({ setBranches }) => {
 
         return Promise.reject("company not found");
       })
-      /*   .then((branchResponse) => {
+      .then((branchResponse) => {
         setBranches(branchResponse.data);
-      }) */
+      })
       .catch((error) => {
         console.error("Error fetching company or branches:", error);
       })

@@ -301,7 +301,7 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
             </Form.Item>
           </div>
         )}
-        {selectedBranch && (
+        {(hasRole(["BRANCH_ADMIN"]) || selectedBranch) && (
           <div
             className="custom-input"
             style={{

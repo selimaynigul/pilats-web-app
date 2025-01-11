@@ -23,7 +23,7 @@ const { Option } = Select;
 
 const StyledSider = styled(Sider)<{ isMobile: boolean }>`
   background: ${({ theme }) => theme.bodyBg};
-  padding: 80px 0 0;
+  padding: ${({ isMobile }) => (isMobile ? "0" : "15px 0 0")};
   height: ${({ isMobile }) => (isMobile ? "100vh" : "auto")};
   position: ${({ isMobile }) => (isMobile ? "fixed" : "sticky")};
   top: 0;
@@ -33,6 +33,20 @@ const StyledSider = styled(Sider)<{ isMobile: boolean }>`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+`;
+
+const LogoContainer = styled.div<{ collapsed: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: ${({ collapsed }) => (collapsed ? "center" : "flex-start")};
+  padding: ${({ collapsed }) => (collapsed ? "10px 0" : "10px 20px")};
+  margin-bottom: 30px;
+  background: #ffffff;
+
+  img {
+    width: ${({ collapsed }) => (collapsed ? "30px" : "120px")};
+    transition: width 0.3s ease;
+  }
 `;
 
 const CustomTrigger = styled.div<{ collapsed: boolean }>`
@@ -62,7 +76,6 @@ const LanguageSelector = styled(Select)`
   bottom: 120px;
   left: 5px;
   background: white !important;
-  color: "#8a2be2";
 
   .ant-select-selector {
     border: none !important;
@@ -125,6 +138,10 @@ const Sidebar: React.FC<SiderProps> = ({
       width={isMobile ? 260 : undefined}
       isMobile={isMobile}
     >
+      <LogoContainer collapsed={collapsed}>
+        <img src="/logo.svg" alt="Logo" />
+      </LogoContainer>
+
       <Menu
         defaultSelectedKeys={[window.location.pathname]}
         theme="light"
