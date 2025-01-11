@@ -48,16 +48,14 @@ const IconWrapper = styled.div`
   }
 `;
 const StyledInput = styled(Input)<{ inputWidth: string }>`
-  /* Remove default focus ring on the affix wrapper */
   &&.ant-input-affix-wrapper {
     &:hover {
       border-color: #4d3abd;
     }
 
-    /* When the affix wrapper is focused */
     &.ant-input-affix-wrapper-focused {
       border-color: #4d3abd;
-      box-shadow: none; /* Remove AntD's default box shadow */
+      box-shadow: none;
     }
   }
   height: 35px;
@@ -71,19 +69,21 @@ const StyledInput = styled(Input)<{ inputWidth: string }>`
   width: ${({ inputWidth }) => inputWidth};
 
   &:focus {
-    outline: none; /* Removes the default blue outline */
-    box-shadow: none; /* Removes any box shadow */
-    border-color: #4d3abd !important; /* Keeps your desired border color */
+    outline: none;
+    box-shadow: none;
+    border-color: #4d3abd !important;
   }
 `;
 
 const StyledReload = styled(AiOutlineReload)`
   cursor: pointer;
 `;
+
 interface CompanyDropdownProps {
   selectedItem: any;
   onSelect: (company: string) => void;
 }
+
 const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
   selectedItem,
   onSelect,
@@ -92,93 +92,91 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<any>([]);
   const [searchMode, setSearchMode] = useState(false);
-  const [dropdownVisible, setDropdownVisible] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const inputRef = useRef<any>(null);
   const [inputWidth, setInputWidth] = useState("0px");
-  const [ignoreNextClose, setIgnoreNextClose] = useState(false);
 
   useEffect(() => {
     if (buttonRef.current) {
       const buttonWidth = buttonRef.current.offsetWidth;
       setInputWidth(`${buttonWidth + 35}px`);
     }
-  }, [searchMode, buttonRef]);
+  }, [searchMode]);
 
-  const fetchCompanies = useCallback(async (query: string) => {
-    if (!query) {
-      setResponse([]);
-      return;
-    }
+  const fetchData = useCallback(
+    async (query: string, fetchService: (query: string) => Promise<any>) => {
+      if (!query) {
+        setResponse([]);
+        return;
+      }
 
-    setLoading(true);
-    try {
-      const response = await companyService.search({
-        companyName: query || null,
-      });
-      setResponse(response.data || []);
-    } catch (error) {
-      console.error("Error fetching companies:", error);
-    } finally {
-      setLoading(false);
-    }
+      setLoading(true);
+      try {
+        const response = await fetchService(query);
+        setResponse(response.data || []);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
+  const fetchCompanies = useCallback((query: string) => {
+    return companyService.search({ companyName: query || null });
   }, []);
 
-  const fetchBranches = useCallback(async (query: string) => {
-    if (!query) {
-      setResponse([]);
-      return;
-    }
-    setLoading(true);
-    try {
-      const response = await branchService.search({
-        branchName: query || null,
-        companyId: getCompanyId(),
-      });
-      setResponse(response.data || []);
-    } catch (error) {
-      console.error("Error fetching branches:", error);
-    } finally {
-      setLoading(false);
-    }
+  const fetchBranches = useCallback((query: string) => {
+    return branchService.search({
+      branchName: query || null,
+      companyId: getCompanyId(),
+    });
   }, []);
 
   useEffect(() => {
     if (searchQuery) {
-      if (hasRole(["COMPANY_ADMIN"])) {
-        fetchBranches(searchQuery);
-      } else if (hasRole(["ADMIN"])) {
-        fetchCompanies(searchQuery);
-      }
+      const fetchService = hasRole(["COMPANY_ADMIN"])
+        ? fetchBranches
+        : fetchCompanies;
+      fetchData(searchQuery, fetchService);
     } else {
       setResponse([]);
     }
-  }, [searchQuery]);
+  }, [searchQuery, fetchData, fetchBranches, fetchCompanies]);
 
   const handleButtonClick = () => {
     setSearchMode(true);
-    setDropdownVisible(true);
     setTimeout(() => {
       setInputWidth("200px");
     }, 10);
   };
 
-  const handleInputBlur = () => {
-    setSearchMode(false);
-    setDropdownVisible(false);
-    setSearchQuery("");
-    setInputWidth("0px");
+  const handleReloadClick = () => {
+    handleSelect({ companyName: "All", branchName: null });
+    const fetchService = hasRole(["COMPANY_ADMIN"])
+      ? fetchBranches
+      : fetchCompanies;
+    fetchData("", fetchService);
+  };
+
+  const handleSearchMode = (mode: boolean) => {
+    setSearchMode(mode);
+    setInputWidth(mode ? "200px" : "0px");
+    if (!mode) setSearchQuery("");
   };
 
   const handleSelect = (item: any) => {
     onSelect(item);
-    setSearchMode(false);
-    setDropdownVisible(false);
-    setSearchQuery("");
+    handleSearchMode(false);
   };
 
   const menu = (
-    <Menu>
-      {/* Render fetched items */}
+    <Menu
+      onMouseDown={(e) => {
+        e.preventDefault();
+      }}
+    >
       {response.map((item: any) => (
         <Menu.Item key={item.id} onClick={() => handleSelect(item)}>
           {item.companyName}
@@ -191,41 +189,34 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
   return (
     <div style={{ position: "relative", width: "100%" }}>
       {searchMode ? (
-        <Dropdown
-          overlay={menu}
-          open={dropdownVisible}
-          onOpenChange={(visible) => {
-            if (!visible && ignoreNextClose) {
-              setIgnoreNextClose(false);
-              handleInputBlur();
-              return;
-            }
-            setDropdownVisible(visible);
-          }}
-          trigger={["click"]}
-        >
+        <Dropdown overlay={menu} visible={searchMode} trigger={["click"]}>
           <StyledInput
+            ref={inputRef}
             className="styled-input"
             autoFocus
             placeholder="Search Company"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onFocus={() => handleSearchMode(true)}
+            onBlur={(e) => {
+              if (
+                e.relatedTarget &&
+                e.relatedTarget.closest(".ant-dropdown-menu")
+              ) {
+                inputRef.current?.focus();
+              } else {
+                handleSearchMode(false);
+              }
+            }}
             suffix={
               loading ? (
                 <Spin size="small" />
               ) : (
                 <StyledReload
-                  onClick={() => {
-                    flushSync(() => {
-                      setIgnoreNextClose(true);
-                    });
-                    handleSelect({ companyName: "All", branchName: null });
-                    if (hasRole(["COMPANY_ADMIN"])) {
-                      fetchBranches("");
-                    } else if (hasRole(["ADMIN"])) {
-                      fetchCompanies("");
-                    }
+                  onMouseDown={(e) => {
+                    e.preventDefault();
                   }}
+                  onClick={handleReloadClick}
                 />
               )
             }
