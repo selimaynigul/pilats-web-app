@@ -115,7 +115,6 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
       try {
         const response = await fetchService(query);
         setResponse(response.data || []);
-        console.log("res. ", response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {

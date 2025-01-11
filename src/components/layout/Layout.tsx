@@ -14,7 +14,12 @@ import {
 import { SettingOutlined, LogoutOutlined } from "@ant-design/icons";
 import { useAuth } from "contexts/AuthProvider";
 import SearchBar from "./Searchbar"; // Import the new SearchBar component
-import { getUser, getUserName, updateUser } from "utils/permissionUtils";
+import {
+  getUser,
+  getUserName,
+  hasRole,
+  updateUser,
+} from "utils/permissionUtils";
 
 const AppLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(window.innerWidth <= 768);
@@ -45,13 +50,15 @@ const AppLayout: React.FC = () => {
 
   const profileMenu = (
     <Menu>
-      <Menu.Item
-        onClick={() => navigate("/role-management")}
-        key="settings"
-        icon={<SettingOutlined />}
-      >
-        Role Management
-      </Menu.Item>
+      {hasRole(["ADMIN"]) && (
+        <Menu.Item
+          onClick={() => navigate("/role-management")}
+          key="settings"
+          icon={<SettingOutlined />}
+        >
+          Role Management
+        </Menu.Item>
+      )}
       <Menu.Item
         onClick={handleLogout}
         key="logout"

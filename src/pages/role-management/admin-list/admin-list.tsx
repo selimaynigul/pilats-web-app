@@ -31,7 +31,8 @@ const AdminList: React.FC<TrainerListProps> = ({
     () => ({
       pageSize: 8,
       sort: "DESC",
-      companyId: company?.id,
+      companyId: company.branchName ? company.companyId : company.id || null,
+      branchId: company.branchName ? company.id : null,
     }),
     [company?.id]
   );

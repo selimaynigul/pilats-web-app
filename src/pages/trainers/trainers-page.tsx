@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import TrainerList from "./trainer-list/trainer-list";
 import { Card } from "components";
 import TrainersToolbar from "./trainers-toolbar";
+import { hasRole } from "utils/permissionUtils";
 
 const TrainersPage: React.FC = () => {
   const [trainerCount, setTrainerCount] = useState(0);
   const [company, setCompany] = useState({
-    companyName: "All",
+    companyName: hasRole(["COMPANY_ADMIN"]) ? "" : "All",
     id: null,
   });
 

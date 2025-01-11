@@ -23,7 +23,6 @@ const TrainerList: React.FC<TrainerListProps> = ({
 }) => {
   const params = useMemo(() => {
     const isAdmin = hasRole(["ADMIN"]);
-    console.log(company);
     return {
       pageSize: 8,
       sort: "DESC",

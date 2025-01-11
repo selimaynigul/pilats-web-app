@@ -1,4 +1,8 @@
-import { branchAdminService, companyAdminService } from "services";
+import {
+  branchAdminService,
+  companyAdminService,
+  companyService,
+} from "services";
 
 export const getUser = () => {
   try {
