@@ -242,11 +242,15 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
         </Dropdown>
       ) : (
         <CompanyDropdownButton ref={buttonRef} onClick={handleButtonClick}>
-          {`${selectedItem?.companyName || selectedCompany?.companyName || (hasRole(["ADMIN"]) ? "Select Company" : "Select Branch")} ${
-            selectedItem?.branchName || selectedCompany?.branchName
-              ? `- ${selectedItem?.branchName || selectedCompany?.branchName}`
-              : ""
-          }`}
+          {selectedItem.companyName === "Loading" ? (
+            <Spin size="small" />
+          ) : (
+            `${selectedItem?.companyName || selectedCompany?.companyName || (hasRole(["ADMIN"]) ? "Select Company" : "Select Branch")} ${
+              selectedItem?.branchName || selectedCompany?.branchName
+                ? `- ${selectedItem?.branchName || selectedCompany?.branchName}`
+                : ""
+            }`
+          )}
 
           <IconWrapper>
             <AiOutlineSearch style={{ strokeWidth: 30 }} />

@@ -4,7 +4,6 @@ import { Row, Col, Spin, Button } from "antd";
 import TrainerCard from "./trainer-list-card";
 import { usePagination } from "hooks";
 import { trainerService } from "services";
-import { Link } from "react-router-dom";
 import { getCompanyId, hasRole } from "utils/permissionUtils";
 
 const LoadMoreContainer = styled.div`
@@ -31,7 +30,9 @@ const TrainerList: React.FC<TrainerListProps> = ({
           ? company?.companyId
           : company?.id
         : getCompanyId(),
-      branchId: company.branchName ? company.id : null,
+      branchId: company.companyParam
+        ? company.branchParam || (company.branchName ? company.id : null)
+        : null,
     };
   }, [company?.id, company?.companyId]);
 
