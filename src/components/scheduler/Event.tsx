@@ -1,5 +1,5 @@
-import React from "react";
-import { Popover, Avatar, Tooltip, Button, message } from "antd";
+import React, { useState } from "react";
+import { Popover, Avatar, Tooltip, Button, message, Modal } from "antd";
 import {
   AntDesignOutlined,
   ArrowRightOutlined,
@@ -14,6 +14,8 @@ import dayjs from "dayjs";
 import { sessionService } from "services";
 import { Link } from "react-router-dom";
 import { hasRole } from "utils/permissionUtils";
+import EditSessionForm from "./edit-session-form/edit-session-form";
+import { StyledModal } from "./SchedulerStyles";
 
 const Container = styled.div<{ more?: boolean }>`
   background: #5d46e5;
@@ -31,6 +33,7 @@ const Container = styled.div<{ more?: boolean }>`
     background: #4d3abd;
   }
 `;
+
 const TrainerInfo = styled.div`
   border: 1px solid white;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 12px;
@@ -41,10 +44,8 @@ const TrainerInfo = styled.div`
   box-sizing: border-box;
   display: flex;
   background: transparent;
-
   align-items: center;
   transition: all 0.1s ease;
-
   gap: 10px;
   cursor: pointer;
 
@@ -56,6 +57,7 @@ const TrainerInfo = styled.div`
     box-shadow: rgba(149, 157, 165, 0.4) 0px 8px 24px;
   }
 `;
+
 const DateInfo = styled.div`
   background: transparent;
   width: fit-content;
@@ -68,6 +70,7 @@ const DateInfo = styled.div`
   gap: 8px;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 12px;
 `;
+
 const TrainerPhoto = styled.div`
   background: grey;
   height: 40px;
@@ -78,10 +81,12 @@ const TrainerPhoto = styled.div`
   align-items: center;
   color: white;
 `;
+
 const TrainerName = styled.div`
   display: flex;
   flex-direction: column;
 `;
+
 const TrainerDetailButton = styled.div`
   background: transparent;
   height: 30px;
@@ -92,7 +97,6 @@ const TrainerDetailButton = styled.div`
   margin-left: auto;
   justify-content: center;
   align-items: center;
-  /* color: #5d46e5; */
   color: gray;
 `;
 
@@ -103,6 +107,7 @@ const ActionButtons = styled.div`
   top: 0px;
   right: 5px;
 `;
+
 const EditButton = styled(Button)`
   border-radius: 10px;
   background: transparent;
@@ -132,6 +137,7 @@ const DeleteButton = styled(Button)`
     box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 12px;
   }
 `;
+
 const AttendeeInfo = styled.div`
   display: flex;
   justify-content: space-between;
@@ -144,6 +150,9 @@ const CustomEvent: React.FC<{
   fetch: () => any;
   highlightedEventId?: any;
 }> = ({ event, dayEvents, fetch, highlightedEventId }) => {
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [popoverVisible, setPopoverVisible] = useState(false);
+
   const handleDelete = () => {
     sessionService
       .delete(event.id)
@@ -156,13 +165,18 @@ const CustomEvent: React.FC<{
       });
   };
 
+  const handleEditClick = () => {
+    setIsEditModalVisible(true);
+    setPopoverVisible(false); // Close the popover
+  };
+
   const content = (
     <div style={{ position: "relative", maxWidth: 300 }}>
       <div style={{ marginBottom: 20 }}>
         <strong>{event.name}</strong>
-        {hasRole(["BRANCH_ADMIN"]) && (
+        {hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN"]) && (
           <ActionButtons>
-            <EditButton type="primary">
+            <EditButton type="primary" onClick={handleEditClick}>
               <EditFilled />
             </EditButton>
             <DeleteButton onClick={handleDelete} type="primary">
@@ -188,11 +202,10 @@ const CustomEvent: React.FC<{
           </strong>
         </DateInfo>
       </div>
-
-      <strong style={{ display: "block", marginTop: 15 }}>Açıklama</strong>
+      <strong style={{ display: "block", marginTop: 15 }}>Description</strong>
       <small>{event.description}</small>
 
-      <strong style={{ display: "block", marginTop: 15 }}>Eğitmen</strong>
+      <strong style={{ display: "block", marginTop: 15 }}>Trainer</strong>
       <div style={{ marginTop: 0 }}>
         <Link to={`/trainers/${event.trainerId}`}>
           <TrainerInfo>
@@ -203,16 +216,14 @@ const CustomEvent: React.FC<{
               <strong>
                 {event.trainerName} {event.trainerSurname}{" "}
               </strong>
-              <small> Uzman Yoga Eğitmeni</small>
+              <small> Expert Yoga Trainer</small>
             </TrainerName>
             <TrainerDetailButton>
               <ArrowRightOutlined />
             </TrainerDetailButton>
           </TrainerInfo>
         </Link>
-        <strong style={{ display: "block", marginTop: 15 }}>
-          Katılımcılar
-        </strong>
+        <strong style={{ display: "block", marginTop: 15 }}>Attendees</strong>
         <AttendeeInfo>
           <Avatar.Group
             style={{ marginTop: 7 }}
@@ -245,7 +256,13 @@ const CustomEvent: React.FC<{
   const moreEventsCount = dayEvents.length - 1; // Number of additional events
   return (
     <div style={{ position: "relative" }}>
-      <Popover trigger="click" content={content} arrow={false}>
+      <Popover
+        trigger="click"
+        content={content}
+        visible={popoverVisible}
+        onVisibleChange={setPopoverVisible}
+        arrow={false}
+      >
         <div>
           <Container
             className={
@@ -263,6 +280,19 @@ const CustomEvent: React.FC<{
           </Container>
         </div>
       </Popover>
+
+      {/* Edit Session Modal */}
+      <StyledModal
+        visible={isEditModalVisible}
+        onCancel={() => setIsEditModalVisible(false)}
+        footer={null}
+      >
+        <EditSessionForm
+          session={event}
+          onClose={() => setIsEditModalVisible(false)}
+          onUpdated={fetch}
+        />
+      </StyledModal>
     </div>
   );
 };

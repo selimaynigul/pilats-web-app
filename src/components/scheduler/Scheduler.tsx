@@ -108,7 +108,6 @@ const Scheduler: React.FC = () => {
         .subtract(7, "day")
         .toDate();
       const end: Date = dayjs(date).endOf("month").add(7, "day").toDate();
-      console.log(start, end);
       setVisibleRange({ start, end });
     }
   }, [date]);
@@ -145,8 +144,6 @@ const Scheduler: React.FC = () => {
       endDate: dayjs(endDate).toISOString(),
     };
 
-    console.log("final", finalParams);
-
     sessionService
       .search(finalParams)
       .then((response) => {
@@ -168,7 +165,7 @@ const Scheduler: React.FC = () => {
 
   const selectSlot = (slotInfo: { start: Date; end: Date }) => {
     if (loading) return;
-    if (hasRole(["BRANCH_ADMIN"])) {
+    if (hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN"])) {
       setSelectedRange(slotInfo);
       setIsModalVisible(true);
     }
@@ -190,7 +187,7 @@ const Scheduler: React.FC = () => {
         .hour(dayjs(endTime).hour())
         .minute(dayjs(endTime).minute())
         .format("YYYY-MM-DDTHH:mm:ss"),
-      branchId: getBranchId(),
+      branchId: hasRole(["COMPANY_ADMIN"]) ? values.branch : getBranchId(),
       trainerId: values.trainer,
       isRepeat: values.repeat || false,
       repeatDay:
@@ -341,10 +338,10 @@ const Scheduler: React.FC = () => {
       <DragAndDropCalendar
         defaultDate={date}
         date={date}
-        draggableAccessor={() => hasRole(["BRANCH_ADMIN"])}
+        draggableAccessor={() => hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN"])}
         events={sessions}
         localizer={localizer}
-        selectable={hasRole(["BRANCH_ADMIN"])}
+        selectable={hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN"])}
         onSelectSlot={selectSlot}
         onEventDrop={moveSession}
         resizable={false}
@@ -371,7 +368,7 @@ const Scheduler: React.FC = () => {
         visible={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
         footer={null}
-        closable={false} // Removes the close icon
+        closable={false}
         afterOpenChange={(open) => {
           if (open) {
             nameInputRef.current?.focus();

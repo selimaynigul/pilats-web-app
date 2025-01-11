@@ -88,18 +88,17 @@ const CompanyInfo: React.FC<{ setBranches: any }> = ({ setBranches }) => {
         const fetchedCompany = response.data[0];
         setCompany(fetchedCompany);
 
-        // Fetch branches using company ID
         if (fetchedCompany?.id) {
           return branchService.search({
             companyId: fetchedCompany.id,
           });
         }
 
-        return Promise.reject("No company ID found");
+        return Promise.reject("company not found");
       })
-      .then((branchResponse) => {
+      /*   .then((branchResponse) => {
         setBranches(branchResponse.data);
-      })
+      }) */
       .catch((error) => {
         console.error("Error fetching company or branches:", error);
       })
@@ -129,7 +128,7 @@ const CompanyInfo: React.FC<{ setBranches: any }> = ({ setBranches }) => {
       <ProfileSection>
         <Avatar
           size={150}
-          src={"http://localhost:8000/api/v1/images/"+company.imageUrl}
+          src={"http://localhost:8000/api/v1/images/" + company.imageUrl}
           icon={<BsBuilding />}
           style={{ marginBottom: 8 }}
         />

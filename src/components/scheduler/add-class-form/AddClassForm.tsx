@@ -20,9 +20,10 @@ import {
   ClockCircleOutlined,
   AlignLeftOutlined,
   PlusOutlined,
+  ApartmentOutlined,
 } from "@ant-design/icons";
-import { trainerService } from "services";
-import { getBranchId } from "utils/permissionUtils";
+import { branchService, trainerService } from "services";
+import { getBranchId, getCompanyId, hasRole } from "utils/permissionUtils";
 
 const StyleOverrides = styled.div`
   .trainer-select {
@@ -87,11 +88,12 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
   const [form] = Form.useForm();
   const [repeat, setRepeat] = useState(false);
   const [repeatFrequency, setRepeatFrequency] = useState("weekly");
-  const [customDays, setCustomDays] = useState(2);
   const [showDescription, setShowDescription] = useState(false);
   const [trainerExpanded, setTrainerExpanded] = useState(false);
   const descRef = useRef<any>(null);
   const [trainers, setTrainers] = useState<any>([]);
+  const [branchOptions, setBranchOptions] = useState<any[]>([]);
+  const [selectedBranch, setSelectedBranch] = useState<any>(null);
 
   useEffect(() => {
     const isSingleDay = selectedRange
@@ -108,13 +110,30 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
     });
   }, [selectedRange, form]);
 
+  useEffect(() => {
+    if (hasRole(["COMPANY_ADMIN"])) {
+      branchService
+        .search({ companyId: getCompanyId() })
+        .then((res) => {
+          setBranchOptions(res?.data || []);
+        })
+        .catch(() => {
+          message.error("Failed to fetch branches.");
+        });
+    }
+  }, []);
+
+  const handleBranchChange = (branchId: number) => {
+    setSelectedBranch(branchId);
+    form.setFieldsValue({ trainer: null });
+  };
+
   const handleFinish = (values: any) => {
     values = { ...values, repeatFrequency };
     onSubmit(values);
     form.resetFields();
     setRepeat(false);
     setRepeatFrequency("weekly");
-    setCustomDays(2);
     setShowDescription(false);
   };
 
@@ -131,13 +150,36 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
     if (!value) return;
 
     trainerService
-      .search({ ucSearchRequest: { name: value, branchId: getBranchId() } })
+      .search({
+        ucSearchRequest: {
+          name: value,
+        },
+        branchId: hasRole(["COMPANY_ADMIN"])
+          ? selectedBranch || null
+          : getBranchId(),
+      })
       .then((res) => {
         setTrainers(res?.data);
       })
       .catch((error) => {
         console.log(error);
         message.error("Error searching trainer");
+      });
+  };
+
+  const handleBranchSearch = (value: string) => {
+    if (!value) return;
+
+    branchService
+      .search({
+        branchName: value,
+      })
+      .then((res) => {
+        setBranchOptions(res?.data);
+      })
+      .catch((error) => {
+        console.log(error);
+        message.error("Error searching branches");
       });
   };
 
@@ -204,7 +246,7 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
             <DatePicker
               style={{ width: "100%" }}
               suffixIcon={null}
-              format={dateFormat} // Use custom format function
+              format={dateFormat}
             />
           </Form.Item>
         </div>
@@ -229,46 +271,77 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
           </Form.Item>
         </div>
 
-        <div
-          className="custom-input"
-          style={{
-            display: "flex",
-            alignItems: "start",
-          }}
-        >
-          <CustomIcon style={{ marginTop: 8 }}>
-            <CalendarOutlined />
-          </CustomIcon>
-          <Form.Item
-            style={{ width: "100%" }}
-            name="trainer"
-            rules={formItems.trainer.rules}
-            className={
-              trainerExpanded ? "trainer-select-expanded" : "trainer-select"
-            }
+        {hasRole(["COMPANY_ADMIN"]) && (
+          <div
+            className="custom-input"
+            style={{
+              display: "flex",
+              alignItems: "start",
+            }}
           >
-            <Select
-              showSearch
-              placeholder="Select a trainer"
-              onSearch={handleTrainerSearch}
-              filterOption={false}
-              onFocus={() => setTrainerExpanded(true)}
-              onBlur={() => setTrainerExpanded(false)}
+            <CustomIcon style={{ marginTop: 8 }}>
+              <ApartmentOutlined />
+            </CustomIcon>
+            <Form.Item
+              style={{ width: "100%" }}
+              name="branch"
+              rules={[{ required: true, message: "Please select a branch." }]}
             >
-              {trainers.map((trainer: any) => {
-                if (trainer.active) {
-                  return (
-                    <Select.Option key={trainer.id} value={trainer.id}>
-                      {trainer.ucGetResponse.name}{" "}
-                      {trainer.ucGetResponse.surname}
-                    </Select.Option>
-                  );
-                }
-              })}
-            </Select>
-          </Form.Item>
-        </div>
-
+              <Select
+                showSearch
+                placeholder="Select a branch"
+                filterOption={false}
+                onSearch={handleBranchSearch}
+                onChange={handleBranchChange}
+                options={branchOptions.map((branch) => ({
+                  value: branch.id,
+                  label: branch.branchName,
+                }))}
+              />
+            </Form.Item>
+          </div>
+        )}
+        {selectedBranch && (
+          <div
+            className="custom-input"
+            style={{
+              display: "flex",
+              alignItems: "start",
+            }}
+          >
+            <CustomIcon style={{ marginTop: 8 }}>
+              <UserOutlined />
+            </CustomIcon>
+            <Form.Item
+              style={{ width: "100%" }}
+              name="trainer"
+              rules={formItems.trainer.rules}
+              className={
+                trainerExpanded ? "trainer-select-expanded" : "trainer-select"
+              }
+            >
+              <Select
+                showSearch
+                placeholder="Select a trainer"
+                onSearch={handleTrainerSearch}
+                filterOption={false}
+                onFocus={() => setTrainerExpanded(true)}
+                onBlur={() => setTrainerExpanded(false)}
+              >
+                {trainers.map((trainer: any) => {
+                  if (trainer.active) {
+                    return (
+                      <Select.Option key={trainer.id} value={trainer.id}>
+                        {trainer.ucGetResponse.name}{" "}
+                        {trainer.ucGetResponse.surname}
+                      </Select.Option>
+                    );
+                  }
+                })}
+              </Select>
+            </Form.Item>
+          </div>
+        )}
         <Form.Item
           style={{ marginLeft: 24 }}
           name="repeat"
