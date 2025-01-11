@@ -10,11 +10,7 @@ import {
   CategoryItem,
   ResultItem,
 } from "./layoutStyles";
-import {
-  CalendarOutlined,
-  ClockCircleOutlined,
-  SearchOutlined,
-} from "@ant-design/icons";
+import { SearchOutlined } from "@ant-design/icons";
 import {
   companyService,
   sessionService,
@@ -22,7 +18,6 @@ import {
   userService,
 } from "services";
 import { hasRole } from "utils/permissionUtils";
-import styled from "styled-components";
 
 interface SearchBarProps {
   isMobile: boolean;
@@ -30,28 +25,7 @@ interface SearchBarProps {
   setSearchActive: (active: boolean) => void;
 }
 
-const DateTimeBox = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px;
-  border: 1px solid #e6e6e6;
-  border-radius: 8px;
-  background: #f9f9f9;
-  font-size: 0.9em;
-  color: #555;
-
-  .icon {
-    color: ${({ theme }) => theme.primary};
-    font-size: 1.2em;
-  }
-`;
-
-const SearchBar: React.FC<SearchBarProps> = ({
-  isMobile,
-  searchActive,
-  setSearchActive,
-}) => {
+const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
   const [selectedCategory, setSelectedCategory] = useState("company");
   const [searchValue, setSearchValue] = useState("");
   const [results, setResults] = useState<any[]>([]);
@@ -66,7 +40,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
       setSelectedCategory("users");
     } else if (location.pathname.includes("trainers")) {
       setSelectedCategory("trainers");
-    } else if (location.pathname.includes("classes")) {
+    } else if (location.pathname.includes("sessions")) {
       setSelectedCategory("sessions");
     } else {
       setSelectedCategory("companies");

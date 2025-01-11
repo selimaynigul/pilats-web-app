@@ -4,7 +4,7 @@ import { Row, Col, Dropdown, Menu, message, Modal, Form, Input } from "antd";
 import AddButton from "components/AddButton";
 import { BsThreeDotsVertical, BsTrash, BsPencil } from "react-icons/bs";
 import { branchService } from "services";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const Container = styled.div`
   height: 100%;
@@ -86,6 +86,7 @@ const CompanyBranchList: React.FC<{
   const [form] = Form.useForm();
   const [updateForm] = Form.useForm();
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
 
   const handleAddBranch = (values: any) => {
     branchService
@@ -149,8 +150,23 @@ const CompanyBranchList: React.FC<{
     updateForm.setFieldsValue({ branchName: branch.branchName });
   };
 
+  const handleSeeTrainers = (branch: any) => {
+    navigate(`/trainers?company=${id}&branch=${branch.id}`);
+  };
+
+  const handleSeeSessions = (branch: any) => {
+    navigate(`/sessions?company=${id}&branch=${branch.id}`);
+  };
+
   const renderMenu = (branch: any) => (
     <Menu>
+      <MenuItem key="trainers" onClick={() => handleSeeTrainers(branch)}>
+        Trainers
+      </MenuItem>
+      <MenuItem key="sessions" onClick={() => handleSeeSessions(branch)}>
+        Sessions
+      </MenuItem>
+      <Menu.Divider />
       <MenuItem key="edit" onClick={() => handleEdit(branch)}>
         <BsPencil style={{ marginRight: 8 }} /> Update
       </MenuItem>
@@ -164,7 +180,6 @@ const CompanyBranchList: React.FC<{
       </MenuItem>
     </Menu>
   );
-
   return (
     <Container>
       <Header>
