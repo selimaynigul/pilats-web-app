@@ -32,10 +32,11 @@ const TrainerList: React.FC<TrainerListProps> = ({
         : getCompanyId(),
       branchId: company.companyParam
         ? company.branchParam || (company.branchName ? company.id : null)
-        : null,
+        : company.branchName
+          ? company.id
+          : null,
     };
   }, [company?.id, company?.companyId]);
-
   const {
     items: trainers,
     loading,
