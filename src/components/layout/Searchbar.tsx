@@ -10,15 +10,42 @@ import {
   CategoryItem,
   ResultItem,
 } from "./layoutStyles";
-import { SearchOutlined } from "@ant-design/icons";
-import { companyService, trainerService } from "services";
+import {
+  CalendarOutlined,
+  ClockCircleOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
+import {
+  companyService,
+  sessionService,
+  trainerService,
+  userService,
+} from "services";
 import { hasRole } from "utils/permissionUtils";
+import styled from "styled-components";
 
 interface SearchBarProps {
   isMobile: boolean;
   searchActive: boolean;
   setSearchActive: (active: boolean) => void;
 }
+
+const DateTimeBox = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+  background: #f9f9f9;
+  font-size: 0.9em;
+  color: #555;
+
+  .icon {
+    color: ${({ theme }) => theme.primary};
+    font-size: 1.2em;
+  }
+`;
 
 const SearchBar: React.FC<SearchBarProps> = ({
   isMobile,
@@ -39,6 +66,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
       setSelectedCategory("users");
     } else if (location.pathname.includes("trainers")) {
       setSelectedCategory("trainers");
+    } else if (location.pathname.includes("classes")) {
+      setSelectedCategory("sessions");
     } else {
       setSelectedCategory("companies");
     }
@@ -48,16 +77,23 @@ const SearchBar: React.FC<SearchBarProps> = ({
     setLoading(true);
     try {
       let fetchedResults = [];
+      let inputPayload;
+      let response;
 
       if (selectedCategory === "companies") {
-        const inputPayload = { companyName: name };
-        const response = await companyService.search(inputPayload);
-        fetchedResults = response.data || [];
+        inputPayload = { companyName: name };
+        response = await companyService.search(inputPayload);
       } else if (selectedCategory === "trainers") {
-        const inputPayload = { ucSearchRequest: { name: name } };
-        const response = await trainerService.search(inputPayload);
-        fetchedResults = response.data || [];
+        inputPayload = { ucSearchRequest: { name: name } };
+        response = await trainerService.search(inputPayload);
+      } else if (selectedCategory === "users") {
+        inputPayload = { ucSearchRequest: { name: name } };
+        response = await userService.search(inputPayload);
+      } else if (selectedCategory === "sessions") {
+        inputPayload = { name: name };
+        response = await sessionService.search(inputPayload);
       }
+      fetchedResults = response ? response.data : [];
       setResults(fetchedResults);
       setDropdownOpen(true);
     } catch (error) {
@@ -84,7 +120,18 @@ const SearchBar: React.FC<SearchBarProps> = ({
     setDropdownOpen(false);
     setSearchValue("");
     setResults([]);
-    navigate(`/${selectedCategory}/${id}`);
+
+    if (selectedCategory === "sessions") {
+      const selectedSession = results.find((session) => session.id === id);
+      if (selectedSession && selectedSession.startDate) {
+        const sessionDate = new Date(selectedSession.startDate)
+          .toISOString()
+          .slice(0, 7);
+        navigate(`/sessions/${sessionDate}?session=${id}`);
+      }
+    } else {
+      navigate(`/${selectedCategory}/${id}`);
+    }
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -134,14 +181,32 @@ const SearchBar: React.FC<SearchBarProps> = ({
           </div>
         </ResultItem>
       ));
-    } else {
+    } else if (selectedCategory === "users") {
       return results.map((user: any) => (
-        <ResultItem key={user.id}>
-          <div>
-            <strong>{user.name}</strong>
-          </div>
+        <ResultItem key={user.id} onClick={() => handleResultClick(user.id)}>
+          <Avatar>{user.ucGetResponse?.name[0].toUpperCase()}</Avatar>
+          <strong>
+            {user.ucGetResponse?.name} {user.ucGetResponse?.surname}
+          </strong>
         </ResultItem>
       ));
+    } else if (selectedCategory === "sessions") {
+      return results.map((session: any) => {
+        return (
+          <ResultItem
+            key={session.id}
+            onClick={() => handleResultClick(session.id)}
+          >
+            <div>
+              <strong>{session.name}</strong>
+              <br />
+              <span>
+                {session.companyName} - {session.branchName}
+              </span>
+            </div>
+          </ResultItem>
+        );
+      });
     }
   };
 
@@ -167,6 +232,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
           onClick={() => setSelectedCategory("users")}
         >
           User
+        </CategoryItem>
+        <CategoryItem
+          isSelected={selectedCategory === "sessions"}
+          onClick={() => setSelectedCategory("sessions")}
+        >
+          Session
         </CategoryItem>
       </TransparentMenu>
       <div style={{ maxHeight: "300px", overflowY: "auto" }}>

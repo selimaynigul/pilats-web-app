@@ -19,7 +19,6 @@ import {
 import { sessionService } from "services";
 import { getBranchId, getCompanyId, hasRole } from "utils/permissionUtils";
 import { useNavigate } from "react-router-dom";
-import styled from "styled-components";
 
 const DragAndDropCalendar = withDragAndDrop(Calendar);
 const localizer = momentLocalizer(moment);
@@ -72,12 +71,31 @@ const Scheduler: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const start: Date = dayjs(date)
-      .startOf("month")
-      .subtract(7, "day")
-      .toDate();
-    const end: Date = dayjs(date).endOf("month").add(7, "day").toDate();
-    setVisibleRange({ start, end });
+    if (sessionId) {
+      setHighlightedEventId(sessionId);
+
+      const timer = setTimeout(() => setHighlightedEventId(null), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [sessionId]);
+
+  useEffect(() => {
+    if (urlDate && dayjs(urlDate, "YYYY-MM", true).isValid()) {
+      const newDate = dayjs(urlDate, "YYYY-MM").toDate();
+      setDate(newDate);
+    }
+  }, [urlDate]);
+
+  useEffect(() => {
+    if (date) {
+      const start: Date = dayjs(date)
+        .startOf("month")
+        .subtract(7, "day")
+        .toDate();
+      const end: Date = dayjs(date).endOf("month").add(7, "day").toDate();
+      console.log(start, end);
+      setVisibleRange({ start, end });
+    }
   }, [date]);
 
   useEffect(() => {
@@ -96,7 +114,7 @@ const Scheduler: React.FC = () => {
     setDate(middleDate);
 
     localStorage.setItem("savedCalendarDate", middleDate.toISOString());
-    navigate(`/classes/${dayjs(middleDate).format("YYYY-MM")}`);
+    navigate(`/sessions/${dayjs(middleDate).format("YYYY-MM")}`);
   };
 
   const fetchSessions = (
@@ -310,6 +328,7 @@ const Scheduler: React.FC = () => {
       )}
       <DragAndDropCalendar
         defaultDate={date}
+        date={date}
         draggableAccessor={() => hasRole(["BRANCH_ADMIN"])}
         events={sessions}
         localizer={localizer}

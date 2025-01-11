@@ -73,7 +73,7 @@ const AppLayout: React.FC = () => {
   const pathTitles: { [key: string]: string } = {
     "/": "Dashboard",
     "/companies": "Companies",
-    "/classes": "Classes",
+    "/sessions": "Sessions",
     "/trainers": "Trainers",
     "/users": "Users",
     "/packages": "Packages",

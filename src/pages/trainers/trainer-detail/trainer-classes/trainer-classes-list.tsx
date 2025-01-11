@@ -147,7 +147,7 @@ const TrainerClassesList: React.FC<{ trainer: any }> = ({ trainer }) => {
 
   const handleSessionClick = (session: any) => {
     const sessionDate = new Date(session.startDate).toISOString().slice(0, 7); // Extract "YYYY-MM"
-    navigate(`/classes/${sessionDate}?session=${session.id}`);
+    navigate(`/sessions/${sessionDate}?session=${session.id}`);
   };
 
   return (

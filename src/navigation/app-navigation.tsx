@@ -91,7 +91,7 @@ const AppNavigation = () => {
         />
 
         <Route
-          path="/classes/:date?"
+          path="/sessions/:date?"
           element={
             <AuthGuard
               requiredRoles={["ADMIN", "COMPANY_ADMIN", "BRANCH_ADMIN"]}

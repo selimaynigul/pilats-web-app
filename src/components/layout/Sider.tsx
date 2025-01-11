@@ -89,7 +89,7 @@ const Sidebar: React.FC<SiderProps> = ({
     setSelectedKey(key);
     const routes: { [key: string]: string } = {
       companies: "/companies",
-      classes: "/classes",
+      sessions: "/sessions",
       trainers: "/trainers",
       users: "/users",
       packages: "/packages",
@@ -109,7 +109,7 @@ const Sidebar: React.FC<SiderProps> = ({
 
   const menuItems = [
     { key: "companies", icon: <BsFillHouseDoorFill />, label: "Companies" },
-    { key: "classes", icon: <BsFillCalendarRangeFill />, label: "Classes" },
+    { key: "sessions", icon: <BsFillCalendarRangeFill />, label: "Sessions" },
     { key: "trainers", icon: <BsFillPeopleFill />, label: "Trainers" },
     { key: "users", icon: <BsFillPersonFill />, label: "Users" },
     { key: "packages", icon: <BsCreditCard2FrontFill />, label: "Packages" },
