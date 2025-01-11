@@ -161,7 +161,7 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
         <Form.Item
               name="jobId"
               label="Job"
-              rules={[{ required: true, message: "Please select or add a job" }]}
+              rules={[{ required: false, message: "Please select or add a job" }]}
             >
           {isAddingJob ? (
             <Input.Group compact>
@@ -222,7 +222,7 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
           < Form.Item
                 name="location"
                 label="Location"
-                rules={[{ required: true, message: "Please enter the location" }]}
+                rules={[{ required: false, message: "Please enter the location" }]}
               >
                 <Input />
               </Form.Item>
