@@ -5,3 +5,4 @@ export { default as Sider } from "./layout/Sider";
 export { default as Layout } from "./layout/Layout";
 export { default as Scheduler } from "./scheduler/Scheduler";
 export { default as CompanyDropdown } from "./company-dropdown";
+export { default as LoadingSkeleton } from "./Skeleton";

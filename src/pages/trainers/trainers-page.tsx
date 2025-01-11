@@ -7,7 +7,7 @@ import { hasRole } from "utils/permissionUtils";
 const TrainersPage: React.FC = () => {
   const [trainerCount, setTrainerCount] = useState(0);
   const [company, setCompany] = useState({
-    companyName: hasRole(["COMPANY_ADMIN"]) ? "" : "All",
+    companyName: hasRole(["COMPANY_ADMIN"]) ? "Company Name" : "All",
     id: null,
   });
 

@@ -129,7 +129,7 @@ const RoleManagementToolbar: React.FC<{
           }
         >
           <TabButton onClick={changeTabs}>
-            {isBranchMode ? "Branch Admins" : "Company Admins"}
+            {isBranchMode ? "Branch" : "Company"}
             <AiOutlineSwap />
           </TabButton>
         </Tooltip>

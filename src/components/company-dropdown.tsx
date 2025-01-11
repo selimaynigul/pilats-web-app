@@ -2,8 +2,6 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Dropdown, Input, Menu, Spin } from "antd";
 import styled from "styled-components";
 import { AiOutlineSearch } from "react-icons/ai";
-import { flushSync } from "react-dom";
-
 import { branchService, companyService } from "services";
 import { getCompanyId, hasRole } from "utils/permissionUtils";
 import { AiOutlineReload } from "react-icons/ai";
