@@ -5,7 +5,7 @@ import TrainerCard from "./trainer-list-card";
 import { usePagination } from "hooks";
 import { trainerService } from "services";
 import { Link } from "react-router-dom";
-import { hasRole } from "utils/permissionUtils";
+import { getCompanyId, hasRole } from "utils/permissionUtils";
 
 const LoadMoreContainer = styled.div`
   text-align: center;
@@ -21,15 +21,20 @@ const TrainerList: React.FC<TrainerListProps> = ({
   onTrainerCountChange,
   company,
 }) => {
-  const params = useMemo(
-    () => ({
+  const params = useMemo(() => {
+    const isAdmin = hasRole(["ADMIN"]);
+    console.log(company);
+    return {
       pageSize: 8,
       sort: "DESC",
-      companyId: hasRole(["ADMIN"]) ? company?.id : null,
-      branchId: hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN"]) ? company?.id : null,
-    }),
-    [company?.id]
-  );
+      companyId: isAdmin
+        ? company?.branchName
+          ? company?.companyId
+          : company?.id
+        : getCompanyId(),
+      branchId: company.branchName ? company.id : null,
+    };
+  }, [company?.id, company?.companyId]);
 
   const {
     items: trainers,

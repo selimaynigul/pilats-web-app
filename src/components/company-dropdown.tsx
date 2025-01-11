@@ -92,6 +92,7 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<any>([]);
   const [searchMode, setSearchMode] = useState(false);
+  const [selectedCompany, setSelectedCompany] = useState<any>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<any>(null);
   const [inputWidth, setInputWidth] = useState("0px");
@@ -114,6 +115,7 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
       try {
         const response = await fetchService(query);
         setResponse(response.data || []);
+        console.log("res. ", response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -127,23 +129,29 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
     return companyService.search({ companyName: query || null });
   }, []);
 
-  const fetchBranches = useCallback((query: string) => {
+  const fetchBranches = useCallback((query: string, companyId?: string) => {
     return branchService.search({
       branchName: query || null,
-      companyId: getCompanyId(),
+      companyId: companyId || getCompanyId(),
     });
   }, []);
 
   useEffect(() => {
     if (searchQuery) {
       const fetchService = hasRole(["COMPANY_ADMIN"])
-        ? fetchBranches
-        : fetchCompanies;
+        ? (query: string) => fetchBranches(query)
+        : selectedCompany
+          ? (query: string) => fetchBranches(query, selectedCompany.id)
+          : fetchCompanies;
       fetchData(searchQuery, fetchService);
     } else {
-      setResponse([]);
+      if (!selectedCompany) {
+        fetchData("", fetchCompanies);
+      } else {
+        setResponse([]);
+      }
     }
-  }, [searchQuery, fetchData, fetchBranches, fetchCompanies]);
+  }, [searchQuery, fetchData, fetchBranches, fetchCompanies, selectedCompany]);
 
   const handleButtonClick = () => {
     setSearchMode(true);
@@ -153,11 +161,11 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
   };
 
   const handleReloadClick = () => {
+    setSelectedCompany(null);
+    setSearchQuery("");
     handleSelect({ companyName: "All", branchName: null });
-    const fetchService = hasRole(["COMPANY_ADMIN"])
-      ? fetchBranches
-      : fetchCompanies;
-    fetchData("", fetchService);
+
+    fetchData("", fetchCompanies);
   };
 
   const handleSearchMode = (mode: boolean) => {
@@ -167,8 +175,15 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
   };
 
   const handleSelect = (item: any) => {
-    onSelect(item);
-    handleSearchMode(false);
+    if (!selectedCompany && !hasRole(["COMPANY_ADMIN"])) {
+      setSelectedCompany(item);
+      setSearchQuery("");
+      onSelect(item);
+      fetchData("", (query: string) => fetchBranches(query, item.id));
+    } else {
+      onSelect(item);
+      handleSearchMode(false);
+    }
   };
 
   const menu = (
@@ -179,8 +194,7 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
     >
       {response.map((item: any) => (
         <Menu.Item key={item.id} onClick={() => handleSelect(item)}>
-          {item.companyName}
-          {hasRole(["COMPANY_ADMIN"]) && ` - ${item.branchName}`}
+          {item.companyName} {item.branchName ? `- ${item.branchName}` : ""}
         </Menu.Item>
       ))}
     </Menu>
@@ -194,7 +208,13 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
             ref={inputRef}
             className="styled-input"
             autoFocus
-            placeholder="Search Company"
+            placeholder={
+              hasRole(["COMPANY_ADMIN"])
+                ? "Search Branch"
+                : selectedCompany
+                  ? "Search Branch"
+                  : "Search Company"
+            }
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => handleSearchMode(true)}
@@ -225,8 +245,11 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
         </Dropdown>
       ) : (
         <CompanyDropdownButton ref={buttonRef} onClick={handleButtonClick}>
-          {`${selectedItem?.companyName} ${selectedItem?.branchName ? `- ${selectedItem.branchName}` : ""}` ||
-            "Select Company"}
+          {`${selectedItem?.companyName || selectedCompany?.companyName || (hasRole(["ADMIN"]) ? "Select Company" : "Select Branch")} ${
+            selectedItem?.branchName || selectedCompany?.branchName
+              ? `- ${selectedItem?.branchName || selectedCompany?.branchName}`
+              : ""
+          }`}
 
           <IconWrapper>
             <AiOutlineSearch style={{ strokeWidth: 30 }} />

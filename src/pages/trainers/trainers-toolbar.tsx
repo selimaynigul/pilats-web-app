@@ -94,7 +94,9 @@ const TrainersToolbar: React.FC<{
         {hasRole(["ADMIN", "COMPANY_ADMIN"]) && (
           <CompanyDropdown
             selectedItem={selectedCompany}
-            onSelect={(company) => setSelectedCompany(company)}
+            onSelect={(company) => {
+              setSelectedCompany(company);
+            }}
           />
         )}
         <AddButton onClick={() => setIsModalVisible(true)} />
