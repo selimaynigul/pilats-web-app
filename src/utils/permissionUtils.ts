@@ -1,3 +1,4 @@
+import { message } from "antd";
 import {
   branchAdminService,
   companyAdminService,
@@ -24,11 +25,23 @@ export const getCompanyId = () => {
   return user?.companyId || null;
 };
 
+export const getCompanyName = () => {
+  const user = getUser();
+
+  if (hasRole(["BRANCH_ADMIN"])) {
+    return user?.companyName || null;
+  } else if (hasRole(["COMPANY_ADMIN"])) {
+    return user?.companyName || null;
+  }
+};
+
 export const capitalize = (str: string) =>
   str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
 export const getUserName = () => {
   const user = getUser();
+
+  if (user.name) return user.name;
   if (!user || !user.ucGetResponse) return null;
 
   const name = capitalize(user.ucGetResponse.name || "");
@@ -69,7 +82,47 @@ export const updateUser = () => {
       });
   }
 
-  return Promise.resolve(null); // Default case for unsupported roles
+  return Promise.resolve(null);
+};
+
+export const loginWithUpdate = () => {
+  const user = getUser();
+  const role = user?.role;
+
+  if (role === "ADMIN") {
+    const combinedData = { ...user, name: "Admin" };
+    localStorage.setItem("user", JSON.stringify(combinedData));
+    window.location.href = "./";
+    return true;
+  } else if (role === "COMPANY_ADMIN") {
+    companyAdminService
+      .getById(user.userId)
+      .then((res) => {
+        const combinedData = { ...user, ...res.data };
+        localStorage.setItem("user", JSON.stringify(combinedData));
+        window.location.href = "./";
+        return true;
+      })
+      .catch((err) => {
+        console.error("Error fetching company admin data:", err);
+        window.location.href = "./";
+        return false;
+      });
+  } else if (role === "BRANCH_ADMIN") {
+    branchAdminService
+      .getById(user.userId)
+      .then((res) => {
+        const combinedData = { ...user, ...res.data };
+        localStorage.setItem("user", JSON.stringify(combinedData));
+        window.location.href = "./";
+        return true;
+      })
+      .catch((err) => {
+        console.error("Error fetching branch admin data:", err);
+        window.location.href = "./";
+        return false;
+      });
+  }
 };
 
 type UserRole = "BRANCH_ADMIN" | "COMPANY_ADMIN" | "ADMIN";

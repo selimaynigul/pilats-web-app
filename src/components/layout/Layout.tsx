@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Layout, Dropdown, Avatar, Menu } from "antd";
+import { Layout, Dropdown, Menu, Avatar } from "antd";
 import Sidebar from "./Sider";
 import Header from "./Header";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -9,12 +9,13 @@ import {
   Title,
   ProfileContainer,
   ProfileInfo,
-  ProfilePhoto,
+  StyledAvatar,
 } from "./layoutStyles";
 import { SettingOutlined, LogoutOutlined } from "@ant-design/icons";
 import { useAuth } from "contexts/AuthProvider";
 import SearchBar from "./Searchbar"; // Import the new SearchBar component
 import {
+  getCompanyName,
   getUser,
   getUserName,
   hasRole,
@@ -30,6 +31,11 @@ const AppLayout: React.FC = () => {
 
   const { user } = useAuth();
   const location = useLocation();
+
+  const getUserInitial = () => {
+    const name = getUserName() || "U";
+    return name.charAt(0).toUpperCase();
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -82,7 +88,6 @@ const AppLayout: React.FC = () => {
 
   const getUserInfo = (info: string) => {
     if (info === "name") {
-      updateUser();
       return getUserName();
     }
   };
@@ -135,15 +140,15 @@ const AppLayout: React.FC = () => {
           {!isMobile && (
             <ProfileContainer>
               <ProfileInfo>
-                <h4>{getUserInfo("name")}</h4>
-                <span>Software Engineer</span>
+                <h4 style={{ marginBottom: 3 }}>{getUserInfo("name")}</h4>
+                <span>{getCompanyName()}</span>
               </ProfileInfo>
               <Dropdown
                 overlay={profileMenu}
                 trigger={["click"]}
                 placement="bottomRight"
               >
-                <ProfilePhoto />
+                <StyledAvatar>{getUserInitial()}</StyledAvatar>
               </Dropdown>
             </ProfileContainer>
           )}

@@ -86,12 +86,7 @@ const GlobalStyle = createGlobalStyle`
 
 .ant-message-notice-content {
  
-/*  padding: 0 12px !important;
-  margin: auto !important; */
   border-radius: 50px !important;
-  background-color: rgba(255, 255, 255, 0.5) !important;
-  backdrop-filter: blur(8px) !important;
-  border: 1px solid white; 
  
 }
 

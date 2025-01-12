@@ -84,12 +84,10 @@ const LoginButton = styled(Button)`
   background: ${({ theme }) => theme.primary};
 `;
 
-const LoginForm: React.FC<{ onFinish: any }> = ({ onFinish }) => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [passwordVisible, setPasswordVisible] = React.useState(false);
-
+const LoginForm: React.FC<{ onFinish: any; loading: any }> = ({
+  onFinish,
+  loading,
+}) => {
   const navigate = useNavigate();
 
   return (

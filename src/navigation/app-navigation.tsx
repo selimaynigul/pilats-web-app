@@ -32,7 +32,9 @@ const AppNavigation = () => {
         <Route
           path="/"
           element={
-            <AuthGuard requiredRoles={["COMPANY_ADMIN", "ADMIN"]}>
+            <AuthGuard
+              requiredRoles={["COMPANY_ADMIN", "ADMIN", "BRANCH_ADMIN"]}
+            >
               <HomePage />
             </AuthGuard>
           }

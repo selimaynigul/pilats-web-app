@@ -7,8 +7,7 @@ import React, {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import { message } from "antd";
-import { branchAdminService, companyAdminService } from "services";
-import { updateUser } from "utils/permissionUtils";
+import { loginWithUpdate } from "utils/permissionUtils";
 
 interface AuthContextType {
   user: User | null;
@@ -46,9 +45,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = (user: any) => {
     localStorage.setItem("user", JSON.stringify(user));
-    updateUser();
-    message.success("Login successful");
-    navigate("/");
+    const res = loginWithUpdate();
+    if (res) {
+      message.success("Login successful");
+    } /*  else {
+      message.warning("Failed to load user info ");
+    } */
   };
 
   const logout = (location: any) => {

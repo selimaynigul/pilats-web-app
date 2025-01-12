@@ -1,6 +1,6 @@
 // styles.ts
 import styled, { css } from "styled-components";
-import { Input, Layout } from "antd";
+import { Avatar, Input, Layout } from "antd";
 
 // Theme for consistent color usage
 export const theme = {
@@ -114,13 +114,14 @@ export const ProfileInfo = styled.div`
   }
 `;
 
-export const ProfilePhoto = styled.div`
+export const StyledAvatar = styled(Avatar)`
   width: 48px;
   height: 48px;
   border-radius: 20px;
-  background-image: url("profile.jpg");
   background-size: cover;
+  font-size: 18px;
   cursor: pointer;
+  background-color: #e6e3ff;
 `;
 
 export const ResultItem = styled.div`

@@ -193,28 +193,13 @@ const LoginPage: React.FC = () => {
   };
 
   const { theme, toggleTheme } = useTheme();
-
   const [hovered, setHovered] = useState(false);
-
   const { login } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const location = useLocation();
 
-  // Check if the path is /login or /register
   const isLogin = location.pathname === "/login";
-  const isRegister = location.pathname === "/register";
-
-  const [messageApi, contextHolder] = message.useMessage();
-
-  const success = () => {
-    messageApi.open({
-      type: "success",
-      content:
-        "This is a prompt message for success, and it will disappear in 10 seconds",
-      duration: 10,
-    });
-  };
 
   const handleLogin = (values: any) => {
     setLoading(true);
@@ -225,8 +210,10 @@ const LoginPage: React.FC = () => {
       })
       .catch(() => {
         message.error("Login failed");
+      })
+      .finally(() => {
+        setLoading(false);
       });
-    setLoading(false);
   };
 
   const handleRegister = async (values: {
@@ -344,9 +331,9 @@ const LoginPage: React.FC = () => {
           </Select>
         </HeaderContainer>
         {isLogin ? (
-          <LoginForm onFinish={handleFinish} />
+          <LoginForm loading={loading} onFinish={handleFinish} />
         ) : (
-          <RegisterForm onFinish={handleRegister} />
+          <RegisterForm loading={loading} onFinish={handleRegister} />
         )}
       </LoginFormContainer>
     </Wrapper>

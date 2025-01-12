@@ -51,8 +51,10 @@ const BackToLoginButton = styled(Button)`
   color: #5d46e5;
 `;
 
-const RegisterForm: React.FC<{ onFinish: any }> = ({ onFinish }) => {
-  const [loading, setLoading] = useState(false);
+const RegisterForm: React.FC<{ onFinish: any; loading: any }> = ({
+  onFinish,
+  loading,
+}) => {
   const navigate = useNavigate();
 
   return (
