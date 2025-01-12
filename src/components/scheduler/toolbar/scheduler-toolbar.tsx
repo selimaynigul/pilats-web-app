@@ -57,7 +57,6 @@ const Toolbar: React.FC<
   setIsModalVisible,
 }) => {
   const [form] = Form.useForm();
-  const [isDropdownVisible, setDropdownVisible] = useState(false);
 
   const handleModalToggle = (visible: boolean) => {
     setIsModalVisible(visible);
@@ -70,10 +69,11 @@ const Toolbar: React.FC<
         (key) => views[key as keyof typeof views]
       ) as View[]);
 
-  const handleDateChange = (selectedDate: dayjs.Dayjs | null) => {
-    if (selectedDate) {
-      onNavigate("DATE", selectedDate.toDate());
-      setDropdownVisible(false);
+  const handleDateChange = (date: unknown, dateString: string | string[]) => {
+    if (dayjs.isDayjs(date)) {
+      onNavigate("DATE", date.toDate());
+    } else {
+      console.warn("Invalid date format received", date);
     }
   };
 
