@@ -413,7 +413,6 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
                 size={150}
                 src={"http://localhost:8000/api/v1/images/" + user.imageUrl}
                 icon={<UserOutlined />}
-                style={{ marginBottom: 8 }}
               />
               <UploadOverlay>
                 <UploadOutlined className="upload-icon" />

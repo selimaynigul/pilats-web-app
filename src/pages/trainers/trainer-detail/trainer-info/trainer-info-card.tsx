@@ -75,6 +75,7 @@ const Container = styled.div`
   justify-content: center;
   flex-direction: column;
   padding: 48px 24px;
+  padding-top: 32px;
   position: relative;
   overflow: hidden;
 `;
@@ -161,7 +162,7 @@ const CompanyInfo = styled.div`
   border: 1px solid #f6f5ff;
   width: 90%;
   margin: auto;
-  margin-top: 32px;
+  margin-top: 12px;
   height: 64px;
   padding: 12px;
   border-radius: 10px;
@@ -507,7 +508,6 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
                 size={150}
                 src={"http://localhost:8000/api/v1/images/" + trainer.imageUrl}
                 icon={<UserOutlined />}
-                style={{ marginBottom: 8 }}
               />
               <UploadOverlay>
                 <UploadOutlined className="upload-icon" />

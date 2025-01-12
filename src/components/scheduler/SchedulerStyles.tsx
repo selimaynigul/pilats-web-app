@@ -103,7 +103,7 @@ export const LoadingOverlay = styled.div`
 
 export const MoreButton = styled.div`
   margin-top: 6px;
-  margin-bottom: 6px;
+  margin-bottom: 56px;
   color: #412bc4;
   cursor: pointer;
   text-align: center;

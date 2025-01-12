@@ -163,9 +163,9 @@ const CompanyBranchList: React.FC<{
       <MenuItem key="trainers" onClick={() => handleSeeTrainers(branch)}>
         Trainers
       </MenuItem>
-      <MenuItem key="sessions" onClick={() => handleSeeSessions(branch)}>
+      {/*   <MenuItem key="sessions" onClick={() => handleSeeSessions(branch)}>
         Sessions
-      </MenuItem>
+      </MenuItem> */}
       <Menu.Divider />
       <MenuItem key="edit" onClick={() => handleEdit(branch)}>
         <BsPencil style={{ marginRight: 8 }} /> Update

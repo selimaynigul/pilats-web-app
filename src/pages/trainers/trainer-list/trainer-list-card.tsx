@@ -133,15 +133,28 @@ const CompanyDetailButton = styled.div`
   color: gray;
 `;
 
-interface Trainer {
-  name: string;
-  title: string;
-  department: string;
-  hiredDate: string;
-  email: string;
-  phone: string;
-  avatarUrl?: string;
-}
+const InactiveIcon = styled.div`
+  background: #f54263;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  position: absolute;
+  left: 18px;
+  top: 14px;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 3px solid white;
+
+  &:before {
+    content: "";
+    background: white;
+    width: 4px;
+    height: 1px;
+    border-radius: 10px;
+  }
+`;
 
 const TrainerCard: React.FC<{ trainer: any }> = ({ trainer }) => {
   const whatsappLink = `https://wa.me/+905077845678`;
@@ -159,6 +172,7 @@ const TrainerCard: React.FC<{ trainer: any }> = ({ trainer }) => {
               gap: 12,
             }}
           >
+            {!trainer.active && <InactiveIcon title="Not working" />}
             <Avatar
               size={60}
               src={"http://localhost:8000/api/v1/images/" + trainer.imageUrl}

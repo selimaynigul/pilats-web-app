@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Row, Col } from "antd";
+import { Row, Col, Spin } from "antd";
 import TrainerInfo from "./trainer-info/trainer-info-card";
 import TrainerClassesList from "./trainer-classes/trainer-classes-list";
 import styled from "styled-components";
@@ -32,7 +32,7 @@ const TrainerDetailPage: React.FC = () => {
   return (
     <Container>
       {loading ? (
-        <p>Loading...</p>
+        <Spin />
       ) : (
         <Row gutter={[16, 16]} style={{ height: "100%" }}>
           <Col xs={24} sm={24} md={8}>

@@ -110,7 +110,7 @@ export const loginWithUpdate = () => {
   if (role === "ADMIN") {
     const combinedData = { ...user, name: "Admin" };
     localStorage.setItem("user", JSON.stringify(combinedData));
-    window.location.href = "./";
+    window.location.href = "./companies";
     return true;
   } else if (role === "COMPANY_ADMIN") {
     companyAdminService
@@ -118,12 +118,12 @@ export const loginWithUpdate = () => {
       .then((res) => {
         const combinedData = { ...user, ...res.data };
         localStorage.setItem("user", JSON.stringify(combinedData));
-        window.location.href = "./";
+        window.location.href = "./companies";
         return true;
       })
       .catch((err) => {
         console.error("Error fetching company admin data:", err);
-        window.location.href = "./";
+        window.location.href = "./companies";
         return false;
       });
   } else if (role === "BRANCH_ADMIN") {
@@ -132,12 +132,12 @@ export const loginWithUpdate = () => {
       .then((res) => {
         const combinedData = { ...user, ...res.data };
         localStorage.setItem("user", JSON.stringify(combinedData));
-        window.location.href = "./";
+        window.location.href = "./companies";
         return true;
       })
       .catch((err) => {
         console.error("Error fetching branch admin data:", err);
-        window.location.href = "./";
+        window.location.href = "./companies";
         return false;
       });
   }

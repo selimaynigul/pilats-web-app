@@ -192,7 +192,6 @@ const CompanyInfo: React.FC<{ setBranches: any }> = ({ setBranches }) => {
               size={150}
               src={"http://localhost:8000/api/v1/images/" + company.imageUrl}
               icon={<UserOutlined />}
-              style={{ marginBottom: 8 }}
             />
             <UploadOverlay>
               <UploadOutlined className="upload-icon" />

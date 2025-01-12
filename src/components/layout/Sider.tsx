@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Layout, Menu, Switch, Select } from "antd";
 import {
   CaretRightOutlined,
@@ -6,7 +6,7 @@ import {
   MoonFilled,
   SunFilled,
 } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   BsFillHouseDoorFill,
   BsFillCalendarRangeFill,
@@ -105,6 +105,22 @@ const Sidebar: React.FC<SiderProps> = ({
 }) => {
   const [selectedKey, setSelectedKey] = useState("1");
   const navigate = useNavigate();
+  const loc = useLocation();
+
+  // Update selected key based on URL path
+  useEffect(() => {
+    const pathToKey: { [key: string]: string } = {
+      "/companies": "companies",
+      "/sessions": "sessions",
+      "/trainers": "trainers",
+      "/users": "users",
+      "/packages": "packages",
+      "/reports": "reports",
+    };
+
+    const currentKey = pathToKey[loc.pathname] || "companies";
+    setSelectedKey(currentKey);
+  }, [loc.pathname]);
 
   const handleMenuSelect = ({ key }: { key: string }) => {
     setSelectedKey(key);

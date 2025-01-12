@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "contexts/AuthProvider";
-import { message } from "antd";
+import { message, Spin } from "antd";
 import { getToken, hasRole } from "utils/permissionUtils";
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -30,7 +30,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children, requiredRoles }) => {
   }, [user, requiredRoles, location]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Spin />;
   }
 
   return <>{children}</>;
