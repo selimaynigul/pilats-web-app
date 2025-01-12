@@ -56,7 +56,7 @@ const AppLayout: React.FC = () => {
 
   const profileMenu = (
     <Menu>
-      {hasRole(["ADMIN"]) && (
+      {hasRole(["ADMIN", "COMPANY_ADMIN"]) && (
         <Menu.Item
           onClick={() => navigate("/role-management")}
           key="settings"

@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import { Card } from "components";
 import RoleManagementToolbar from "./role-management-toolbar";
 import AdminList from "./admin-list/admin-list";
+import { hasRole } from "utils/permissionUtils";
 
 const RoleManagementPage: React.FC = () => {
   const [trainerCount, setTrainerCount] = useState(0);
   const [isBranchMode, setIsBranchMode] = useState<boolean>(() => {
+    if (hasRole(["COMPANY_ADMIN"])) return true;
     const storedValue = localStorage.getItem("isBranchMode");
     return storedValue ? JSON.parse(storedValue) : false;
   });

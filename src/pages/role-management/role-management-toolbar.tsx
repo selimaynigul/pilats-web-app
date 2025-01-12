@@ -110,7 +110,9 @@ const RoleManagementToolbar: React.FC<{
   };
 
   const changeTabs = () => {
-    setIsBranchMode((prev: any) => !prev);
+    if (hasRole(["ADMIN"])) {
+      setIsBranchMode((prev: any) => !prev);
+    }
   };
 
   return (
