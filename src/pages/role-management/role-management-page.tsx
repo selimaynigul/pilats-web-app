@@ -31,7 +31,7 @@ const RoleManagementPage: React.FC = () => {
     >
       <AdminList
         isBranchMode={isBranchMode}
-        onTrainerCountChange={updateTrainerCount}
+        onAdminCountChange={updateTrainerCount}
         company={company}
       />
       <div></div>

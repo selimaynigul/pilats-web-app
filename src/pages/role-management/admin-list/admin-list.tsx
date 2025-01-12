@@ -17,13 +17,13 @@ const LoadMoreContainer = styled.div`
 `;
 
 interface TrainerListProps {
-  onTrainerCountChange: (count: number) => void;
+  onAdminCountChange: (count: number) => void;
   company: any;
   isBranchMode: boolean;
 }
 
 const AdminList: React.FC<TrainerListProps> = ({
-  onTrainerCountChange,
+  onAdminCountChange,
   company,
   isBranchMode,
 }) => {
@@ -44,7 +44,7 @@ const AdminList: React.FC<TrainerListProps> = ({
   );
 
   const {
-    items: trainers,
+    items: admins,
     loading,
     hasMore,
     loadMore,
@@ -54,15 +54,15 @@ const AdminList: React.FC<TrainerListProps> = ({
   });
 
   useEffect(() => {
-    onTrainerCountChange(trainers.length);
-  }, [trainers, onTrainerCountChange]);
+    onAdminCountChange(admins.length);
+  }, [admins, onAdminCountChange]);
 
   return (
     <>
       <Row gutter={[16, 16]}>
-        {trainers.map((trainer: any, index: number) => (
+        {admins.map((admin: any, index: number) => (
           <Col xs={24} sm={12} md={8} lg={6} key={index}>
-            <AdminCard trainer={trainer} />
+            <AdminCard isBranchMode={isBranchMode} admin={admin} />
           </Col>
         ))}
       </Row>

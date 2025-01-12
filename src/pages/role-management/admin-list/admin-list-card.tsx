@@ -12,6 +12,7 @@ import {
 
 import { BsEnvelopeFill, BsWhatsapp } from "react-icons/bs";
 import { Link } from "react-router-dom";
+import { getUserRole } from "utils/permissionUtils";
 
 const { Meta } = Card;
 
@@ -155,57 +156,53 @@ interface Trainer {
   avatarUrl?: string;
 }
 
-const AdminCard: React.FC<{ trainer: any }> = ({ trainer }) => {
+const AdminCard: React.FC<{ admin: any; isBranchMode: boolean }> = ({
+  admin,
+  isBranchMode,
+}) => {
   const whatsappLink = `https://wa.me/+905077845678`;
-
   return (
     <StyledCard
       cover={
-        <Link to={`/trainers/${trainer.id}`}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              padding: 16,
-              paddingBottom: 0,
-              gap: 12,
-            }}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            padding: 16,
+            paddingBottom: 0,
+            gap: 12,
+          }}
+        >
+          <Avatar
+            size={60}
+            src={"http://localhost:8000/api/v1/images/" + admin.imageUrl}
+            style={{ background: "lightgrey" }}
           >
-            <Avatar
-              size={60}
-              src={"http://localhost:8000/api/v1/images/" + trainer.imageUrl}
-              style={{ background: "lightgrey" }}
-            >
-              {trainer.ucGetResponse.name[0].toUpperCase()}
-            </Avatar>
-            <Meta
-              title={
-                trainer.ucGetResponse.name + " " + trainer.ucGetResponse.surname
-              }
-              description={trainer.jobName}
-            />
-          </div>
-        </Link>
+            {admin.ucGetResponse.name[0].toUpperCase()}
+          </Avatar>
+          <Meta
+            title={admin.ucGetResponse.name + " " + admin.ucGetResponse.surname}
+            description={isBranchMode ? "Branch Admin" : "Company Admin"}
+          />
+        </div>
       }
     >
       <Container>
-        <Link to={`/companies/${trainer.companyId}`}>
-          <CompanyInfo>
-            <CompanyLogo>
-              <UserOutlined style={{ fontSize: 20 }} />
-            </CompanyLogo>
-            <CompanyName>
-              <strong>{trainer.companyName}</strong>
-              <small>{trainer.branchName}</small>
-            </CompanyName>
-            <CompanyDetailButton>
-              <ArrowRightOutlined />
-            </CompanyDetailButton>
-          </CompanyInfo>
-        </Link>
+        <CompanyInfo>
+          <CompanyLogo>
+            <UserOutlined style={{ fontSize: 20 }} />
+          </CompanyLogo>
+          <CompanyName>
+            <strong>{admin.companyName}</strong>
+            <small>{admin.branchName}</small>
+          </CompanyName>
+          <CompanyDetailButton>
+            <ArrowRightOutlined />
+          </CompanyDetailButton>
+        </CompanyInfo>
         <ContactInfo>
           <Link
-            to={`mailto:${trainer.ucGetResponse.name}`}
+            to={`mailto:${admin.ucGetResponse.name}`}
             style={{ color: "#4a4a4a" }}
           >
             <ContactButton>
@@ -213,7 +210,7 @@ const AdminCard: React.FC<{ trainer: any }> = ({ trainer }) => {
             </ContactButton>
           </Link>
           <Link
-            to={`mailto:${trainer.ucGetResponse.name}`}
+            to={`mailto:${admin.ucGetResponse.name}`}
             style={{ color: "#4a4a4a" }}
           >
             <ContactButton>

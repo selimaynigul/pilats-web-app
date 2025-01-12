@@ -55,6 +55,21 @@ export const getToken = () => {
   return user?.token || null;
 };
 
+export const getUserRole = () => {
+  const user = getUser();
+  const role = user?.role;
+  let res;
+
+  if (role === "BRANCH_ADMIN") {
+    res = "Branch Admin";
+  } else if (role === "COMPANY_ADMIN") {
+    res = "Company Admin";
+  } else if (role === "ADMIN") {
+    res = "Admin";
+  }
+  return res;
+};
+
 export const updateUser = () => {
   const user = getUser();
   const role = user?.role;

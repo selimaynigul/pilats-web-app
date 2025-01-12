@@ -1,24 +1,6 @@
 import React, { useState } from "react";
-import {
-  Input,
-  Button,
-  Form,
-  Typography,
-  Switch,
-  Select,
-  Divider,
-  Carousel,
-  Row,
-  Col,
-  message,
-} from "antd";
-import {
-  UserOutlined,
-  LockOutlined,
-  SunFilled,
-  MoonFilled,
-  CheckCircleFilled,
-} from "@ant-design/icons";
+import { Typography, Switch, Select, Carousel, message } from "antd";
+import { SunFilled, MoonFilled } from "@ant-design/icons";
 import styled, { keyframes } from "styled-components";
 import { useTheme } from "contexts/ThemeProvider";
 import { useAuth } from "contexts/AuthProvider";
@@ -89,102 +71,59 @@ const Cover = styled.div`
 const StyledCarousel = styled(Carousel)`
   height: 100%;
 `;
-const FirstSlide = styled.div`
-  /*   background: url("slide2.png");
-  background-size: cover; */
-  width: 100%;
-  height: 100%;
-  background: #5d46e5;
-  /*  padding: 60px; */
-  box-sizing: border-box;
-
-  .ant-typography {
-    color: white;
-  }
-`;
 const TestSlide = styled.div`
   width: 100%;
   height: 100%;
-  background: #5d46e5;
-
+  background-color: hsla(248, 75%, 58%, 1);
+  background-image: radial-gradient(
+      at 40% 20%,
+      hsla(248, 75%, 58%, 1) 0px,
+      transparent 50%
+    ),
+    radial-gradient(at 65% 15%, hsla(224, 73%, 56%, 1) 0px, transparent 50%);
   box-sizing: border-box;
+  position: relative;
 
   .ant-typography {
     color: white;
   }
-
-  position: relative;
 `;
 
-const SkeletonWrapper = styled.div<{ visible: boolean }>`
-  display: ${({ visible }) => (visible ? "flex" : "none")};
-  width: 80%;
-  padding: 22px;
-  gap: 10px;
-`;
-
-// Skeleton parts
-const AvatarSkeleton = styled.div`
-  width: 60px;
-  height: 60px;
-  border-radius: 10px;
-  background-color: #a599ff;
-  flex-shrink: 0;
-`;
-
-const LineSkeleton = styled.div`
-  height: 16px;
-  border-radius: 5px;
-  background-color: #c0b3ff;
-  margin: 5px 0;
-`;
-
-// Wrapper for skeleton lines
-const TextSkeletonWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+const OverlayImage = styled.img`
+  position: absolute;
+  bottom: 0;
+  left: 0;
   width: 100%;
+  object-fit: cover;
+  z-index: 1;
 `;
 
-const FirstSlideContent = styled.div``;
-
-const Box = styled.div`
-  width: 242px;
-  height: 152px;
-  border-radius: 15px;
-  background-color: #6a55e6;
-
-  &:hover {
-    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-    scale: 1.04;
-    transition: 0.2s;
-    background: #a398e3;
-  }
-`;
-
-const Container = styled.div`
-  height: 100%; /* Adjust height based on your need */
-  width: 80%;
-  margin-left: auto;
-  position: absolute;
-  right: 16px;
-  top: -17px;
-`;
-
-const AlignWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end; /* Align to bottom */
-  align-items: flex-end; /* Align to right */
-  gap: 16px;
-  height: 100%;
-  align-self: end;
-`;
 const TextContent = styled.div`
-  position: absolute;
+  position: relative;
   top: 40px;
   left: 40px;
+  z-index: 2; /* Ensures the content is above the overlay image */
+`;
+const LogoContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 10px 20px;
+  margin-bottom: 20px;
+
+  margin-left: 30px;
+  margin-top: 30px;
+  .logo-icon {
+    width: 60px;
+    transition: width 0.3s ease;
+  }
+
+  .logo-text {
+    display: inline;
+    margin-left: 10px;
+    width: 120px;
+    transition: opacity 0.3s ease;
+  }
 `;
 
 const LoginPage: React.FC = () => {
@@ -236,6 +175,30 @@ const LoginPage: React.FC = () => {
       <Cover>
         <StyledCarousel autoplay autoplaySpeed={8000}>
           <TestSlide>
+            <OverlayImage src="/login-cover.png" alt="Login Cover" />
+
+            <LogoContainer>
+              <img
+                className="logo-icon"
+                src="/logo-icon-white.svg"
+                alt="Logo Icon"
+              />
+              <img
+                className="logo-text"
+                src="/logo-text-white.svg"
+                alt="Logo Text"
+              />
+            </LogoContainer>
+            <TextContent style={{ top: 20 }}>
+              <Title style={{ marginBottom: 10 }} level={3} color="white">
+                Simplify and manage your workflows
+              </Title>
+              <Text style={{ opacity: 0.8 }}>
+                Seamlessly organize with all-in-one management
+              </Text>
+            </TextContent>
+          </TestSlide>
+          {/*  <TestSlide>
             <TextContent>
               <Title level={3} color="white">
                 Assign traniers and take attendance
@@ -244,73 +207,17 @@ const LoginPage: React.FC = () => {
                 You can easily view and edit your new classes on your calendar!
               </Text>
             </TextContent>
-            <Container>
-              <Row
-                gutter={[16, 16]}
-                justify="end"
-                style={{
-                  height: "100%",
-                }}
-              >
-                {/* First Column */}
-                <Col span={8}>
-                  <AlignWrapper>
-                    <Box
-                      onMouseEnter={() => setHovered(true)}
-                      onMouseLeave={() => setHovered(false)}
-                    >
-                      <SkeletonWrapper visible={hovered}>
-                        <AvatarSkeleton />
-                        <TextSkeletonWrapper>
-                          <LineSkeleton />
-                          <LineSkeleton />
-                        </TextSkeletonWrapper>
-                      </SkeletonWrapper>
-                    </Box>
-                  </AlignWrapper>
-                </Col>
-
-                {/* Second Column */}
-                <Col span={8}>
-                  <AlignWrapper>
-                    <Box />
-                    <Box />
-                    <Box />
-                  </AlignWrapper>
-                </Col>
-
-                {/* Third Column */}
-                <Col span={8}>
-                  <AlignWrapper>
-                    <Box />
-                    <Box />
-                    <Box />
-                    <Box />
-                  </AlignWrapper>
-                </Col>
-              </Row>
-            </Container>
           </TestSlide>
-          <FirstSlide>
-            <FirstSlideContent>
-              <Title level={3} color="white">
-                Assign traniers and take attendance
-              </Title>
-              <Text>
-                You can easily view and edit your new classes on your calendar!
-              </Text>
-            </FirstSlideContent>
-          </FirstSlide>
-          <FirstSlide>
-            <FirstSlideContent>
+          <TestSlide>
+            <TextContent>
               <Title level={3} color="white">
                 View and edit new classes
               </Title>
               <Text>
                 You can easily view and edit your new classes on your calendar!
               </Text>
-            </FirstSlideContent>
-          </FirstSlide>
+            </TextContent>
+          </TestSlide> */}
         </StyledCarousel>
       </Cover>
       <LoginFormContainer>

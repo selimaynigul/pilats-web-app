@@ -33,7 +33,7 @@ const StyledTitle = styled(Title)`
   span {
     display: block;
     height: 100%;
-    animation: spin_words 20s infinite;
+    animation: spin_words 16s infinite;
 
     text-align: end;
   }
@@ -82,6 +82,23 @@ const ForgotPasswordLink = styled(Link)`
 
 const LoginButton = styled(Button)`
   background: ${({ theme }) => theme.primary};
+  background-color: hsla(248, 75%, 58%, 1);
+  background-image: radial-gradient(
+      at 40% 20%,
+      hsla(248, 75%, 58%, 1) 0px,
+      transparent 50%
+    ),
+    radial-gradient(at 65% 15%, hsla(224, 73%, 56%, 1) 0px, transparent 50%);
+
+  &:hover {
+    background-color: hsla(248, 75%, 58%, 1);
+    background-image: radial-gradient(
+        at 40% 20%,
+        hsla(248, 75%, 58%, 1) 0px,
+        transparent 50%
+      ),
+      radial-gradient(at 65% 15%, hsla(224, 73%, 56%, 1) 0px, transparent 50%);
+  }
 `;
 
 const LoginForm: React.FC<{ onFinish: any; loading: any }> = ({
@@ -91,7 +108,12 @@ const LoginForm: React.FC<{ onFinish: any; loading: any }> = ({
   const navigate = useNavigate();
 
   return (
-    <StyledForm name="login_form" onFinish={onFinish} layout="vertical">
+    <StyledForm
+      variant="filled"
+      name="login_form"
+      onFinish={onFinish}
+      layout="vertical"
+    >
       <StyledTitle level={3}>
         <div className="words">
           <span>Welcome</span>
