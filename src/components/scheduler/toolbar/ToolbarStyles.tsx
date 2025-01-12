@@ -47,6 +47,7 @@ export const ActionButton = styled.button`
   height: 35px;
   cursor: pointer;
   transition: border 0.2s;
+  flex-shrink: 0;
 
   &:hover {
     border: 1px solid #4d3abd;
