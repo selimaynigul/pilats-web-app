@@ -61,51 +61,7 @@ const CompanyItem = styled.div`
 `;
 
 const HomePage: React.FC = () => {
-  return (
-    <div>
-      <div
-        className="custom-toolbar"
-        style={{
-          marginBottom: "20px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          background: "white",
-          borderRadius: 20,
-          padding: "10px",
-        }}
-      >
-        {/* Navigation Buttons */}
-        <Nav>
-          <StyledButton2 style={{ marginRight: "5px" }}>Today</StyledButton2>
-          <StyledButton style={{ marginRight: "5px" }}>
-            <LeftOutlined />
-          </StyledButton>
-          <StyledButton>
-            <RightOutlined />
-          </StyledButton>
-        </Nav>
-
-        {/* View Selector */}
-        <Nav>
-          <StyledButton
-            style={{
-              border: "1px solid #5d46e5",
-              color: "#5d46e5",
-              background: "white",
-            }}
-          >
-            <SearchOutlined />
-          </StyledButton>
-          <StyledButton style={{ background: "#5d46e5", color: "white" }}>
-            <PlusOutlined />
-          </StyledButton>
-        </Nav>
-      </div>
-
-      <CompanyItem></CompanyItem>
-    </div>
-  );
+  return <div></div>;
 };
 
 export default HomePage;

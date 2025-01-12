@@ -30,17 +30,23 @@ import {
   UploadOutlined,
   PhoneOutlined,
 } from "@ant-design/icons";
-import { imageService, jobService, trainerService, userService } from "services";
+import {
+  imageService,
+  jobService,
+  trainerService,
+  userService,
+} from "services";
 import moment from "moment";
-import { PlusOutlined } from '@ant-design/icons';
-import { Divider } from 'antd';
+import { PlusOutlined } from "@ant-design/icons";
+import { Divider } from "antd";
+import { capitalize } from "utils/permissionUtils";
 
 const countryCodes = [
-  { code: '+90', country: 'TR' },
-  { code: '+1', country: 'USA' },
-  { code: '+44', country: 'UK' },
-  { code: '+49', country: 'GR' },
-  { code: '+33', country: 'FR' },
+  { code: "+90", country: "TR" },
+  { code: "+1", country: "USA" },
+  { code: "+44", country: "UK" },
+  { code: "+49", country: "GR" },
+  { code: "+33", country: "FR" },
   // if need add more no necc mens1s
 ];
 
@@ -163,90 +169,10 @@ const ContactButton = styled.div`
   font-size: 14px;
 `;
 
-const CompanyInfo = styled.div`
-  border: 1px solid #f6f5ff;
-  width: 90%;
-  margin: auto;
-  margin-top: 32px;
-  height: 64px;
-  padding: 12px;
-  border-radius: 10px;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  transition: 0.2s;
-
-  &:hover {
-    div:nth-of-type(3) {
-      opacity: 1;
-    }
-    box-shadow: 0px 8px 42px -5px rgba(93, 70, 229, 0.2);
-  }
-`;
-
-const CompanyLogo = styled.div`
-  background: #e6e3ff;
-  height: 40px;
-  width: 40px;
-  border-radius: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-`;
-
-const CompanyName = styled.div`
-  display: flex;
-  flex-direction: column;
-
-  strong {
-    color: black;
-  }
-  small {
-    color: gray;
-  }
-`;
 const AvatarContainer = styled.div`
   position: relative;
   width: fit-content;
   margin: auto;
-`;
-const InactiveIcon = styled.div`
-  background: #f54263;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  position: absolute;
-  left: 15px;
-  top: 4px;
-  z-index: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: 3px solid white;
-
-  &:before {
-    content: "";
-    background: white;
-    width: 10px;
-    height: 3px;
-    border-radius: 10px;
-  }
-`;
-
-const CompanyDetailButton = styled.div`
-  background: transparent;
-  height: 30px;
-  width: 30px;
-  border-radius: 10px;
-  opacity: 0;
-  display: flex;
-  margin-left: auto;
-  justify-content: center;
-  align-items: center;
-  color: gray;
 `;
 
 const EditButton = styled(Button)`
@@ -279,29 +205,12 @@ const DeleteButton = styled(Button)`
   }
 `;
 
-const Status = styled.div`
-  background: black;
-  opacity: 0.25;
-  width: 95%;
-  position: absolute;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-radius: 10px;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 4px 0;
-  font-size: 0.9em;
-`;
-
 const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [jobs, setJobs] = useState<any[]>([]);
   const [isAddingJob, setIsAddingJob] = useState(false);
-  const [newJobName, setNewJobName] = useState('');
-  const [newJobDesc, setNewJobDesc] = useState('');
+  const [newJobName, setNewJobName] = useState("");
+  const [newJobDesc, setNewJobDesc] = useState("");
   const [jobLoading, setJobLoading] = useState(false);
 
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
@@ -330,10 +239,10 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
   const fetchJobs = async () => {
     setJobLoading(true);
     try {
-      const response = await jobService.getAll(); // Implement this API call
+      const response = await jobService.getAll();
       setJobs(response.data);
     } catch (error) {
-      message.error('Failed to fetch jobs');
+      message.error("Failed to fetch jobs");
     } finally {
       setJobLoading(false);
     }
@@ -341,19 +250,19 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
 
   const handleAddNewJob = async () => {
     try {
-      if(!newJobName) return message.error('Please enter a job name');
-      if(!newJobDesc) return message.error('Please enter a job name');
-      await jobService.add({ 
-          jobName:newJobName,
-          jobDesc:"Designs, develops, tests and deploys software products."
-      }); 
-      message.success('Job added successfully');
+      if (!newJobName) return message.error("Please enter a job name");
+      if (!newJobDesc) return message.error("Please enter a job name");
+      await jobService.add({
+        jobName: newJobName,
+        jobDesc: "Designs, develops, tests and deploys software products.",
+      });
+      message.success("Job added successfully");
       setIsAddingJob(false);
-      setNewJobName('');
-      setNewJobDesc('');
+      setNewJobName("");
+      setNewJobDesc("");
       fetchJobs(); // Refresh jobs list
     } catch (error) {
-      message.error('Failed to add job');
+      message.error("Failed to add job");
     }
   };
 
@@ -371,10 +280,10 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
         gender: values.gender.toUpperCase(),
         telNo1: formattedPhone,
       },
-      jobId: jobs.find(job => job.jobName === values.jobId)?.id,
+      jobId: jobs.find((job) => job.jobName === values.jobId)?.id,
       location: values.location,
     };
-  
+
     userService
       .update(payload)
       .then(() => {
@@ -391,11 +300,11 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
 
   useEffect(() => {
     if (user) {
-      var phoneNumber = user.ucGetResponse.telNo1 || '';
+      var phoneNumber = user.ucGetResponse.telNo1 || "";
       // Extract country code and number from phone number
       for (const code of countryCodes) {
         if (phoneNumber.startsWith(code.code)) {
-          phoneNumber = phoneNumber.replace(code.code, '');
+          phoneNumber = phoneNumber.replace(code.code, "");
           form.setFieldsValue({ countryCode: code.code });
           form.setFieldsValue({ phoneNumber: phoneNumber });
           break;
@@ -407,7 +316,7 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
         active: user.active,
         endDate: user.passiveEndDate,
         jobId: user.jobName,
-        location: user.location
+        location: user.location,
       });
     }
   }, [user, form]);
@@ -466,19 +375,21 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
     fileInputRef.current?.click(); // File input'u tıklanmış gibi tetikle
   };
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
-  
-    const confirm = window.confirm('Do you want to upload this image?');
+
+    const confirm = window.confirm("Do you want to upload this image?");
     if (!confirm) return;
-  
+
     const formData = new FormData();
     formData.append("name", file.name);
     formData.append("type", file.type);
     formData.append("data", file);
     formData.append("id", user.id);
-  
+
     await imageService.postCustomerImage(formData);
     window.location.reload();
   };
@@ -496,11 +407,11 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
         </ActionButtons>
 
         <ProfileSection>
-        <AvatarContainer onClick={handleAvatarClick}>
+          <AvatarContainer onClick={handleAvatarClick}>
             <AvatarWrapper>
               <Avatar
                 size={150}
-                src={"http://localhost:8000/api/v1/images/"+user.imageUrl}
+                src={"http://localhost:8000/api/v1/images/" + user.imageUrl}
                 icon={<UserOutlined />}
                 style={{ marginBottom: 8 }}
               />
@@ -508,34 +419,20 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
                 <UploadOutlined className="upload-icon" />
               </UploadOverlay>
             </AvatarWrapper>
-            <input 
+            <input
               type="file"
               ref={fileInputRef}
-              style={{ display: 'none' }}
+              style={{ display: "none" }}
               accept=".png"
               onChange={handleFileChange}
             />
           </AvatarContainer>
           <Name>
-            {user.ucGetResponse.name} {user.ucGetResponse.surname}
+            {capitalize(`${user.ucGetResponse.name} `)}
+            {capitalize(`${user.ucGetResponse.surname}`)}
           </Name>
           <Title>{user.jobName}</Title>
         </ProfileSection>
-
-        <Link to={`/companies/${user.companyId}`}>
-          <CompanyInfo>
-            <CompanyLogo>
-              <BsBuilding style={{ fontSize: 20 }} />
-            </CompanyLogo>
-            <CompanyName>
-              <strong>{user.companyName}</strong>
-              <small>{user.branchName}</small>
-            </CompanyName>
-            <CompanyDetailButton>
-              <ArrowRightOutlined />
-            </CompanyDetailButton>
-          </CompanyInfo>
-        </Link>
 
         <InfoSection>
           <InfoItem>
@@ -608,18 +505,20 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
             >
               <DatePicker style={{ width: "100%" }} />
             </Form.Item>
-            <Form.Item
-              label="Phone Number"
-              required
-            >
+            <Form.Item label="Phone Number" required>
               <Input.Group compact>
                 <Form.Item
                   name="countryCode"
                   noStyle
                   initialValue="+90"
-                  rules={[{ required: true, message: 'Please select a country code!' }]}
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please select a country code!",
+                    },
+                  ]}
                 >
-                  <Select style={{ width: '30%' }}>
+                  <Select style={{ width: "30%" }}>
                     {countryCodes.map(({ code, country }) => (
                       <Select.Option key={code} value={code}>
                         {`${code} ${country}`}
@@ -631,19 +530,22 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
                   name="phoneNumber"
                   noStyle
                   rules={[
-                    { required: true, message: 'Please input your phone number!' },
+                    {
+                      required: true,
+                      message: "Please input your phone number!",
+                    },
                     {
                       pattern: /^\d{10}$/,
-                      message: 'Please enter a valid 10-digit phone number!',
+                      message: "Please enter a valid 10-digit phone number!",
                     },
                   ]}
                 >
                   <Input
-                    style={{ width: '70%' }}
+                    style={{ width: "70%" }}
                     prefix={<PhoneOutlined />}
                     maxLength={10}
                     onChange={(e) => {
-                      const value = e.target.value.replace(/\D/g, '');
+                      const value = e.target.value.replace(/\D/g, "");
                       form.setFieldsValue({ phoneNumber: value });
                     }}
                   />
@@ -664,71 +566,79 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
             <Form.Item
               name="jobId"
               label="Job"
-              rules={[{ required: false, message: "Please select or add a job" }]}
+              rules={[
+                { required: false, message: "Please select or add a job" },
+              ]}
             >
-          {isAddingJob ? (
-            <Input.Group compact>
-              <Input 
-                style={{ width: 'calc(100% - 90px)' }}
-                value={newJobName}
-                onChange={(e) => setNewJobName(e.target.value)}
-                placeholder="Enter new job name"
-              />
-              <Input 
-                style={{ width: 'calc(100% - 90px)', marginTop: '7px', marginBottom: '7px' }}
-                value={newJobDesc}
-                onChange={(e) => setNewJobDesc(e.target.value)}
-                placeholder="Enter new job description"
-              />
-              <br/>
-              <Button 
-                type="primary" 
-                onClick={handleAddNewJob}
-                loading={jobLoading}
-              >
-                Add
-              </Button>
-              <Button 
-                onClick={() => setIsAddingJob(false)}
-                style={{ marginLeft: '8px' }}
-              >
-                Cancel
-              </Button>
-            </Input.Group>
-          ) : (
-            <Select
-              loading={jobLoading}
-              placeholder="Select job"
-              dropdownRender={(menu) => (
-                <>
-                  {menu}
-                  <Divider style={{ margin: '8px 0' }} />
-                  <Button 
-                    type="text" 
-                    icon={<PlusOutlined />}
-                    onClick={() => setIsAddingJob(true)}
-                    style={{ paddingLeft: 8 }}
+              {isAddingJob ? (
+                <Input.Group compact>
+                  <Input
+                    style={{ width: "calc(100% - 90px)" }}
+                    value={newJobName}
+                    onChange={(e) => setNewJobName(e.target.value)}
+                    placeholder="Enter new job name"
+                  />
+                  <Input
+                    style={{
+                      width: "calc(100% - 90px)",
+                      marginTop: "7px",
+                      marginBottom: "7px",
+                    }}
+                    value={newJobDesc}
+                    onChange={(e) => setNewJobDesc(e.target.value)}
+                    placeholder="Enter new job description"
+                  />
+                  <br />
+                  <Button
+                    type="primary"
+                    onClick={handleAddNewJob}
+                    loading={jobLoading}
                   >
-                    Add new job
+                    Add
                   </Button>
-                </>
+                  <Button
+                    onClick={() => setIsAddingJob(false)}
+                    style={{ marginLeft: "8px" }}
+                  >
+                    Cancel
+                  </Button>
+                </Input.Group>
+              ) : (
+                <Select
+                  loading={jobLoading}
+                  placeholder="Select job"
+                  dropdownRender={(menu) => (
+                    <>
+                      {menu}
+                      <Divider style={{ margin: "8px 0" }} />
+                      <Button
+                        type="text"
+                        icon={<PlusOutlined />}
+                        onClick={() => setIsAddingJob(true)}
+                        style={{ paddingLeft: 8 }}
+                      >
+                        Add new job
+                      </Button>
+                    </>
+                  )}
+                >
+                  {jobs.map((job) => (
+                    <Select.Option key={job.id} value={job.jobName}>
+                      {job.jobName}
+                    </Select.Option>
+                  ))}
+                </Select>
               )}
+            </Form.Item>
+            <Form.Item
+              name="location"
+              label="Location"
+              rules={[
+                { required: false, message: "Please enter the location" },
+              ]}
             >
-              {jobs.map(job => (
-                <Select.Option key={job.id} value={job.jobName}>
-                  {job.jobName}
-                </Select.Option>
-              ))}
-            </Select>
-          )}
-        </Form.Item>
-          < Form.Item
-                name="location"
-                label="Location"
-                rules={[{ required: false, message: "Please enter the location" }]}
-              >
-                <Input />
-              </Form.Item>
+              <Input />
+            </Form.Item>
           </Form>
         </Modal>
       </Container>

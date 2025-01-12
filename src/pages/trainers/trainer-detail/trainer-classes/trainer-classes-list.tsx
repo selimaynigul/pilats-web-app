@@ -173,35 +173,39 @@ const TrainerClassesList: React.FC<{ trainer: any }> = ({ trainer }) => {
         <Spin />
       ) : (
         <Sessions>
-          <Row gutter={[16, 16]}>
-            {sessions.map((session: any, index) => {
-              const { date, start, end } = formatDateTime(
-                session.startDate,
-                session.endDate
-              );
+          {trainer && (
+            <Row gutter={[16, 16]}>
+              {sessions.map((session: any, index) => {
+                const { date, start, end } = formatDateTime(
+                  session.startDate,
+                  session.endDate
+                );
 
-              return (
-                <Col xs={24} sm={12} key={index}>
-                  <SessionCard onClick={() => handleSessionClick(session)}>
-                    <div>
-                      <h3>{session.name}</h3>
-                      <p>{session.description || "No description available"}</p>
-                      <div className="date-time">
-                        <DateTimeBox>
-                          <CalendarOutlined className="icon" />
-                          {date}
-                        </DateTimeBox>
-                        <DateTimeBox>
-                          <ClockCircleOutlined className="icon" />
-                          {start} - {end}
-                        </DateTimeBox>
+                return (
+                  <Col xs={24} sm={12} key={index}>
+                    <SessionCard onClick={() => handleSessionClick(session)}>
+                      <div>
+                        <h3>{session.name}</h3>
+                        <p>
+                          {session.description || "No description available"}
+                        </p>
+                        <div className="date-time">
+                          <DateTimeBox>
+                            <CalendarOutlined className="icon" />
+                            {date}
+                          </DateTimeBox>
+                          <DateTimeBox>
+                            <ClockCircleOutlined className="icon" />
+                            {start} - {end}
+                          </DateTimeBox>
+                        </div>
                       </div>
-                    </div>
-                  </SessionCard>
-                </Col>
-              );
-            })}
-          </Row>
+                    </SessionCard>
+                  </Col>
+                );
+              })}
+            </Row>
+          )}
         </Sessions>
       )}
     </Container>

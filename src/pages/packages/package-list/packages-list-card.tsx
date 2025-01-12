@@ -1,8 +1,9 @@
 import React from "react";
 import styled from "styled-components";
-import { DeleteOutlined } from '@ant-design/icons';
-import { Modal, message } from 'antd';
-import { companyPackageService }  from "services";
+import { MoreOutlined, DeleteOutlined } from "@ant-design/icons";
+import { Dropdown, Menu, Modal, message } from "antd";
+import { companyPackageService } from "services";
+import { capitalize } from "utils/permissionUtils";
 
 interface CardProps {
   id: string | number;
@@ -12,29 +13,13 @@ interface CardProps {
   features: Array<{ value: string; label: string }>;
   onDelete?: (id: string | number) => void;
 }
-const DeleteButton = styled.div`
-  position: absolute;
-  bottom: 0px;
-  right: 5px;
-  cursor: pointer;
-  color: #4f46e5;
-  font-size: 18px;
-  transition: all 0.3s;
-  
-  &:hover {
-    transform: scale(1.1);
-    color:rgb(37, 31, 153);
-  }
-`;
 
 const CardContainer = styled.div`
   position: relative;
   background: white;
   border-radius: 20px;
-
   color: #4f46e5;
   border: 1px solid #e5e5e5;
-
   &:hover {
     cursor: pointer;
     box-shadow: 0px 8px 42px -5px rgba(93, 70, 229, 0.2);
@@ -86,19 +71,6 @@ const FeatureItem = styled.div`
   }
 `;
 
-const FeatureValue2 = styled.div`
-  background: #6a5bff;
-  color: white;
-  font-size: 0.9rem;
-  font-weight: bold;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 5px;
-  margin-right: 10px;
-`;
 const FeatureValue = styled.div`
   background: white;
   border: 1px solid #4f46e5;
@@ -131,46 +103,58 @@ const PackageCard: React.FC<CardProps> = ({
 }) => {
   const handleDelete = () => {
     Modal.confirm({
-      title: 'Delete Package',
-      content: 'Are you sure you want to delete this package?',
-      okText: 'Yes',
-      okType: 'danger',
-      cancelText: 'No',
+      title: "Delete Package",
+      content: "Are you sure you want to delete this package?",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
       onOk: async () => {
         try {
           await companyPackageService.delete(parseInt(id.toString()));
-          message.success('Package deleted successfully');
+          message.success("Package deleted successfully");
           onDelete && onDelete(id);
         } catch (error) {
-          message.error('Failed to delete package');
+          message.error("Failed to delete package");
           console.error(error);
         }
       },
     });
   };
+
+  const menu = (
+    <Menu>
+      <Menu.Item
+        key="delete"
+        icon={<DeleteOutlined style={{ color: "red" }} />}
+        onClick={handleDelete}
+      >
+        Delete
+      </Menu.Item>
+    </Menu>
+  );
+
   return (
-    <CardContainer>
-      <DeleteButton onClick={handleDelete}>
-        <DeleteOutlined />
-      </DeleteButton>
-      <CardHeader>
-        <Title>{title}</Title>
-        <Price>₺{price}</Price>
-      </CardHeader>
-      <InfoContainer>
-        <Description>{description}</Description>
-        <FeatureList>
-          {features.map((feature, index) => (
-            <FeatureItem key={index}>
-              <FeatureValue>✔</FeatureValue>
-              <FeatureLabel>
-                {feature.value} {feature.label}
-              </FeatureLabel>
-            </FeatureItem>
-          ))}
-        </FeatureList>
-      </InfoContainer>
-    </CardContainer>
+    <Dropdown overlay={menu} trigger={["click"]}>
+      <CardContainer>
+        <CardHeader>
+          <Title>{capitalize(title)}</Title>
+          <Price>₺{price}</Price>
+        </CardHeader>
+        <InfoContainer>
+          <Description>{description}</Description>
+          <FeatureList>
+            {features.map((feature, index) => (
+              <FeatureItem key={index}>
+                <FeatureValue>✔</FeatureValue>
+                <FeatureLabel>
+                  {feature.value} {feature.label}
+                </FeatureLabel>
+              </FeatureItem>
+            ))}
+          </FeatureList>
+        </InfoContainer>
+      </CardContainer>
+    </Dropdown>
   );
 };
 

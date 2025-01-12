@@ -12,6 +12,7 @@ import {
 
 import { BsEnvelopeFill, BsWhatsapp } from "react-icons/bs";
 import { Link } from "react-router-dom";
+import { capitalize } from "utils/permissionUtils";
 
 const { Meta } = Card;
 
@@ -132,19 +133,6 @@ const CompanyDetailButton = styled.div`
   color: gray;
 `;
 
-const Overlay = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: ${({ theme }) => theme.contentBg};
-  opacity: 0.5;
-  z-index: 2;
-  border-radius: 20px;
-  pointer-events: none;
-`;
-
 interface Trainer {
   name: string;
   title: string;
@@ -157,7 +145,7 @@ interface Trainer {
 
 const TrainerCard: React.FC<{ trainer: any }> = ({ trainer }) => {
   const whatsappLink = `https://wa.me/+905077845678`;
-
+  console.log(trainer);
   return (
     <StyledCard
       cover={
@@ -174,22 +162,20 @@ const TrainerCard: React.FC<{ trainer: any }> = ({ trainer }) => {
             <Avatar
               size={60}
               src={"http://localhost:8000/api/v1/images/" + trainer.imageUrl}
-              style={{ background: "lightgrey" }}
+              style={{ background: "lightgrey", flexShrink: 0 }}
             >
               {trainer.ucGetResponse.name[0].toUpperCase()}
             </Avatar>
             <Meta
-              title={
-                trainer.ucGetResponse.name + " " + trainer.ucGetResponse.surname
-              }
+              title={capitalize(
+                `${trainer.ucGetResponse.name} ${trainer.ucGetResponse.surname}`
+              )}
               description={trainer.jobName}
             />
           </div>
         </Link>
       }
     >
-      {!trainer.active && <Overlay />}
-
       <Container>
         <Link to={`/companies/${trainer.companyId}`}>
           <CompanyInfo>

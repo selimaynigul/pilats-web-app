@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 import styled from "styled-components";
-import { Row, Col, Spin, Button } from "antd";
+import { Row, Col, Spin, Button, message } from "antd";
 import AdminCard from "./admin-list-card";
 import { usePagination } from "hooks";
 import {
@@ -57,12 +57,32 @@ const AdminList: React.FC<TrainerListProps> = ({
     onAdminCountChange(admins.length);
   }, [admins, onAdminCountChange]);
 
+  const handleDelete = (id: string | number) => {
+    const deleteService = isBranchMode
+      ? branchAdminService.delete
+      : companyAdminService.delete;
+
+    deleteService(id)
+      .then(() => {
+        console.log("Admin deleted successfully");
+        message.success("Admin deleted successfully");
+        window.location.reload();
+      })
+      .catch((error) => {
+        message.error("Failed to delete admin");
+      });
+  };
+
   return (
     <>
       <Row gutter={[16, 16]}>
         {admins.map((admin: any, index: number) => (
           <Col xs={24} sm={12} md={8} lg={6} key={index}>
-            <AdminCard isBranchMode={isBranchMode} admin={admin} />
+            <AdminCard
+              onDelete={() => handleDelete(admin.id)}
+              isBranchMode={isBranchMode}
+              admin={admin}
+            />
           </Col>
         ))}
       </Row>

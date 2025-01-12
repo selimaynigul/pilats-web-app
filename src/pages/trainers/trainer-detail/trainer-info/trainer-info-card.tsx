@@ -25,15 +25,16 @@ import {
 } from "@ant-design/icons";
 import { imageService, jobService, trainerService } from "services";
 import moment from "moment";
-import { PlusOutlined } from '@ant-design/icons';
-import { Divider } from 'antd';
+import { PlusOutlined } from "@ant-design/icons";
+import { Divider } from "antd";
+import { capitalize } from "utils/permissionUtils";
 
 const countryCodes = [
-  { code: '+90', country: 'TR' },
-  { code: '+1', country: 'USA' },
-  { code: '+44', country: 'UK' },
-  { code: '+49', country: 'GR' },
-  { code: '+33', country: 'FR' },
+  { code: "+90", country: "TR" },
+  { code: "+1", country: "USA" },
+  { code: "+44", country: "UK" },
+  { code: "+49", country: "GR" },
+  { code: "+33", country: "FR" },
   // if need add more no necc mens1s
 ];
 
@@ -300,8 +301,8 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [jobs, setJobs] = useState<any[]>([]);
   const [isAddingJob, setIsAddingJob] = useState(false);
-  const [newJobName, setNewJobName] = useState('');
-  const [newJobDesc, setNewJobDesc] = useState('');
+  const [newJobName, setNewJobName] = useState("");
+  const [newJobDesc, setNewJobDesc] = useState("");
   const [jobLoading, setJobLoading] = useState(false);
 
   useEffect(() => {
@@ -316,7 +317,7 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
       const response = await jobService.getAll(); // Implement this API call
       setJobs(response.data);
     } catch (error) {
-      message.error('Failed to fetch jobs');
+      message.error("Failed to fetch jobs");
     } finally {
       setJobLoading(false);
     }
@@ -324,19 +325,19 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
 
   const handleAddNewJob = async () => {
     try {
-      if(!newJobName) return message.error('Please enter a job name');
-      if(!newJobDesc) return message.error('Please enter a job name');
-      await jobService.add({ 
-          jobName:newJobName,
-          jobDesc:"Designs, develops, tests and deploys software products."
-      }); 
-      message.success('Job added successfully');
+      if (!newJobName) return message.error("Please enter a job name");
+      if (!newJobDesc) return message.error("Please enter a job name");
+      await jobService.add({
+        jobName: newJobName,
+        jobDesc: "Designs, develops, tests and deploys software products.",
+      });
+      message.success("Job added successfully");
       setIsAddingJob(false);
-      setNewJobName('');
-      setNewJobDesc('');
+      setNewJobName("");
+      setNewJobDesc("");
       fetchJobs(); // Refresh jobs list
     } catch (error) {
-      message.error('Failed to add job');
+      message.error("Failed to add job");
     }
   };
 
@@ -369,7 +370,7 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
         birthdate: values.birthdate.format("YYYY-MM-DD"), // Birthdate in "YYYY-MM-DD" format
         telNo1: formattedPhone,
       },
-      jobId: jobs.find(job => job.jobName === values.jobId)?.id,
+      jobId: jobs.find((job) => job.jobName === values.jobId)?.id,
       gender: values.gender.toUpperCase(),
       location: values.location,
     };
@@ -384,18 +385,18 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
       })
       .catch((error) => {
         console.error("Error updating trainer:", error);
-        message.error("Failed to update trainer. "+ error);
+        message.error("Failed to update trainer. " + error);
       });
   };
 
   useEffect(() => {
     setIsActive((prev: any) => !prev);
     if (trainer) {
-      var phoneNumber = trainer.ucGetResponse.telNo1 || '';
+      var phoneNumber = trainer.ucGetResponse.telNo1 || "";
       // Extract country code and number from phone number
       for (const code of countryCodes) {
         if (phoneNumber.startsWith(code.code)) {
-          phoneNumber = phoneNumber.replace(code.code, '');
+          phoneNumber = phoneNumber.replace(code.code, "");
           form.setFieldsValue({ countryCode: code.code });
           form.setFieldsValue({ phoneNumber: phoneNumber });
           break;
@@ -407,7 +408,7 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
         active: trainer.active,
         endDate: trainer.passiveEndDate,
         jobId: trainer.jobName,
-        location: trainer.location
+        location: trainer.location,
       });
     }
   }, [trainer, form]);
@@ -463,24 +464,25 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
 
   const whatsappLink = "https://wa.me/+905077845678";
 
-
   const handleAvatarClick = () => {
     fileInputRef.current?.click(); // File input'u tıklanmış gibi tetikle
   };
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
-  
-    const confirm = window.confirm('Do you want to upload this image?');
+
+    const confirm = window.confirm("Do you want to upload this image?");
     if (!confirm) return;
-  
+
     const formData = new FormData();
     formData.append("name", file.name);
     formData.append("type", file.type);
     formData.append("data", file);
     formData.append("id", trainer.id);
-  
+
     await imageService.postTrainerImage(formData);
     window.location.reload();
   };
@@ -503,7 +505,7 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
             <AvatarWrapper>
               <Avatar
                 size={150}
-                src={"http://localhost:8000/api/v1/images/"+trainer.imageUrl}
+                src={"http://localhost:8000/api/v1/images/" + trainer.imageUrl}
                 icon={<UserOutlined />}
                 style={{ marginBottom: 8 }}
               />
@@ -511,16 +513,17 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
                 <UploadOutlined className="upload-icon" />
               </UploadOverlay>
             </AvatarWrapper>
-            <input 
+            <input
               type="file"
               ref={fileInputRef}
-              style={{ display: 'none' }}
+              style={{ display: "none" }}
               accept=".png"
               onChange={handleFileChange}
             />
           </AvatarContainer>
           <Name>
-            {trainer.ucGetResponse.name} {trainer.ucGetResponse.surname}
+            {capitalize(`${trainer.ucGetResponse.name} `)}
+            {capitalize(`${trainer.ucGetResponse.surname}`)}
           </Name>
           <Title>{trainer.jobName}</Title>
         </ProfileSection>
@@ -611,110 +614,121 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
             >
               <DatePicker style={{ width: "100%" }} />
             </Form.Item>
+            <Form.Item label="Phone Number" required>
+              <Input.Group compact>
+                <Form.Item
+                  name="countryCode"
+                  noStyle
+                  initialValue="+90"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please select a country code!",
+                    },
+                  ]}
+                >
+                  <Select style={{ width: "30%" }}>
+                    {countryCodes.map(({ code, country }) => (
+                      <Select.Option key={code} value={code}>
+                        {`${code} ${country}`}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+                <Form.Item
+                  name="phoneNumber"
+                  noStyle
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please input your phone number!",
+                    },
+                    {
+                      pattern: /^\d{10}$/,
+                      message: "Please enter a valid 10-digit phone number!",
+                    },
+                  ]}
+                >
+                  <Input
+                    style={{ width: "70%" }}
+                    prefix={<PhoneOutlined />}
+                    maxLength={10}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, "");
+                      form.setFieldsValue({ phoneNumber: value });
+                    }}
+                  />
+                </Form.Item>
+              </Input.Group>
+            </Form.Item>
             <Form.Item
-                label="Phone Number"
-                required
-              >
+              name="jobId"
+              label="Job"
+              rules={[
+                { required: false, message: "Please select or add a job" },
+              ]}
+            >
+              {isAddingJob ? (
                 <Input.Group compact>
-                  <Form.Item
-                    name="countryCode"
-                    noStyle
-                    initialValue="+90"
-                    rules={[{ required: true, message: 'Please select a country code!' }]}
+                  <Input
+                    style={{ width: "calc(100% - 90px)" }}
+                    value={newJobName}
+                    onChange={(e) => setNewJobName(e.target.value)}
+                    placeholder="Enter new job name"
+                  />
+
+                  <Input
+                    style={{
+                      width: "calc(100% - 90px)",
+                      marginTop: "7px",
+                      marginBottom: "7px",
+                    }}
+                    value={newJobDesc}
+                    onChange={(e) => setNewJobDesc(e.target.value)}
+                    placeholder="Enter new job description"
+                  />
+                  <br />
+                  <Button
+                    type="primary"
+                    onClick={handleAddNewJob}
+                    loading={jobLoading}
                   >
-                    <Select style={{ width: '30%' }}>
-                      {countryCodes.map(({ code, country }) => (
-                        <Select.Option key={code} value={code}>
-                          {`${code} ${country}`}
-                        </Select.Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
-                  <Form.Item
-                    name="phoneNumber"
-                    noStyle
-                    rules={[
-                      { required: true, message: 'Please input your phone number!' },
-                      {
-                        pattern: /^\d{10}$/,
-                        message: 'Please enter a valid 10-digit phone number!',
-                      },
-                    ]}
+                    Add
+                  </Button>
+                  <Button
+                    onClick={() => setIsAddingJob(false)}
+                    style={{ marginLeft: "8px" }}
                   >
-                    <Input
-                      style={{ width: '70%' }}
-                      prefix={<PhoneOutlined />}
-                      maxLength={10}
-                      onChange={(e) => {
-                        const value = e.target.value.replace(/\D/g, '');
-                        form.setFieldsValue({ phoneNumber: value });
-                      }}
-                    />
-                  </Form.Item>
+                    Cancel
+                  </Button>
                 </Input.Group>
-              </Form.Item>
-            <Form.Item
-                          name="jobId"
-                          label="Job"
-                          rules={[{ required: false, message: "Please select or add a job" }]}
-                        >
-                      {isAddingJob ? (
-                        <Input.Group compact>
-                          <Input 
-                            style={{ width: 'calc(100% - 90px)' }}
-                            value={newJobName}
-                            onChange={(e) => setNewJobName(e.target.value)}
-                            placeholder="Enter new job name"
-                          />
-                          
-                          <Input 
-                            style={{ width: 'calc(100% - 90px)', marginTop: '7px', marginBottom: '7px' }}
-                            value={newJobDesc}
-                            onChange={(e) => setNewJobDesc(e.target.value)}
-                            placeholder="Enter new job description"
-                          />
-                          <br />
-                          <Button 
-                            type="primary" 
-                            onClick={handleAddNewJob}
-                            loading={jobLoading}
-                          >
-                            Add
-                          </Button>
-                          <Button 
-                            onClick={() => setIsAddingJob(false)}
-                            style={{ marginLeft: '8px' }}
-                          >
-                            Cancel
-                          </Button>
-                        </Input.Group>
-                      ) : (
-                        <Select
-                          loading={jobLoading}
-                          placeholder="Select job"
-                          dropdownRender={(menu) => (
-                            <>
-                              {menu}
-                              <Divider style={{ margin: '8px 0' }} />
-                              <Button 
-                                type="text" 
-                                icon={<PlusOutlined />}
-                                onClick={() => setIsAddingJob(true)}
-                                style={{ paddingLeft: 8 }}
-                              >
-                                Add new job
-                              </Button>
-                            </>
-                          )}
-                        >
-                          {jobs.map(job => (
-                            <Select.Option key={job.id} value={job.jobName}>
-                              {job.jobName}
-                            </Select.Option>
-                          ))}
-                        </Select>
-                      )}
-                    </Form.Item>
+              ) : (
+                <Select
+                  loading={jobLoading}
+                  placeholder="Select job"
+                  dropdownRender={(menu) => (
+                    <>
+                      {menu}
+                      <Divider style={{ margin: "8px 0" }} />
+                      <Button
+                        type="text"
+                        icon={<PlusOutlined />}
+                        onClick={() => setIsAddingJob(true)}
+                        style={{ paddingLeft: 8 }}
+                      >
+                        Add new job
+                      </Button>
+                    </>
+                  )}
+                >
+                  {jobs.map((job) => (
+                    <Select.Option key={job.id} value={job.jobName}>
+                      {job.jobName}
+                    </Select.Option>
+                  ))}
+                </Select>
+              )}
+            </Form.Item>
             <Form.Item
               name="gender"
               label="Gender"
@@ -725,13 +739,15 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
                 <Select.Option value="FEMALE">Female</Select.Option>
               </Select>
             </Form.Item>
-            < Form.Item
-                            name="location"
-                            label="Location"
-                            rules={[{ required: false, message: "Please enter the location" }]}
-                          >
-                            <Input />
-                          </Form.Item>
+            <Form.Item
+              name="location"
+              label="Location"
+              rules={[
+                { required: false, message: "Please enter the location" },
+              ]}
+            >
+              <Input />
+            </Form.Item>
             <Form.Item
               name="active"
               label="Is Active"

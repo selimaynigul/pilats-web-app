@@ -12,6 +12,7 @@ import {
 
 import { BsEnvelopeFill, BsWhatsapp } from "react-icons/bs";
 import { Link } from "react-router-dom";
+import { capitalize } from "utils/permissionUtils";
 
 const { Meta } = Card;
 
@@ -150,13 +151,15 @@ const UserCard: React.FC<{ user: any }> = ({ user }) => {
           >
             <Avatar
               size={60}
-              src={"http://localhost:8000/api/v1/images/"+user.imageUrl}
+              src={"http://localhost:8000/api/v1/images/" + user.imageUrl}
               style={{ background: "lightgrey" }}
             >
               {user.ucGetResponse.name[0].toUpperCase()}
             </Avatar>
             <Meta
-              title={user.ucGetResponse.name + " " + user.ucGetResponse.surname}
+              title={capitalize(
+                `${user.ucGetResponse.name} ${user.ucGetResponse.surname}`
+              )}
               description={user.jobName}
             />
           </div>
@@ -164,20 +167,6 @@ const UserCard: React.FC<{ user: any }> = ({ user }) => {
       }
     >
       <Container>
-        <Link to={`/companies/${user.companyId}`}>
-          <CompanyInfo>
-            <CompanyLogo>
-              <UserOutlined style={{ fontSize: 20 }} />
-            </CompanyLogo>
-            <CompanyName>
-              <strong>{user.companyName}</strong>
-              <small>{user.branchName}</small>
-            </CompanyName>
-            <CompanyDetailButton>
-              <ArrowRightOutlined />
-            </CompanyDetailButton>
-          </CompanyInfo>
-        </Link>
         <ContactInfo>
           <Link
             to={`mailto:${user.ucGetResponse.name}`}

@@ -36,7 +36,10 @@ export const getCompanyName = () => {
 };
 
 export const capitalize = (str: string) =>
-  str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  str
+    .split(" ") // Split the string into an array of words
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize each word
+    .join(" "); // Join the array back into a single string
 
 export const getUserName = () => {
   const user = getUser();

@@ -85,20 +85,22 @@ const RoleManagementToolbar: React.FC<{
         name: values.name,
         surname: values.surname,
         birthdate: values.birthdate,
-        gender: values.gender.toUpperCase(),
+        gender: values.gender,
         telNo1: values.phoneNumber,
       },
       companyId: values.company,
-      ...(isBranchMode && { branchId: values.branch }), // Include branchId if branch mode
+      ...(isBranchMode && { branchId: values.branch }),
     };
 
     try {
       if (isBranchMode) {
         await branchAdminService.register(payload);
         message.success("Branch Admin added successfully!");
+        window.location.reload();
       } else {
         await companyAdminService.register(payload);
         message.success("Company Admin added successfully!");
+        window.location.reload();
       }
       setIsModalVisible(false);
     } catch (err) {

@@ -4,6 +4,7 @@ import { Card, Avatar } from "antd";
 
 import { Link } from "react-router-dom";
 import { BsBuilding } from "react-icons/bs";
+import { capitalize } from "utils/permissionUtils";
 
 const { Meta } = Card;
 
@@ -43,7 +44,7 @@ const CompanyListCard: React.FC<{ company: any }> = ({ company }) => {
           >
             <Avatar
               size={60}
-              src={"http://localhost:8000/api/v1/images/"+company.imageUrl}
+              src={"http://localhost:8000/api/v1/images/" + company.imageUrl}
               style={{
                 background: "lightgrey",
                 fontSize: 24,
@@ -52,7 +53,10 @@ const CompanyListCard: React.FC<{ company: any }> = ({ company }) => {
             >
               <BsBuilding />
             </Avatar>
-            <Meta title={company.companyName} description="İstanbul" />
+            <Meta
+              title={capitalize(company.companyName)}
+              description="İstanbul"
+            />
           </div>
         </Link>
       }
