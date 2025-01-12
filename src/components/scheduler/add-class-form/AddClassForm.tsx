@@ -400,12 +400,13 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
                 alignItems: "start",
               }}
             >
-              <CustomIcon style={{ marginTop: 8 }}>
+              <CustomIcon style={{ marginTop: 38 }}>
                 <CalendarOutlined />
               </CustomIcon>
               <Form.Item
                 style={{ width: "100%" }}
                 name="endDate"
+                label="End date"
                 rules={formItems.endDate.rules}
               >
                 <DatePicker
