@@ -5,6 +5,7 @@ import AddButton from "components/AddButton";
 import { BsThreeDotsVertical, BsTrash, BsPencil } from "react-icons/bs";
 import { branchService } from "services";
 import { useNavigate, useParams } from "react-router-dom";
+import { hasRole } from "utils/permissionUtils";
 
 const Container = styled.div`
   height: 100%;
@@ -184,7 +185,9 @@ const CompanyBranchList: React.FC<{
     <Container>
       <Header>
         <h2>Branches</h2>
-        <AddButton onClick={() => setIsModalVisible(true)} />
+        {hasRole(["COMPANY_ADMIN", "ADMIN"]) && (
+          <AddButton onClick={() => setIsModalVisible(true)} />
+        )}
       </Header>
       <Row gutter={[16, 16]}>
         {branches.map((branch, index) => (

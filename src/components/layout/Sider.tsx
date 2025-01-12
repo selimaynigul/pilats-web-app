@@ -145,7 +145,11 @@ const Sidebar: React.FC<SiderProps> = ({
   };
 
   const menuItems = [
-    { key: "companies", icon: <BsFillHouseDoorFill />, label: "Companies" },
+    {
+      key: "companies",
+      icon: <BsFillHouseDoorFill />,
+      label: hasRole(["ADMIN"]) ? "Companies" : "My Company",
+    },
     { key: "sessions", icon: <BsFillCalendarRangeFill />, label: "Sessions" },
     { key: "trainers", icon: <BsFillPeopleFill />, label: "Trainers" },
     { key: "users", icon: <BsFillPersonFill />, label: "Users" },

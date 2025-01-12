@@ -7,6 +7,7 @@ import { handleError } from "utils/apiHelpers";
 import { message } from "antd";
 import { CompanyDropdown } from "components";
 import moment from "moment";
+import { hasRole } from "utils/permissionUtils";
 
 const ToolbarContainer = styled.div`
   display: flex;
@@ -91,10 +92,12 @@ const UsersToolbar: React.FC<{
         <CountNumber>{userCount}</CountNumber> users listed
       </CountContainer>
       <ActionContainer>
-        <CompanyDropdown
-          selectedItem={selectedCompany}
-          onSelect={(company) => setSelectedCompany(company)}
-        />
+        {hasRole(["ADMIN", "COMPANY_ADMIN"]) && (
+          <CompanyDropdown
+            selectedItem={selectedCompany}
+            onSelect={(company) => setSelectedCompany(company)}
+          />
+        )}
         <AddButton onClick={() => setIsModalVisible(true)} />
       </ActionContainer>
       <AddUserModal

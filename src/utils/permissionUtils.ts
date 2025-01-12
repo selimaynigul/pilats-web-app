@@ -29,7 +29,7 @@ export const getCompanyName = () => {
   const user = getUser();
 
   if (hasRole(["BRANCH_ADMIN"])) {
-    return user?.companyName || null;
+    return `${user?.companyName} - ${user?.branchName}`;
   } else if (hasRole(["COMPANY_ADMIN"])) {
     return user?.companyName || null;
   }
@@ -103,6 +103,11 @@ export const updateUser = () => {
   return Promise.resolve(null);
 };
 
+const navigateToCompanyPage = (companyId: string) => {
+  const route = `./companies/${companyId}`;
+  window.location.href = route;
+};
+
 export const loginWithUpdate = () => {
   const user = getUser();
   const role = user?.role;
@@ -118,12 +123,17 @@ export const loginWithUpdate = () => {
       .then((res) => {
         const combinedData = { ...user, ...res.data };
         localStorage.setItem("user", JSON.stringify(combinedData));
-        window.location.href = "./companies";
+        const companyId = res.data?.companyId;
+        if (companyId) {
+          navigateToCompanyPage(companyId);
+        } else {
+          console.error("Company ID not found for Company Admin.");
+        }
         return true;
       })
       .catch((err) => {
         console.error("Error fetching company admin data:", err);
-        window.location.href = "./companies";
+        window.location.href = "./sessions";
         return false;
       });
   } else if (role === "BRANCH_ADMIN") {
@@ -132,12 +142,18 @@ export const loginWithUpdate = () => {
       .then((res) => {
         const combinedData = { ...user, ...res.data };
         localStorage.setItem("user", JSON.stringify(combinedData));
-        window.location.href = "./companies";
+
+        const companyId = res.data?.companyId;
+        if (companyId) {
+          navigateToCompanyPage(companyId);
+        } else {
+          console.error("Company ID not found for Branch Admin.");
+        }
         return true;
       })
       .catch((err) => {
         console.error("Error fetching branch admin data:", err);
-        window.location.href = "./companies";
+        window.location.href = "./sessions";
         return false;
       });
   }
