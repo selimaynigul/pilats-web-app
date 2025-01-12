@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
-import CustomEvent from "./Event";
+import CustomEvent from "./event/Event";
 import { message, Modal, Popover, Spin } from "antd";
 import AddClassForm from "components/scheduler/add-class-form/AddClassForm";
 import CustomToolbar from "components/scheduler/toolbar/scheduler-toolbar";
@@ -312,9 +312,23 @@ const Scheduler: React.FC = () => {
             trigger="click"
             content={
               <div>
-                {dayEvents.map((event, index) => (
-                  <div key={index}>
-                    <strong>{event.name}</strong>
+                {dayEvents.slice(1).map((event, index) => (
+                  <div style={{ marginBottom: 5 }}>
+                    <CustomEvent
+                      key={index}
+                      event={event}
+                      dayEvents={dayEvents}
+                      fetch={() => {
+                        if (visibleRange) {
+                          return fetchSessions(
+                            visibleRange.start,
+                            visibleRange.end,
+                            true
+                          );
+                        }
+                      }}
+                      highlightedEventId={highlightedEventId}
+                    />
                   </div>
                 ))}
               </div>

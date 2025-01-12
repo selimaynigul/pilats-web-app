@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Popover, Avatar, Tooltip, Button, message, Modal } from "antd";
+import React from "react";
+import { Avatar, Tooltip, Button, Popover } from "antd";
 import {
   AntDesignOutlined,
   ArrowRightOutlined,
@@ -11,28 +11,8 @@ import {
 } from "@ant-design/icons";
 import styled from "styled-components";
 import dayjs from "dayjs";
-import { sessionService } from "services";
 import { Link } from "react-router-dom";
 import { hasRole } from "utils/permissionUtils";
-import EditSessionForm from "./edit-session-form/edit-session-form";
-import { StyledModal } from "./SchedulerStyles";
-
-const Container = styled.div<{ more?: boolean }>`
-  background: #5d46e5;
-  border-bottom: 5px solid #4d3abd;
-  color: white;
-  padding: 10px;
-  border-radius: ${(props) => (props.more ? "0 15px 15px 15px" : "15px")};
-  border-radius: 15px;
-  cursor: pointer;
-  position: relative;
-  box-sizing: border-box;
-  transition: 0.1s;
-
-  &:hover {
-    background: #4d3abd;
-  }
-`;
 
 const TrainerInfo = styled.div`
   border: 1px solid white;
@@ -144,32 +124,23 @@ const AttendeeInfo = styled.div`
   align-items: center;
 `;
 
-const CustomEvent: React.FC<{
+interface EventPopoverProps {
   event: any;
-  dayEvents: any[];
-  fetch: () => any;
-  highlightedEventId?: any;
-}> = ({ event, dayEvents, fetch, highlightedEventId }) => {
-  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [popoverVisible, setPopoverVisible] = useState(false);
+  handleEditClick: () => void;
+  handleDelete: () => void;
+  children: any;
+  visible: boolean;
+  setVisible: any;
+}
 
-  const handleDelete = () => {
-    sessionService
-      .delete(event.id)
-      .then(() => {
-        fetch();
-        message.success("Deleted successfully!");
-      })
-      .catch((error) => {
-        message.error("Failed to delete the event.");
-      });
-  };
-
-  const handleEditClick = () => {
-    setIsEditModalVisible(true);
-    setPopoverVisible(false); // Close the popover
-  };
-
+const EventPopover: React.FC<EventPopoverProps> = ({
+  event,
+  handleEditClick,
+  handleDelete,
+  children,
+  visible,
+  setVisible,
+}) => {
   const content = (
     <div style={{ position: "relative", maxWidth: 300 }}>
       <div style={{ marginBottom: 20 }}>
@@ -252,49 +223,17 @@ const CustomEvent: React.FC<{
     </div>
   );
 
-  const more = dayEvents.length > 1; // Example: Adjust if more events should show "+More" button
-  const moreEventsCount = dayEvents.length - 1; // Number of additional events
   return (
-    <div style={{ position: "relative" }}>
-      <Popover
-        trigger="click"
-        content={content}
-        visible={popoverVisible}
-        onVisibleChange={setPopoverVisible}
-        arrow={false}
-      >
-        <div>
-          <Container
-            className={
-              event.id == highlightedEventId ? "highlighted-event" : ""
-            }
-            more={more}
-          >
-            <strong style={{ display: "block" }}>{(event as any)?.name}</strong>
-            {moreEventsCount === 0 && (
-              <small>
-                {dayjs(event.start).format("HH:mm")} -{" "}
-                {dayjs(event.end).format("HH:mm")}
-              </small>
-            )}
-          </Container>
-        </div>
-      </Popover>
-
-      {/* Edit Session Modal */}
-      <StyledModal
-        visible={isEditModalVisible}
-        onCancel={() => setIsEditModalVisible(false)}
-        footer={null}
-      >
-        <EditSessionForm
-          session={event}
-          onClose={() => setIsEditModalVisible(false)}
-          onUpdated={fetch}
-        />
-      </StyledModal>
-    </div>
+    <Popover
+      open={visible}
+      onOpenChange={setVisible}
+      trigger="click"
+      content={content}
+      arrow={false}
+    >
+      {children}
+    </Popover>
   );
 };
 
-export default CustomEvent;
+export default EventPopover;
