@@ -158,7 +158,7 @@ const AdminCard: React.FC<AdminCardProps> = ({
           >
             <Avatar
               size={60}
-              src={"http://localhost:8000/api/v1/images/" + admin.imageUrl}
+              src={"http://193.140.134.43/tomcat/platesapi/api/v1/images/" + admin.imageUrl}
               style={{ background: "lightgrey" }}
             >
               {admin.ucGetResponse.name[0].toUpperCase()}

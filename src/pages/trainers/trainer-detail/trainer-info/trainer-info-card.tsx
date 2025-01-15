@@ -506,7 +506,7 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
             <AvatarWrapper>
               <Avatar
                 size={150}
-                src={"http://localhost:8000/api/v1/images/" + trainer.imageUrl}
+                src={"http://193.140.134.43/tomcat/platesapi/api/v1/images/" + trainer.imageUrl}
                 icon={<UserOutlined />}
               />
               <UploadOverlay>

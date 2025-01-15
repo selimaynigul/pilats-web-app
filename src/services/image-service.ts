@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: "http://localhost:8000/api/v1",
+  baseURL: "http://193.140.134.43/tomcat/platesapi/api/v1",
   headers: {
     'Content-Type': 'multipart/form-data',
   },
