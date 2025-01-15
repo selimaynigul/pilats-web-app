@@ -158,7 +158,6 @@ const InactiveIcon = styled.div`
 
 const TrainerCard: React.FC<{ trainer: any }> = ({ trainer }) => {
   const whatsappLink = `https://wa.me/+905077845678`;
-  console.log(trainer);
   return (
     <StyledCard
       cover={

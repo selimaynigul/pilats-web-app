@@ -64,7 +64,6 @@ const AdminList: React.FC<TrainerListProps> = ({
 
     deleteService(id)
       .then(() => {
-        console.log("Admin deleted successfully");
         message.success("Admin deleted successfully");
         window.location.reload();
       })

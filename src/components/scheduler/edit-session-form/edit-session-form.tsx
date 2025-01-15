@@ -115,9 +115,6 @@ const EditSessionForm: React.FC<EditSessionFormProps> = ({
       trainerId: values.trainer.value,
     };
 
-    console.log(payload);
-    console.log("current", values.trainer);
-
     sessionService
       .update(payload)
       .then(() => {

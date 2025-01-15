@@ -24,17 +24,18 @@ apiClient.interceptors.request.use(
 );
 
 // Add a response interceptor to handle token-related errors
-/* apiClient.interceptors.response.use(
+apiClient.interceptors.response.use(
   (response) => {
     return response;
   },
   (error) => {
     if (error.response && error.response.status === 403) {
-      window.location.href = "/unauthorized";
+      localStorage.clear();
+      window.location.href = "/login";
     }
 
     return Promise.reject(error);
   }
 );
- */
+
 export default apiClient;

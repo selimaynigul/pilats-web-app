@@ -69,7 +69,6 @@ const UsersPage: React.FC = () => {
             <Segmented<string>
               options={["Dersler", "Paketler", "Ölçümler"]}
               onChange={(value) => {
-                console.log(value); // string
               }}
             />
           </TabsContainer>
