@@ -4,6 +4,7 @@ import AddButton from "components/AddButton";
 import { Modal, Form, Input, message } from "antd";
 import { companyService } from "services";
 import { handleError } from "utils/apiHelpers";
+import { useNavigate } from "react-router-dom";
 
 const ToolbarContainer = styled.div`
   display: flex;
@@ -43,6 +44,7 @@ const CompaniesToolbar: React.FC<{
 }> = ({ trainerCount }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
+  const navigate = useNavigate();
 
   const handleAddCompany = (values: any) => {
     companyService
@@ -51,7 +53,7 @@ const CompaniesToolbar: React.FC<{
         message.success("Company updated successfully");
         setIsModalVisible(false);
         form.resetFields();
-        window.location.reload();
+        navigate("/companies");
       })
       .catch((err) => {
         console.error("Error updating company:", err);

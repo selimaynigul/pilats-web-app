@@ -4,6 +4,7 @@ import CompanyInfo from "./company-info/company-info-card";
 import CompanyBranchList from "./company-branches/company-branches-list";
 import styled from "styled-components";
 import { branchService } from "services";
+import { useNavigate } from "react-router-dom";
 
 const Container = styled.div`
   height: 100%;
@@ -11,9 +12,10 @@ const Container = styled.div`
 
 const CompanyDetailsPage: React.FC = () => {
   const [branches, setBranches] = useState<any[]>([]);
+  const navigate = useNavigate();
 
   const refreshBranches = () => {
-    window.location.reload();
+    navigate("/companies");
   };
 
   return (
