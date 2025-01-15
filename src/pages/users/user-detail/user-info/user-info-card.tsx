@@ -411,7 +411,7 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
             <AvatarWrapper>
               <Avatar
                 size={150}
-                src={"/api/v1/images/" + user.imageUrl}
+                src={"https://prod-grad.onrender.com/api/v1/images/" + user.imageUrl}
                 icon={<UserOutlined />}
               />
               <UploadOverlay>

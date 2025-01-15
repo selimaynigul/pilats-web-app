@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: "/api/v1",
+  baseURL: "https://prod-grad.onrender.com/api/v1",
   headers: {
     'Content-Type': 'multipart/form-data',
   },
