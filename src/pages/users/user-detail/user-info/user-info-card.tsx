@@ -288,7 +288,7 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
       .update(payload)
       .then(() => {
         message.success("User updated successfully");
-        window.location.reload();
+        navigate("/users");
         setIsEditModalVisible(false);
         form.resetFields();
       })
@@ -391,7 +391,7 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
     formData.append("id", user.id);
 
     await imageService.postCustomerImage(formData);
-    window.location.reload();
+    navigate("/users");
   };
   return (
     <>
@@ -411,7 +411,7 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
             <AvatarWrapper>
               <Avatar
                 size={150}
-                src={"https://prod-grad.onrender.com/api/v1/images/" + user.imageUrl}
+                src={"https://prod-grad.onrender.com/api/v1/images" + user.imageUrl}
                 icon={<UserOutlined />}
               />
               <UploadOverlay>
