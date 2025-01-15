@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
 import { Avatar, Spin } from "antd";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { BsBuilding, BsEnvelopeFill } from "react-icons/bs";
 import { 
   PhoneFilled,
@@ -120,6 +120,8 @@ const CompanyInfo: React.FC<{ setBranches: any }> = ({ setBranches }) => {
   const [company, setCompany] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
+
   useEffect(() => {
     companyService
       .search({ id })
@@ -180,7 +182,7 @@ const CompanyInfo: React.FC<{ setBranches: any }> = ({ setBranches }) => {
     formData.append("id", company.id);
   
     await imageService.postCompanyImage(formData);
-    window.location.reload();
+    navigate("/companies");
   };
 
   return (
@@ -190,7 +192,7 @@ const CompanyInfo: React.FC<{ setBranches: any }> = ({ setBranches }) => {
             <AvatarWrapper>
               <Avatar
                 size={150}
-                src = {"https://prod-grad.onrender.com/api/v1/images" + company.imageUrl.replace(/\/{2,}/g, "/")}
+                src = {"https://prod-grad.onrender.com/api/v1/images" + company.imageUrl}
                 icon={<UserOutlined />}
               />
               <UploadOverlay>
