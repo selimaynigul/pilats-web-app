@@ -157,11 +157,11 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
     }, 10);
   };
 
-  const handleReloadClick = () => {
+  const handleRefreshClick = () => {
     setSelectedCompany(null);
     setSearchQuery("");
-    handleSelect({ companyName: "All", branchName: null });
-
+    onSelect("Select Company");
+    handleSearchMode(false);
     fetchData("", fetchCompanies);
   };
 
@@ -209,7 +209,7 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
               hasRole(["COMPANY_ADMIN"])
                 ? "Search Branch"
                 : selectedCompany
-                  ? "Search Branch"
+                  ? "Search Branch" //
                   : "Search Company"
             }
             value={searchQuery}
@@ -233,7 +233,7 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
                   onMouseDown={(e) => {
                     e.preventDefault();
                   }}
-                  onClick={handleReloadClick}
+                  onClick={handleRefreshClick}
                 />
               )
             }
