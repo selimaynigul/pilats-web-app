@@ -288,7 +288,7 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
       .update(payload)
       .then(() => {
         message.success("User updated successfully");
-        navigate("/users");
+        window.location.reload();
         setIsEditModalVisible(false);
         form.resetFields();
       })
@@ -329,7 +329,7 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
       okType: "danger",
       cancelText: "Cancel",
       onOk: () => {
-        trainerService
+        userService
           .delete(user.id)
           .then(() => {
             message.success("User deleted successfully");

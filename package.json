@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "proxy": "https://subtle-scone-3209de.netlify.app",
-  "homepage": ".",
+  "homepage": "/",
   "dependencies": {
     "@ant-design/icons": "^5.5.1",
     "@nivo/bar": "^0.87.0",

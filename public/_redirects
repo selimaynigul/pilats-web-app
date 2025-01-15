@@ -1,2 +1,7 @@
+# Handle asset paths
+/static/*  /static/:splat  200
+/logo-icon.svg  /logo-icon.svg  200
+/manifest.json  /manifest.json  200
+
+# Handle all routes for SPA
 /*    /index.html   200
-/*/*    /index.html   200

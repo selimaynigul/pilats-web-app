@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
 import { Avatar, Spin } from "antd";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { BsBuilding, BsEnvelopeFill } from "react-icons/bs";
 import { 
   PhoneFilled,
@@ -120,7 +120,6 @@ const CompanyInfo: React.FC<{ setBranches: any }> = ({ setBranches }) => {
   const [company, setCompany] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     companyService
@@ -182,7 +181,7 @@ const CompanyInfo: React.FC<{ setBranches: any }> = ({ setBranches }) => {
     formData.append("id", company.id);
   
     await imageService.postCompanyImage(formData);
-    navigate("/companies");
+    window.location.reload();
   };
 
   return (

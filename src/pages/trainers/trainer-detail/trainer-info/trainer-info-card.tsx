@@ -380,7 +380,7 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
       .update(payload)
       .then(() => {
         message.success("Trainer updated successfully");
-        navigate("/trainers");
+        window.location.reload();
         setIsEditModalVisible(false);
         form.resetFields();
       })
@@ -485,7 +485,7 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
     formData.append("id", trainer.id);
 
     await imageService.postTrainerImage(formData);
-    navigate("/trainers");
+    window.location.reload();
   };
   return (
     <>
