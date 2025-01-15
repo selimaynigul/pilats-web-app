@@ -175,7 +175,7 @@ const TrainerCard: React.FC<{ trainer: any }> = ({ trainer }) => {
             {!trainer.active && <InactiveIcon title="Not working" />}
             <Avatar
               size={60}
-              src={"http://localhost:8000/api/v1/images/" + trainer.imageUrl}
+              src={"https://prod-grad.onrender.com/api/v1/images/" + trainer.imageUrl}
               style={{ background: "lightgrey", flexShrink: 0 }}
             >
               {trainer.ucGetResponse.name[0].toUpperCase()}
