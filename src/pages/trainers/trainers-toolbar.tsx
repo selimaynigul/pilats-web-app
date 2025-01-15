@@ -8,6 +8,7 @@ import { message } from "antd";
 import { CompanyDropdown } from "components";
 import moment from "moment";
 import { hasRole } from "utils/permissionUtils";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const ToolbarContainer = styled.div`
   display: flex;
@@ -49,6 +50,7 @@ const TrainersToolbar: React.FC<{
   setSelectedCompany: any;
 }> = ({ trainerCount, selectedCompany, setSelectedCompany }) => {
   const [isModalVisible, setIsModalVisible] = React.useState(false);
+  const navigate = useNavigate();
 
   const handleAddTrainer = (values: any) => {
     const payload = {
@@ -71,13 +73,12 @@ const TrainersToolbar: React.FC<{
       jobId: values.jobId,
       location: values.location,
     };
-
     trainerService
       .register(payload)
       .then(() => {
         message.success("Trainer is added");
         setIsModalVisible(false);
-        window.location.reload();
+        navigate("/trainers");
       })
       .catch((err) => {
         console.error("Error adding trainer:", err);

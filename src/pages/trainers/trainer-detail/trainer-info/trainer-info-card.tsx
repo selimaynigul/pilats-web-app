@@ -380,7 +380,7 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
       .update(payload)
       .then(() => {
         message.success("Trainer updated successfully");
-        window.location.reload();
+        navigate("/trainers");
         setIsEditModalVisible(false);
         form.resetFields();
       })
@@ -485,7 +485,7 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
     formData.append("id", trainer.id);
 
     await imageService.postTrainerImage(formData);
-    window.location.reload();
+    navigate("/trainers");
   };
   return (
     <>
@@ -506,7 +506,7 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
             <AvatarWrapper>
               <Avatar
                 size={150}
-                src={"http://localhost:8000/api/v1/images/" + trainer.imageUrl}
+                src={"https://prod-grad.onrender.com/api/v1/images" + trainer.imageUrl}
                 icon={<UserOutlined />}
               />
               <UploadOverlay>

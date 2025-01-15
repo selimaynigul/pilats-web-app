@@ -1,14 +1,14 @@
 import React, { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
 import { Avatar, Spin } from "antd";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { BsBuilding, BsEnvelopeFill } from "react-icons/bs";
-import {
+import { 
   PhoneFilled,
-  WhatsAppOutlined,
-  UserOutlined,
-  UploadOutlined,
-} from "@ant-design/icons";
+   WhatsAppOutlined, 
+   UserOutlined, 
+   UploadOutlined,
+  } from "@ant-design/icons";
 import { companyService, branchService, imageService } from "services";
 import { capitalize } from "utils/permissionUtils";
 
@@ -120,6 +120,8 @@ const CompanyInfo: React.FC<{ setBranches: any }> = ({ setBranches }) => {
   const [company, setCompany] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
+
   useEffect(() => {
     companyService
       .search({ id })
@@ -169,43 +171,43 @@ const CompanyInfo: React.FC<{ setBranches: any }> = ({ setBranches }) => {
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
+  
     const confirm = window.confirm("Do you want to upload this image?");
     if (!confirm) return;
-
+  
     const formData = new FormData();
     formData.append("name", file.name);
     formData.append("type", file.type);
     formData.append("data", file);
     formData.append("id", company.id);
-
+  
     await imageService.postCompanyImage(formData);
-    window.location.reload();
+    navigate("/companies");
   };
 
   return (
     <Container>
       <ProfileSection>
-        <AvatarContainer onClick={handleAvatarClick}>
-          <AvatarWrapper>
-            <Avatar
-              size={150}
-              src={"http://localhost:8000/api/v1/images/" + company.imageUrl}
-              icon={<UserOutlined />}
+      <AvatarContainer onClick={handleAvatarClick}>
+            <AvatarWrapper>
+              <Avatar
+                size={150}
+                src = {"https://prod-grad.onrender.com/api/v1/images" + company.imageUrl}
+                icon={<UserOutlined />}
+              />
+              <UploadOverlay>
+                <UploadOutlined className="upload-icon" />
+              </UploadOverlay>
+            </AvatarWrapper>
+            <input 
+              type="file"
+              ref={fileInputRef}
+              style={{ display: "none" }}
+              accept=".png"
+              onChange={handleFileChange}
             />
-            <UploadOverlay>
-              <UploadOutlined className="upload-icon" />
-            </UploadOverlay>
-          </AvatarWrapper>
-          <input
-            type="file"
-            ref={fileInputRef}
-            style={{ display: "none" }}
-            accept=".png"
-            onChange={handleFileChange}
-          />
-        </AvatarContainer>
-        <Name>{capitalize(company.companyName)}</Name>
+          </AvatarContainer>
+          <Name>{capitalize(company.companyName)}</Name>
         <Title>İstanbul</Title>
       </ProfileSection>
 
