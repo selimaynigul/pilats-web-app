@@ -26,7 +26,13 @@ const AppNavigation = () => {
       <Route path="/register" element={<LoginPage />} />
 
       {/* Protected Routes within the App Layout */}
-      <Route element={<AppLayout />}>
+      <Route
+        element={
+          <AuthGuard requiredRoles={["COMPANY_ADMIN", "ADMIN", "BRANCH_ADMIN"]}>
+            <AppLayout />
+          </AuthGuard>
+        }
+      >
         {/* Home Page (accessible to all authenticated users) */}
 
         <Route
@@ -53,7 +59,7 @@ const AppNavigation = () => {
         <Route
           path="/companies"
           element={
-            <AuthGuard requiredRoles={["COMPANY_ADMIN", "ADMIN"]}>
+            <AuthGuard requiredRoles={["ADMIN"]}>
               <CompaniesPage />
             </AuthGuard>
           }
