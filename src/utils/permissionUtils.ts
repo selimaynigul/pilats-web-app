@@ -44,8 +44,9 @@ export const capitalize = (str: string) =>
 export const getUserName = () => {
   const user = getUser();
 
+  if (!user) return null;
   if (user.name) return user.name;
-  if (!user || !user.ucGetResponse) return null;
+  if (!user.ucGetResponse) return null;
 
   const name = capitalize(user.ucGetResponse.name || "");
   const surname = capitalize(user.ucGetResponse.surname || "");
