@@ -190,7 +190,7 @@ const CompanyInfo: React.FC<{ setBranches: any }> = ({ setBranches }) => {
             <AvatarWrapper>
               <Avatar
                 size={150}
-                src={"http://193.140.134.43/tomcat/platesapi/api/v1/images/" + company.imageUrl}
+                src={"/api/v1/images/" + company.imageUrl}
                 icon={<UserOutlined />}
               />
               <UploadOverlay>

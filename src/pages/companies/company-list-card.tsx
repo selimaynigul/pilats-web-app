@@ -44,7 +44,7 @@ const CompanyListCard: React.FC<{ company: any }> = ({ company }) => {
           >
             <Avatar
               size={60}
-              src={"http://193.140.134.43/tomcat/platesapi/api/v1/images/" + company.imageUrl}
+              src={"/api/v1/images/" + company.imageUrl}
               style={{
                 background: "lightgrey",
                 fontSize: 24,
