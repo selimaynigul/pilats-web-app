@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Input, DatePicker, Select, Button, Modal } from "antd";
 import { companyService, branchService } from "services";
-
+import { hasRole, getCompanyId } from "utils/permissionUtils";
 interface AddAdminModalProps {
   visible: boolean;
   onClose: () => void;
@@ -21,6 +21,16 @@ const AddAdminModal: React.FC<AddAdminModalProps> = ({
   const [companySearchLoading, setCompanySearchLoading] = useState(false);
   const [branchLoading, setBranchLoading] = useState(false);
 
+  useEffect(() => {
+    if (isBranchMode && hasRole(["COMPANY_ADMIN"])) {
+      const companyId = getCompanyId();
+      if (companyId) {
+        form.setFieldsValue({ company: companyId });
+        fetchBranches(companyId);
+      }
+    }
+  }, [isBranchMode, form]);
+
   const handleCompanySearch = async (value: string) => {
     if (!value) return;
     setCompanySearchLoading(true);
@@ -35,7 +45,10 @@ const AddAdminModal: React.FC<AddAdminModalProps> = ({
   };
 
   const handleCompanySelect = async (companyId: string) => {
-    if (!isBranchMode) return;
+    fetchBranches(companyId);
+  };
+
+  const fetchBranches = async (companyId: string) => {
     setBranchLoading(true);
     try {
       const res = await branchService.search({ companyId });
@@ -99,22 +112,28 @@ const AddAdminModal: React.FC<AddAdminModalProps> = ({
         <Form.Item name="phoneNumber" label="Phone Number">
           <Input placeholder="Enter phone number" />
         </Form.Item>
-        <Form.Item name="company" label="Company" rules={[{ required: true }]}>
-          <Select
-            showSearch
-            placeholder="Search and select company"
-            filterOption={false}
-            onSearch={handleCompanySearch}
-            onSelect={handleCompanySelect}
-            loading={companySearchLoading}
+        {!hasRole(["COMPANY_ADMIN"]) && (
+          <Form.Item
+            name="company"
+            label="Company"
+            rules={[{ required: true }]}
           >
-            {companies.map((company: any) => (
-              <Select.Option key={company.id} value={company.id}>
-                {company.companyName}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
+            <Select
+              showSearch
+              placeholder="Search and select company"
+              filterOption={false}
+              onSearch={handleCompanySearch}
+              onSelect={handleCompanySelect}
+              loading={companySearchLoading}
+            >
+              {companies.map((company: any) => (
+                <Select.Option key={company.id} value={company.id}>
+                  {company.companyName}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+        )}
         {isBranchMode && (
           <Form.Item name="branch" label="Branch" rules={[{ required: true }]}>
             <Select placeholder="Select branch" loading={branchLoading}>
