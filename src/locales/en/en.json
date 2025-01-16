@@ -1,3 +1,15 @@
 {
-  "welcomeHeader": "Welcome to the Gebze Technical University internship management system."
+  "companies": "Companies",
+  "branches": "Branches",
+  "trainers": "Trainers",
+  "users": "Users",
+  "packages": "Packages",
+  "reports": "Reports",
+  "sessions": "Sessions",
+  "myCompany": "My Company",
+  "searchSomething": "Search something",
+  "usersListed": "users listed",
+  "adminsListed": "admins listed",
+  "trainersListed": "trainers listed",
+  "packagesListed": "packages listed"
 }

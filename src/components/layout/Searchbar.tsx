@@ -18,6 +18,7 @@ import {
   userService,
 } from "services";
 import { hasRole } from "utils/permissionUtils";
+import { useLanguage } from "hooks";
 
 interface SearchBarProps {
   isMobile: boolean;
@@ -34,6 +35,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const inputRef = useRef<InputRef>(null);
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (location.pathname.includes("users")) {
@@ -243,7 +245,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
       >
         <Search
           ref={inputRef}
-          placeholder="Search something"
+          placeholder={t.searchSomething}
           value={searchValue}
           onChange={(e) => {
             setSearchValue(e.target.value);

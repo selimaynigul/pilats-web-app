@@ -17,6 +17,7 @@ import {
 } from "react-icons/bs";
 import styled from "styled-components";
 import { getCompanyId, hasRole } from "utils/permissionUtils";
+import { useLanguage } from "hooks";
 
 const { Sider } = Layout;
 const { Option } = Select;
@@ -104,7 +105,13 @@ const Sidebar: React.FC<SiderProps> = ({
   setCollapsed,
 }) => {
   const [selectedKey, setSelectedKey] = useState("1");
+  const [selectedLanguage, setSelectedLanguage] = useState<string>(
+    localStorage.getItem("rcml-lang") || "en"
+  );
+  const { userLanguage, userLanguageChange, t } = useLanguage();
+
   const navigate = useNavigate();
+
   const loc = useLocation();
 
   // Update selected key based on URL path
@@ -187,8 +194,12 @@ const Sidebar: React.FC<SiderProps> = ({
 
       {!isMobile && (
         <>
-          <LanguageSelector defaultValue="EN">
-            <Option value="EN">EN</Option>
+          <LanguageSelector
+            value={userLanguage} // Use context state
+            onChange={(value) => userLanguageChange()}
+          >
+            <Option value="en">EN</Option>
+            <Option value="tr">TR</Option>
           </LanguageSelector>
 
           <BottomSwitch

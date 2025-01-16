@@ -1,3 +1,15 @@
 {
-  "welcomeHeader": "Gebze Teknik Üniversitesi staj yönetim sistemine hoş geldiniz."
+  "companies": "Şirketler",
+  "branches": "Şubeler",
+  "trainers": "Eğitmenler",
+  "users": "Kullanıcılar",
+  "packages": "Paketler",
+  "reports": "Raporlar",
+  "sessions": "Dersler",
+  "myCompany": "Şirketim",
+  "searchSomething": "Arama yap",
+  "usersListed": "kullanıcı listeleniyor",
+  "adminsListed": "yönetici listeleniyor",
+  "trainersListed": "eğitmen listeleniyor",
+  "packagesListed": "paket listeleniyor"
 }

@@ -229,11 +229,11 @@ const LoginPage: React.FC = () => {
             style={{ backgroundColor: "#5d46e5" }}
           />
           <Select
-            defaultValue="EN"
+            defaultValue="en"
             bordered={false}
             style={{ color: "#8a2be2" }}
           >
-            <Option value="EN">EN</Option>
+            <Option value="en">EN</Option>
             {/* Add more language options if needed */}
           </Select>
         </HeaderContainer>

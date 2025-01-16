@@ -4,14 +4,14 @@ import { languageOptions, dictionaryList } from "../locales";
 
 interface LanguageContextProps {
   userLanguage: any;
-  dictionary: Record<any, any>;
+  t: Record<any, any>;
   userLanguageChange: () => void;
 }
 
 // create the language context with default selected language
 export const LanguageContext = createContext<LanguageContextProps>({
   userLanguage: "en",
-  dictionary: dictionaryList.en,
+  t: dictionaryList.en,
   userLanguageChange: () => {},
 });
 
@@ -23,12 +23,12 @@ interface LanguageProviderProps {
 export function LanguageProvider({ children }: LanguageProviderProps) {
   const defaultLanguage = window.localStorage.getItem("rcml-lang");
   const [userLanguage, setUserLanguage] = useState<string>(
-    defaultLanguage || "en"
+    defaultLanguage?.toLowerCase() || "en"
   );
 
   const provider: LanguageContextProps = {
     userLanguage,
-    dictionary: dictionaryList[userLanguage as keyof typeof dictionaryList],
+    t: dictionaryList[userLanguage as keyof typeof dictionaryList],
     userLanguageChange: () => {
       const newLanguage = userLanguage === "en" ? "tr" : "en";
       setUserLanguage(newLanguage);
@@ -51,5 +51,5 @@ interface TextProps {
 export function Text({ tid }: TextProps) {
   const languageContext = useContext(LanguageContext);
 
-  return languageContext.dictionary[tid] || tid;
+  return languageContext.t[tid] || tid;
 }
