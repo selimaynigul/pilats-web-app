@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: "https://prod-grad.onrender.com/api/v1",
+  baseURL: "http://localhost:8000/api/v1",
   headers: {
     "Content-Type": "application/json",
   },
@@ -30,8 +30,8 @@ apiClient.interceptors.response.use(
   },
   (error) => {
     if (error.response && error.response.status === 403) {
-      localStorage.clear();
-      window.location.href = "/login";
+      /*   localStorage.clear();
+      window.location.href = "/login"; */
     }
 
     return Promise.reject(error);

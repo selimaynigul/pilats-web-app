@@ -123,6 +123,17 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
     }
   }, []);
 
+  useEffect(() => {
+    trainerService
+      .search({})
+      .then((res) => {
+        setTrainers(res?.data || []);
+      })
+      .catch(() => {
+        message.error("Failed to fetch trainers.");
+      });
+  }, []);
+
   const handleBranchChange = (branchId: number) => {
     setSelectedBranch(branchId);
     form.setFieldsValue({ trainer: null });

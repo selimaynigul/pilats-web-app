@@ -79,7 +79,12 @@ const AddAdminModal: React.FC<AddAdminModalProps> = ({
       onCancel={onClose}
       footer={null}
     >
-      <Form form={form} layout="vertical" onFinish={handleSubmit}>
+      <Form
+        variant="filled"
+        form={form}
+        layout="vertical"
+        onFinish={handleSubmit}
+      >
         <Form.Item name="name" label="First Name" rules={[{ required: true }]}>
           <Input placeholder="Enter first name" />
         </Form.Item>

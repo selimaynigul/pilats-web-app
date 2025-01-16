@@ -55,7 +55,6 @@ const UsersToolbar: React.FC<{
       uaRegisterRequest: {
         email: values.email,
         password: "1234",
-        // role: "USER_ROLE", // Replace with a valid RoleEnum value if required
       },
       ucRegisterRequest: {
         name: values.name,
@@ -66,9 +65,7 @@ const UsersToolbar: React.FC<{
         gender: values.gender.toUpperCase(),
         telNo1: values.phoneNumber,
       },
-      branchId: parseInt(values.branch, 10), // Ensure this is a valid integer
-      /*       jobId: values.jobId || null, // If jobId is optional, send null when not provided
-       */
+      branchId: parseInt(values.branch, 10),
       jobId: values.jobId,
       location: values.location,
     };

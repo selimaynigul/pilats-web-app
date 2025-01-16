@@ -235,7 +235,7 @@ const CompanyBranchList: React.FC<{
 
       {/* Update Branch Modal */}
       <Modal
-        title="Update Branch"
+        title="Add Branch"
         visible={isUpdateModalVisible}
         onCancel={() => setIsUpdateModalVisible(false)}
         onOk={() => {

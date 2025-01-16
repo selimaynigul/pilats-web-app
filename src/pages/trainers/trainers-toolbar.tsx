@@ -67,18 +67,18 @@ const TrainersToolbar: React.FC<{
         gender: values.gender.toUpperCase(),
         telNo1: values.phoneNumber,
       },
-      branchId: parseInt(values.branch, 10), // Ensure this is a valid integer
-      /*       jobId: values.jobId || null, // If jobId is optional, send null when not provided
-       */
+      branchId: parseInt(values.branch, 10),
       jobId: values.jobId,
       location: values.location,
     };
+
+    console.log(payload);
     trainerService
       .register(payload)
       .then(() => {
         message.success("Trainer is added");
         setIsModalVisible(false);
-        navigate("/trainers");
+        window.location.reload();
       })
       .catch((err) => {
         console.error("Error adding trainer:", err);
