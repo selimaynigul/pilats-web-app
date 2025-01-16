@@ -122,50 +122,39 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
         <Form.Item {...addTrainerFormItems.surname} name="surname">
           <Input placeholder="Enter user's surname" />
         </Form.Item>
-
-        <Form.Item
-          style={{
-            display: hasRole(["COMPANY_ADMIN", "BRANCH_ADMIN"])
-              ? "none"
-              : "block",
-          }}
-          {...addTrainerFormItems.company}
-          name="company"
-        >
-          <Select
-            showSearch
-            placeholder="Search and select company"
-            filterOption={false}
-            onSearch={handleCompanySearch}
-            onSelect={(value) => fetchBranches(value)}
-            loading={companySearchLoading}
-          >
-            {companies.map((company: any) => (
-              <Select.Option key={company.id} value={company.id}>
-                {company.companyName}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
-
-        <Form.Item
-          style={{ display: hasRole(["BRANCH_ADMIN"]) ? "none" : "block" }}
-          {...addTrainerFormItems.branch}
-          name="branch"
-        >
-          <Select
-            placeholder="Select branch"
-            loading={branchLoading}
-            disabled={!branches.length}
-          >
-            {branches.map((branch: any) => (
-              <Select.Option key={branch.id} value={branch.id}>
-                {branch.branchName}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
-
+        {!hasRole(["COMPANY_ADMIN", "BRANCH_ADMIN"]) && (
+          <Form.Item {...addTrainerFormItems.company} name="company">
+            <Select
+              showSearch
+              placeholder="Search and select company"
+              filterOption={false}
+              onSearch={handleCompanySearch}
+              onSelect={(value) => fetchBranches(value)}
+              loading={companySearchLoading}
+            >
+              {companies.map((company: any) => (
+                <Select.Option key={company.id} value={company.id}>
+                  {company.companyName}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+        )}
+        {!hasRole(["BRANCH_ADMIN"]) && (
+          <Form.Item {...addTrainerFormItems.branch} name="branch">
+            <Select
+              placeholder="Select branch"
+              loading={branchLoading}
+              disabled={!branches.length}
+            >
+              {branches.map((branch: any) => (
+                <Select.Option key={branch.id} value={branch.id}>
+                  {branch.branchName}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+        )}
         <Form.Item {...addTrainerFormItems.birthdate} name="birthdate">
           <DatePicker style={{ width: "100%" }} />
         </Form.Item>
