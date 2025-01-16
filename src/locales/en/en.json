@@ -11,5 +11,11 @@
   "usersListed": "users listed",
   "adminsListed": "admins listed",
   "trainersListed": "trainers listed",
-  "packagesListed": "packages listed"
+  "packagesListed": "packages listed",
+  "selectCompany": "Select Company",
+  "selectBranch": "Select Branch",
+  "today": "Today",
+  "roleManagement": "Role Management",
+  "logout": "Log Out",
+  "description": "Description"
 }

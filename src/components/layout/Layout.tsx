@@ -21,12 +21,13 @@ import {
   hasRole,
   updateUser,
 } from "utils/permissionUtils";
+import { useLanguage } from "hooks";
 
 const AppLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(window.innerWidth <= 768);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [searchActive, setSearchActive] = useState(false);
-  const [userName, setUserName] = useState("");
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const { user } = useAuth();
@@ -94,7 +95,18 @@ const AppLayout: React.FC = () => {
 
   const pathSegments = location.pathname.split("/").filter(Boolean);
   const basePath = `/${pathSegments[0] || ""}`;
-  const pageTitle = pathTitles[basePath] || "Dashboard";
+
+  const pathToTranslationKey: any = {
+    "/": "dashboard",
+    "/companies": "companies",
+    "/sessions": "sessions",
+    "/trainers": "trainers",
+    "/users": "users",
+    "/packages": "packages",
+    "/reports": "reports",
+  };
+
+  const pageTitle = t[pathToTranslationKey[basePath] || "dashboard"];
 
   return (
     <Layout style={{ height: "100vh" }}>

@@ -43,7 +43,6 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
     setBranchLoading(true);
     try {
       const res = await branchService.search({ companyId });
-      console.log(res.data);
       setBranches(res.data);
     } catch (error) {
       console.error("Error fetching branches:", error);

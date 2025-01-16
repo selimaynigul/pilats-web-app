@@ -57,11 +57,9 @@ const TestCalendar: React.FC = () => {
   const handleDragOver = (e: React.DragEvent) => {
     const calendarWidth = e.currentTarget.clientWidth;
     const mouseX = e.clientX;
-    console.log(mouseX, calendarWidth);
 
     // If near the right edge, start a timer to navigate to the next month
     if (mouseX > calendarWidth - 100) {
-      console.log("Near the right edge");
       if (!timerRef.current) {
         timerRef.current = setTimeout(() => {
           setCurrentDate(moment(currentDate).add(1, "month").toDate());

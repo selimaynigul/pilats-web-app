@@ -72,7 +72,6 @@ const TrainersToolbar: React.FC<{
       location: values.location,
     };
 
-    console.log(payload);
     trainerService
       .register(payload)
       .then(() => {
