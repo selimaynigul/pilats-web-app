@@ -9,12 +9,14 @@ interface AddTrainerFormProps {
   visible: boolean;
   onClose: () => void;
   onSubmit: (values: any) => void;
+  loading: boolean;
 }
 
 const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
   visible,
   onClose,
   onSubmit,
+  loading,
 }) => {
   const [form] = Form.useForm();
   const [companies, setCompanies] = useState([]);
@@ -32,8 +34,6 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
       handleCompanySearch("All");
     } else if (hasRole(["COMPANY_ADMIN"])) {
       fetchBranches(getCompanyId());
-    } else if (hasRole(["BRANCH_ADMIN"])) {
-      form.setFieldsValue({ branch: getBranchId() });
     }
     fetchJobs();
   }, []);
@@ -104,7 +104,12 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
     form
       .validateFields()
       .then((values) => {
-        onSubmit(values);
+        let modifiedValues;
+        if (hasRole(["BRANCH_ADMIN"])) {
+          const branchId = getBranchId();
+          modifiedValues = { ...values, branch: branchId };
+        }
+        onSubmit(modifiedValues);
         form.resetFields();
       })
       .catch((info) => {
@@ -243,9 +248,15 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit">
+          <Button
+            onClick={handleSubmit}
+            loading={loading}
+            type="primary"
+            htmlType="submit"
+          >
             Submit
           </Button>
+
           <Button style={{ marginLeft: "10px" }} onClick={onClose}>
             Cancel
           </Button>

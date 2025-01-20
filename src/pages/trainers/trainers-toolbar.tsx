@@ -50,7 +50,7 @@ const TrainersToolbar: React.FC<{
   setSelectedCompany: any;
 }> = ({ trainerCount, selectedCompany, setSelectedCompany }) => {
   const [isModalVisible, setIsModalVisible] = React.useState(false);
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const handleAddTrainer = (values: any) => {
     const payload = {
@@ -72,6 +72,7 @@ const TrainersToolbar: React.FC<{
       location: values.location,
     };
 
+    setLoading(true);
     trainerService
       .register(payload)
       .then(() => {
@@ -83,6 +84,7 @@ const TrainersToolbar: React.FC<{
         console.error("Error adding trainer:", err);
         handleError(err);
       });
+    setLoading(false);
   };
 
   return (
@@ -102,6 +104,7 @@ const TrainersToolbar: React.FC<{
         <AddButton onClick={() => setIsModalVisible(true)} />
       </ActionContainer>
       <AddTrainerModal
+        loading={loading}
         visible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
         onSubmit={handleAddTrainer}
