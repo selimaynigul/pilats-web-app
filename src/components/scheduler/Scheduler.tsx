@@ -7,7 +7,7 @@ import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import CustomEvent from "./event/Event";
-import { message, Modal, Popover, Spin } from "antd";
+import { message, Popover, Spin } from "antd";
 import AddClassForm from "components/scheduler/add-class-form/AddClassForm";
 import CustomToolbar from "components/scheduler/toolbar/scheduler-toolbar";
 import {
@@ -19,9 +19,13 @@ import {
 import { sessionService } from "services";
 import { getBranchId, getCompanyId, hasRole } from "utils/permissionUtils";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "hooks";
+import "moment/locale/tr";
+import "moment/locale/en-gb";
 
 const DragAndDropCalendar = withDragAndDrop(Calendar);
 const localizer = momentLocalizer(moment);
+
 type EventDropArgs = {
   event: any;
   start: Date | string;
@@ -40,8 +44,9 @@ const Scheduler: React.FC = () => {
   );
   const [loading, setLoading] = useState(false);
   const [sessions, setSessions] = useState<any[]>([]);
+  const { t, userLanguage } = useLanguage();
   const [company, setCompany] = useState<any>({
-    companyName: hasRole(["ADMIN"]) ? "Select Company" : "Select Branch",
+    companyName: hasRole(["ADMIN"]) ? t.selectCompany : t.selectBranch,
     id: null,
   });
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -77,6 +82,30 @@ const Scheduler: React.FC = () => {
       },
     };
   }, [company]);
+
+  useEffect(() => {
+    if (userLanguage === "tr") {
+      moment.locale("tr");
+    } else {
+      moment.locale("en-gb");
+    }
+  }, [userLanguage]);
+
+  const messages = useMemo(
+    () => ({
+      today: t.today || "Today",
+      month: t.month || "Month",
+      week: t.week || "Week",
+      day: t.day || "Day",
+      agenda: t.agenda || "Agenda",
+      date: t.date || "Date",
+      time: t.time || "Time",
+      event: t.event || "Event",
+      allDay: t.allDay || "All Day",
+      noEventsInRange: t.noEventsInRange || "No events in range.",
+    }),
+    [t]
+  );
 
   useEffect(() => {
     if (highlightedEventId) {
@@ -359,6 +388,7 @@ const Scheduler: React.FC = () => {
         onSelectSlot={selectSlot}
         onEventDrop={moveSession}
         resizable={false}
+        messages={messages}
         style={{ height: 700 }}
         onRangeChange={updateVisibleDate}
         components={{

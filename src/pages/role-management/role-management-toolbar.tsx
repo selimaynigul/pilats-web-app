@@ -7,6 +7,7 @@ import { CompanyDropdown } from "components";
 import { hasRole } from "utils/permissionUtils";
 import { companyAdminService, branchAdminService } from "services";
 import { AiOutlineSwap } from "react-icons/ai";
+import { useLanguage } from "hooks";
 
 const ToolbarContainer = styled.div`
   display: flex;
@@ -74,6 +75,7 @@ const RoleManagementToolbar: React.FC<{
   setIsBranchMode,
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const { t } = useLanguage();
 
   const handleAddAdmin = async (values: any) => {
     const payload = {
@@ -118,7 +120,7 @@ const RoleManagementToolbar: React.FC<{
   return (
     <ToolbarContainer>
       <CountContainer>
-        <CountNumber>{trainerCount}</CountNumber> admins listed
+        <CountNumber>{trainerCount}</CountNumber> {t.adminsListed}
       </CountContainer>
       <ActionContainer>
         {hasRole(["ADMIN", "COMPANY_ADMIN"]) && (
@@ -133,7 +135,7 @@ const RoleManagementToolbar: React.FC<{
           }
         >
           <TabButton onClick={changeTabs}>
-            {isBranchMode ? "Branch" : "Company"}
+            {isBranchMode ? t.branch : t.company}
             <AiOutlineSwap />
           </TabButton>
         </Tooltip>

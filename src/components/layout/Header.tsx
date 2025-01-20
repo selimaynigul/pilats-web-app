@@ -8,6 +8,7 @@ import {
   SearchOutlined,
   CloseOutlined,
 } from "@ant-design/icons";
+import { useLanguage } from "hooks";
 
 const { Header } = Layout;
 
@@ -78,17 +79,19 @@ const AppHeader: React.FC<HeaderProps> = ({
   setSearchActive,
   pageTitle,
 }) => {
+  const { t } = useLanguage();
+
   const profileMenu = (
     <Menu>
       <Menu.Item key="settings" icon={<SettingOutlined />}>
-        Role Management
+        {t.roleManagement}
       </Menu.Item>
       <Menu.Item
         key="logout"
         icon={<LogoutOutlined style={{ color: "red" }} />}
         style={{ color: "red" }}
       >
-        Log Out
+        {t.logout}
       </Menu.Item>
     </Menu>
   );

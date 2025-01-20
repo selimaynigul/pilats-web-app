@@ -1,7 +1,7 @@
 import { Col, Dropdown, Row, Spin, theme } from "antd";
 import Alert from "antd/es/alert/Alert";
 import AddButton from "components/AddButton";
-import { usePagination } from "hooks";
+import { useLanguage, usePagination } from "hooks";
 import React, { useMemo, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { sessionService } from "services";
@@ -114,6 +114,7 @@ const SessionCard = styled.div`
 const TrainerClassesList: React.FC<{ trainer: any }> = ({ trainer }) => {
   const [params, setParams] = useState({ trainerId: trainer?.id });
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const {
     items: sessions,
@@ -153,7 +154,7 @@ const TrainerClassesList: React.FC<{ trainer: any }> = ({ trainer }) => {
   return (
     <Container>
       <Header>
-        <h2>Classes</h2>
+        <h2>{t.sessions}</h2>
       </Header>
       {trainer && !trainer?.active && (
         <Alert

@@ -3,8 +3,10 @@ import { Card } from "components";
 import RoleManagementToolbar from "./role-management-toolbar";
 import AdminList from "./admin-list/admin-list";
 import { hasRole } from "utils/permissionUtils";
+import { useLanguage } from "hooks";
 
 const RoleManagementPage: React.FC = () => {
+  const { t } = useLanguage();
   const [trainerCount, setTrainerCount] = useState(0);
   const [isBranchMode, setIsBranchMode] = useState<boolean>(() => {
     if (hasRole(["COMPANY_ADMIN"])) return true;
@@ -17,7 +19,7 @@ const RoleManagementPage: React.FC = () => {
   }, [isBranchMode]);
 
   const [company, setCompany] = useState({
-    companyName: "All",
+    companyName: t.all,
     id: null,
   });
 

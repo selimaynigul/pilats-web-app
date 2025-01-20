@@ -194,26 +194,26 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
             isSelected={selectedCategory === "companies"}
             onClick={() => setSelectedCategory("companies")}
           >
-            Company
+            {t.company}
           </CategoryItem>
         )}
         <CategoryItem
           isSelected={selectedCategory === "trainers"}
           onClick={() => setSelectedCategory("trainers")}
         >
-          Trainer
+          {t.trainer}
         </CategoryItem>
         <CategoryItem
           isSelected={selectedCategory === "users"}
           onClick={() => setSelectedCategory("users")}
         >
-          User
+          {t.customer}
         </CategoryItem>
         <CategoryItem
           isSelected={selectedCategory === "sessions"}
           onClick={() => setSelectedCategory("sessions")}
         >
-          Session
+          {t.session}
         </CategoryItem>
       </TransparentMenu>
       <div style={{ maxHeight: "300px", overflowY: "auto" }}>

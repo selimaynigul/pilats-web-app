@@ -5,16 +5,18 @@ import TrainersToolbar from "./trainers-toolbar";
 import { hasRole } from "utils/permissionUtils";
 import { useSearchParams } from "react-router-dom";
 import { branchService, companyService } from "services";
+import { useLanguage } from "hooks";
 
 const TrainersPage: React.FC = () => {
   const [trainerCount, setTrainerCount] = useState(0);
+  const { t } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
   const [company, setCompany] = useState<any>({
     companyName: hasRole(["COMPANY_ADMIN"])
-      ? "Select Branch"
+      ? t.selectBranch
       : searchParams.get("company")
         ? "Loading"
-        : "Select Company",
+        : t.selectCompany,
     id: searchParams.get("company"),
     branchParam: searchParams.get("branch") || null,
     companyParam: searchParams.get("company") || null,

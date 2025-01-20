@@ -63,7 +63,7 @@ const AppLayout: React.FC = () => {
           key="settings"
           icon={<SettingOutlined />}
         >
-          Role Management
+          {t.roleManagement}
         </Menu.Item>
       )}
       <Menu.Item
@@ -72,7 +72,7 @@ const AppLayout: React.FC = () => {
         icon={<LogoutOutlined style={{ color: "red" }} />}
         style={{ color: "red" }}
       >
-        Log Out
+        {t.logout}
       </Menu.Item>
     </Menu>
   );

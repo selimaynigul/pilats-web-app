@@ -6,6 +6,7 @@ import { BsThreeDotsVertical, BsTrash, BsPencil } from "react-icons/bs";
 import { branchService } from "services";
 import { useNavigate, useParams } from "react-router-dom";
 import { hasRole } from "utils/permissionUtils";
+import { useLanguage } from "hooks";
 
 const Container = styled.div`
   height: 100%;
@@ -86,6 +87,8 @@ const CompanyBranchList: React.FC<{
   const [currentBranch, setCurrentBranch] = useState<any>(null);
   const [form] = Form.useForm();
   const [updateForm] = Form.useForm();
+  const { t } = useLanguage();
+
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
@@ -162,7 +165,7 @@ const CompanyBranchList: React.FC<{
   const renderMenu = (branch: any) => (
     <Menu>
       <MenuItem key="trainers" onClick={() => handleSeeTrainers(branch)}>
-        Trainers
+        {t.trainers}
       </MenuItem>
       {/*   <MenuItem key="sessions" onClick={() => handleSeeSessions(branch)}>
         Sessions
@@ -184,7 +187,7 @@ const CompanyBranchList: React.FC<{
   return (
     <Container>
       <Header>
-        <h2>Branches</h2>
+        <h2>{hasRole(["BRANCH_ADMIN"]) ? t.myBranch : t.branches}</h2>
         {hasRole(["COMPANY_ADMIN", "ADMIN"]) && (
           <AddButton onClick={() => setIsModalVisible(true)} />
         )}

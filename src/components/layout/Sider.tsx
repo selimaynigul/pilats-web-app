@@ -155,13 +155,13 @@ const Sidebar: React.FC<SiderProps> = ({
     {
       key: "companies",
       icon: <BsFillHouseDoorFill />,
-      label: hasRole(["ADMIN"]) ? "Companies" : "My Company",
+      label: hasRole(["ADMIN"]) ? t.companies : t.myCompany,
     },
-    { key: "sessions", icon: <BsFillCalendarRangeFill />, label: "Sessions" },
-    { key: "trainers", icon: <BsFillPeopleFill />, label: "Trainers" },
-    { key: "users", icon: <BsFillPersonFill />, label: "Users" },
-    { key: "packages", icon: <BsCreditCard2FrontFill />, label: "Packages" },
-    { key: "reports", icon: <BsBarChartFill />, label: "Reports" },
+    { key: "sessions", icon: <BsFillCalendarRangeFill />, label: t.sessions },
+    { key: "trainers", icon: <BsFillPeopleFill />, label: t.trainers },
+    { key: "users", icon: <BsFillPersonFill />, label: t.users },
+    { key: "packages", icon: <BsCreditCard2FrontFill />, label: t.packages },
+    { key: "reports", icon: <BsBarChartFill />, label: t.reports },
   ];
 
   return (

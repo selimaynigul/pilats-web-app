@@ -8,6 +8,7 @@ import { message } from "antd";
 import { CompanyDropdown } from "components";
 import moment from "moment";
 import { hasRole } from "utils/permissionUtils";
+import { useLanguage } from "hooks";
 
 const ToolbarContainer = styled.div`
   display: flex;
@@ -49,6 +50,7 @@ const UsersToolbar: React.FC<{
   setSelectedCompany: any;
 }> = ({ userCount, selectedCompany, setSelectedCompany }) => {
   const [isModalVisible, setIsModalVisible] = React.useState(false);
+  const { t } = useLanguage();
 
   const handleAddTrainer = (values: any) => {
     const payload = {
@@ -86,7 +88,7 @@ const UsersToolbar: React.FC<{
   return (
     <ToolbarContainer>
       <CountContainer>
-        <CountNumber>{userCount}</CountNumber> users listed
+        <CountNumber>{userCount}</CountNumber> {t.usersListed}
       </CountContainer>
       <ActionContainer>
         {hasRole(["ADMIN", "COMPANY_ADMIN"]) && (

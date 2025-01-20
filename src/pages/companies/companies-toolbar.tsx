@@ -4,6 +4,7 @@ import AddButton from "components/AddButton";
 import { Modal, Form, Input, message } from "antd";
 import { companyService } from "services";
 import { handleError } from "utils/apiHelpers";
+import { useLanguage } from "hooks";
 
 const ToolbarContainer = styled.div`
   display: flex;
@@ -43,6 +44,7 @@ const CompaniesToolbar: React.FC<{
 }> = ({ trainerCount }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
+  const { t } = useLanguage();
 
   const handleAddCompany = (values: any) => {
     companyService
@@ -62,7 +64,7 @@ const CompaniesToolbar: React.FC<{
   return (
     <ToolbarContainer>
       <CountContainer>
-        <CountNumber>{trainerCount}</CountNumber> companies listed
+        <CountNumber>{trainerCount}</CountNumber> {t.companiesListed}
       </CountContainer>
       <ActionContainer>
         <AddButton onClick={() => setIsModalVisible(true)} />

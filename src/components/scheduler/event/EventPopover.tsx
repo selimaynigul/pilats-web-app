@@ -13,6 +13,7 @@ import styled from "styled-components";
 import dayjs from "dayjs";
 import { Link } from "react-router-dom";
 import { hasRole } from "utils/permissionUtils";
+import { useLanguage } from "hooks";
 
 const TrainerInfo = styled.div`
   border: 1px solid white;
@@ -141,6 +142,8 @@ const EventPopover: React.FC<EventPopoverProps> = ({
   visible,
   setVisible,
 }) => {
+  const { t } = useLanguage();
+
   const content = (
     <div style={{ position: "relative", maxWidth: 300 }}>
       <div style={{ marginBottom: 20 }}>
@@ -173,10 +176,12 @@ const EventPopover: React.FC<EventPopoverProps> = ({
           </strong>
         </DateInfo>
       </div>
-      <strong style={{ display: "block", marginTop: 15 }}>Description</strong>
+      <strong style={{ display: "block", marginTop: 15 }}>
+        {t.description}
+      </strong>
       <small>{event.description}</small>
 
-      <strong style={{ display: "block", marginTop: 15 }}>Trainer</strong>
+      <strong style={{ display: "block", marginTop: 15 }}>{t.trainer}</strong>
       <div style={{ marginTop: 0 }}>
         <Link to={`/trainers/${event.trainerId}`}>
           <TrainerInfo>
@@ -194,7 +199,9 @@ const EventPopover: React.FC<EventPopoverProps> = ({
             </TrainerDetailButton>
           </TrainerInfo>
         </Link>
-        <strong style={{ display: "block", marginTop: 15 }}>Attendees</strong>
+        <strong style={{ display: "block", marginTop: 15 }}>
+          {t.attendees}
+        </strong>
         <AttendeeInfo>
           <Avatar.Group
             style={{ marginTop: 7 }}

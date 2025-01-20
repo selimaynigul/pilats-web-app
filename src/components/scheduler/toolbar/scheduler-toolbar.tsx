@@ -2,19 +2,24 @@ import React, { useState } from "react";
 import {
   ToolbarContainer,
   NavButtons,
-  TitleButton,
   ActionButton,
   ToggleViewButton,
 } from "./ToolbarStyles";
 import { RightOutlined, LeftOutlined } from "@ant-design/icons";
-import { Form, Dropdown, Menu, DatePicker } from "antd";
+import { Form, ConfigProvider, DatePicker } from "antd";
 import dayjs from "dayjs";
 import AddButton from "components/AddButton";
 import { CompanyDropdown } from "components";
 import { ToolbarProps, View } from "react-big-calendar";
-import { hasRole } from "utils/permissionUtils";
+import { capitalize, hasRole } from "utils/permissionUtils";
 import styled from "styled-components";
+import { useLanguage } from "hooks";
+import enUS from "antd/es/locale/en_US";
+import trTR from "antd/es/locale/tr_TR";
+import "dayjs/locale/tr"; // Import Turkish locale
+import "dayjs/locale/en"; // Import English locale
 
+// Styled components
 const StyledDatePicker = styled(DatePicker)`
   margin: 0;
   height: 35px;
@@ -44,98 +49,95 @@ const StyledDatePicker = styled(DatePicker)`
     display: none;
   }
 `;
+
 const Toolbar: React.FC<
   ToolbarProps & { company: any; setCompany: any; setIsModalVisible: any }
-> = ({
-  onNavigate,
-  onView,
-  views,
-  view,
-  date,
-  setCompany,
-  company,
-  setIsModalVisible,
-}) => {
-  const [form] = Form.useForm();
+> = React.memo(
+  ({
+    onNavigate,
+    onView,
+    views,
+    view,
+    date,
+    setCompany,
+    company,
+    setIsModalVisible,
+  }) => {
+    const [form] = Form.useForm();
+    const { t, userLanguage } = useLanguage();
+    dayjs.locale(userLanguage);
 
-  const handleModalToggle = (visible: boolean) => {
-    setIsModalVisible(visible);
-    if (!visible) form.resetFields();
-  };
+    const currentLocale = userLanguage === "tr" ? trTR : enUS;
 
-  const viewArray = Array.isArray(views)
-    ? views
-    : (Object.keys(views).filter(
-        (key) => views[key as keyof typeof views]
-      ) as View[]);
+    const handleModalToggle = (visible: boolean) => {
+      setIsModalVisible(visible);
+      if (!visible) form.resetFields();
+    };
 
-  const handleDateChange = (date: unknown, dateString: string | string[]) => {
-    if (dayjs.isDayjs(date)) {
-      onNavigate("DATE", date.toDate());
-    } else {
-      console.warn("Invalid date format received", date);
-    }
-  };
+    const viewArray = Array.isArray(views)
+      ? views
+      : (Object.keys(views).filter(
+          (key) => views[key as keyof typeof views]
+        ) as View[]);
 
-  const menu = (
-    <StyledDatePicker
-      picker="month"
-      value={dayjs(date)}
-      onChange={handleDateChange}
-      suffixIcon={null}
-      format="MMMM YYYY"
-      style={{ width: "100%" }}
-    />
-  );
+    const handleDateChange = (date: unknown, dateString: string | string[]) => {
+      if (dayjs.isDayjs(date)) {
+        onNavigate("DATE", date.toDate());
+      } else {
+        console.warn("Invalid date format received", date);
+      }
+    };
 
-  return (
-    <ToolbarContainer>
-      <NavButtons>
-        <ToggleViewButton onClick={() => onNavigate("TODAY")}>
-          Today
-        </ToggleViewButton>
-        <ActionButton onClick={() => onNavigate("PREV")}>
-          <LeftOutlined />
-        </ActionButton>
-        <ActionButton onClick={() => onNavigate("NEXT")}>
-          <RightOutlined />
-        </ActionButton>
-
-        {/* <Dropdown
-          overlay={menu}
-          trigger={["click"]}
-          visible={isDropdownVisible}
-          onVisibleChange={(visible) => setDropdownVisible(visible)}
-        >
-          <TitleButton>{dayjs(date).format("MMMM YYYY")}</TitleButton>
-        </Dropdown> */}
-
-        {menu}
-      </NavButtons>
-      <div>
-        {hasRole(["ADMIN", "COMPANY_ADMIN"]) && (
-          <CompanyDropdown
-            selectedItem={company}
-            onSelect={(selectedCompany) => setCompany(selectedCompany)}
-          />
-        )}
-      </div>
-      <NavButtons>
-        {viewArray.map((v: any) => (
-          <ToggleViewButton
-            key={v}
-            onClick={() => onView(v)}
-            style={{ fontWeight: view === v ? "bold" : "normal" }}
-          >
-            {v.charAt(0).toUpperCase() + v.slice(1)}
+    return (
+      <ToolbarContainer>
+        <NavButtons>
+          <ToggleViewButton onClick={() => onNavigate("TODAY")}>
+            {t.today}
           </ToggleViewButton>
-        ))}
-        {hasRole(["BRANCH_ADMIN"]) && (
-          <AddButton onClick={() => handleModalToggle(true)} />
-        )}
-      </NavButtons>
-    </ToolbarContainer>
-  );
-};
+          <ActionButton onClick={() => onNavigate("PREV")}>
+            <LeftOutlined />
+          </ActionButton>
+          <ActionButton onClick={() => onNavigate("NEXT")}>
+            <RightOutlined />
+          </ActionButton>
+          <ConfigProvider locale={currentLocale}>
+            <StyledDatePicker
+              picker="month"
+              value={dayjs(date)}
+              onChange={handleDateChange}
+              suffixIcon={null}
+              format="MMMM YYYY"
+              style={{ width: "100%" }}
+            />
+          </ConfigProvider>
+        </NavButtons>
+        <div>
+          {hasRole(["ADMIN", "COMPANY_ADMIN"]) && (
+            <CompanyDropdown
+              selectedItem={company}
+              onSelect={(selectedCompany) => setCompany(selectedCompany)}
+            />
+          )}
+        </div>
+        <NavButtons>
+          {viewArray.map((v: any) => (
+            <ToggleViewButton
+              key={v}
+              onClick={() => onView(v)}
+              style={{ fontWeight: view === v ? "bold" : "normal" }}
+            >
+              {t["calendar"][v] || capitalize(v)}
+            </ToggleViewButton>
+          ))}
+          {hasRole(["BRANCH_ADMIN"]) && (
+            <AddButton onClick={() => handleModalToggle(true)} />
+          )}
+        </NavButtons>
+      </ToolbarContainer>
+    );
+  }
+);
+
+Toolbar.displayName = "Toolbar";
 
 export default Toolbar;

@@ -12,6 +12,7 @@ import { message } from "antd";
 import { CompanyDropdown } from "components";
 import moment from "moment";
 import { hasRole } from "utils/permissionUtils";
+import { useLanguage } from "hooks";
 
 const ToolbarContainer = styled.div`
   display: flex;
@@ -53,6 +54,7 @@ const PackagesToolbar: React.FC<{
   setSelectedCompany: any;
 }> = ({ packageCount, selectedCompany, setSelectedCompany }) => {
   const [isModalVisible, setIsModalVisible] = React.useState(false);
+  const { t } = useLanguage();
 
   const handleAddPackage = (values: any) => {
     const payload = {
@@ -84,7 +86,7 @@ const PackagesToolbar: React.FC<{
   return (
     <ToolbarContainer>
       <CountContainer>
-        <CountNumber>{packageCount}</CountNumber> packages listed
+        <CountNumber>{packageCount}</CountNumber> {t.packagesListed}
       </CountContainer>
       <ActionContainer>
         {hasRole(["ADMIN", "COMPANY_ADMIN"]) && (

@@ -9,6 +9,7 @@ import { CompanyDropdown } from "components";
 import moment from "moment";
 import { hasRole } from "utils/permissionUtils";
 import { Navigate, useNavigate } from "react-router-dom";
+import { useLanguage } from "hooks";
 
 const ToolbarContainer = styled.div`
   display: flex;
@@ -51,6 +52,7 @@ const TrainersToolbar: React.FC<{
 }> = ({ trainerCount, selectedCompany, setSelectedCompany }) => {
   const [isModalVisible, setIsModalVisible] = React.useState(false);
   const [loading, setLoading] = useState(false);
+  const { t } = useLanguage();
 
   const handleAddTrainer = (values: any) => {
     const payload = {
@@ -90,7 +92,7 @@ const TrainersToolbar: React.FC<{
   return (
     <ToolbarContainer>
       <CountContainer>
-        <CountNumber>{trainerCount}</CountNumber> trainers listed
+        <CountNumber>{trainerCount}</CountNumber> {t.trainersListed}
       </CountContainer>
       <ActionContainer>
         {hasRole(["ADMIN", "COMPANY_ADMIN"]) && (

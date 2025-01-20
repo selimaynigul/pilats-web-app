@@ -8,6 +8,7 @@
   "sessions": "Sessions",
   "myCompany": "My Company",
   "searchSomething": "Search something",
+  "companiesListed": "companies listed",
   "usersListed": "users listed",
   "adminsListed": "admins listed",
   "trainersListed": "trainers listed",
@@ -17,5 +18,23 @@
   "today": "Today",
   "roleManagement": "Role Management",
   "logout": "Log Out",
-  "description": "Description"
+  "description": "Description",
+  "trainer": "Trainer",
+  "attendees": "Attendees",
+  "all": "All",
+  "searchCompany": "Search Company",
+  "searchBranch": "Search Branch",
+  "myBranch": "My Branch",
+  "company": "Company",
+  "branch": "Branch",
+  "customer": "Customer",
+  "session": "Session",
+  "turkish": "Turkish",
+  "english": "English",
+  "calendar": {
+    "month": "Month",
+    "week": "Week",
+    "day": "Day",
+    "agenda": "Agenda"
+  }
 }

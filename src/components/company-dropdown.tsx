@@ -5,6 +5,7 @@ import { AiOutlineSearch } from "react-icons/ai";
 import { branchService, companyService } from "services";
 import { getCompanyId, hasRole } from "utils/permissionUtils";
 import { AiOutlineReload } from "react-icons/ai";
+import { useLanguage } from "hooks";
 
 const CompanyDropdownButton = styled.button`
   position: relative;
@@ -94,6 +95,7 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
   const buttonRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<any>(null);
   const [inputWidth, setInputWidth] = useState("0px");
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (buttonRef.current) {
@@ -160,7 +162,7 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
   const handleRefreshClick = () => {
     setSelectedCompany(null);
     setSearchQuery("");
-    onSelect("Select Company");
+    onSelect(t.selectCompany);
     handleSearchMode(false);
     fetchData("", fetchCompanies);
   };
@@ -207,10 +209,10 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
             autoFocus
             placeholder={
               hasRole(["COMPANY_ADMIN"])
-                ? "Search Branch"
+                ? t.searchBranch
                 : selectedCompany
-                  ? "Search Branch" //
-                  : "Search Company"
+                  ? t.searchBranch
+                  : t.searchCompany
             }
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -245,7 +247,7 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
           {selectedItem.companyName === "Loading" ? (
             <Spin size="small" />
           ) : (
-            `${selectedItem?.companyName || selectedCompany?.companyName || (hasRole(["ADMIN"]) ? "Select Company" : "Select Branch")} ${
+            `${selectedItem?.companyName || selectedCompany?.companyName || (hasRole(["ADMIN"]) ? t.selectCompany : t.selectBranch)} ${
               selectedItem?.branchName || selectedCompany?.branchName
                 ? `- ${selectedItem?.branchName || selectedCompany?.branchName}`
                 : ""
