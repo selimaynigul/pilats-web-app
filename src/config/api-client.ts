@@ -1,12 +1,15 @@
 import axios from "axios";
 
-const apiClient = axios.create({
-  baseURL: "https://prod-grad.onrender.com/api/v1",
+const baseURL = window.location.hostname.includes("localhost")
+  ? "http://localhost:8000/api/v1"
+  : "https://prod-grad.onrender.com/api/v1";
 
+const apiClient = axios.create({
+  baseURL,
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 5000,
+  timeout: 500000,
 });
 
 // Add a request interceptor to include the token in the headers
