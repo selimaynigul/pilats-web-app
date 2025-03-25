@@ -20,3 +20,26 @@ export interface PaginatedResponse<T> {
   size: number;
   number: number;
 }
+
+export interface ItemData {
+  id: string;
+  isActive?: boolean | null;
+  imageUrl?: string | null;
+  title: string;
+  subtitle?: string | null;
+  detailUrl?: string | null;
+
+  company?: {
+    id: string | null;
+    name: string | null;
+    branch?: string | null;
+  };
+
+  contact?: {
+    email?: string | null;
+    phone?: string | null;
+    whatsapp?: string | null;
+  };
+}
+
+export type ListItemType = "default" | "user" | "company";

@@ -1,0 +1,27 @@
+import { ItemData } from "types/types";
+export const mapToItemData = (raw: any): ItemData => {
+  return {
+    id: raw?.id?.toString() ?? "",
+    isActive: raw?.passive ?? null,
+    imageUrl: raw?.imageUrl ?? null,
+
+    title: raw?.ucGetResponse
+      ? `${raw.ucGetResponse.name ?? ""} ${raw.ucGetResponse.surname ?? ""}`.trim()
+      : "Unnamed",
+    subtitle: raw?.jobName ?? null,
+
+    detailUrl: raw?.detailUrl && raw?.id ? `${raw.detailUrl}/${raw.id}` : null,
+
+    company: {
+      id: raw?.companyId?.toString() ?? null,
+      name: raw?.companyName ?? null,
+      branch: raw?.branchName ?? null,
+    },
+
+    contact: {
+      email: raw?.email ?? null,
+      phone: raw?.ucGetResponse?.telNo1 ?? null,
+      whatsapp: raw?.ucGetResponse?.telNo1 ?? null,
+    },
+  };
+};
