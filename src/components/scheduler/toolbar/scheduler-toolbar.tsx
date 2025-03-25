@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ToolbarContainer,
   NavButtons,
@@ -50,6 +50,15 @@ const StyledDatePicker = styled(DatePicker)`
   }
 `;
 
+const MobileRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+`;
+
 const Toolbar: React.FC<
   ToolbarProps & { company: any; setCompany: any; setIsModalVisible: any }
 > = React.memo(
@@ -68,6 +77,13 @@ const Toolbar: React.FC<
     dayjs.locale(userLanguage);
 
     const currentLocale = userLanguage === "tr" ? trTR : enUS;
+
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
+    useEffect(() => {
+      const handleResize = () => setIsMobile(window.innerWidth <= 1024);
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
     const handleModalToggle = (visible: boolean) => {
       setIsModalVisible(visible);
@@ -90,49 +106,81 @@ const Toolbar: React.FC<
 
     return (
       <ToolbarContainer>
-        <NavButtons>
-          <ToggleViewButton onClick={() => onNavigate("TODAY")}>
-            {t.today}
-          </ToggleViewButton>
-          <ActionButton onClick={() => onNavigate("PREV")}>
-            <LeftOutlined />
-          </ActionButton>
-          <ActionButton onClick={() => onNavigate("NEXT")}>
-            <RightOutlined />
-          </ActionButton>
-          <ConfigProvider locale={currentLocale}>
-            <StyledDatePicker
-              picker="month"
-              value={dayjs(date)}
-              onChange={handleDateChange}
-              suffixIcon={null}
-              format="MMMM YYYY"
-              style={{ width: "100%" }}
-            />
-          </ConfigProvider>
-        </NavButtons>
-        <div>
-          {hasRole(["ADMIN", "COMPANY_ADMIN"]) && (
-            <CompanyDropdown
-              selectedItem={company}
-              onSelect={(selectedCompany) => setCompany(selectedCompany)}
-            />
-          )}
-        </div>
-        <NavButtons>
-          {viewArray.map((v: any) => (
-            <ToggleViewButton
-              key={v}
-              onClick={() => onView(v)}
-              style={{ fontWeight: view === v ? "bold" : "normal" }}
-            >
-              {t["calendar"][v] || capitalize(v)}
-            </ToggleViewButton>
-          ))}
-          {hasRole(["BRANCH_ADMIN"]) && (
-            <AddButton onClick={() => handleModalToggle(true)} />
-          )}
-        </NavButtons>
+        {isMobile ? (
+          <MobileRow>
+            <div>
+              <ConfigProvider locale={currentLocale}>
+                <StyledDatePicker
+                  picker="month"
+                  value={dayjs(date)}
+                  onChange={handleDateChange}
+                  suffixIcon={null}
+                  format="MMMM YYYY"
+                  style={{ width: "100%" }}
+                />
+              </ConfigProvider>
+            </div>
+            <div style={{ display: "flex", gap: 8 }}>
+              {hasRole(["ADMIN", "COMPANY_ADMIN"]) && (
+                <CompanyDropdown
+                  selectedItem={company}
+                  onSelect={(selectedCompany) => setCompany(selectedCompany)}
+                />
+              )}
+              {hasRole(["BRANCH_ADMIN"]) && (
+                <AddButton onClick={() => handleModalToggle(true)} />
+              )}
+            </div>
+          </MobileRow>
+        ) : (
+          <>
+            {/* original full layout for desktop */}
+            <NavButtons>
+              <ToggleViewButton onClick={() => onNavigate("TODAY")}>
+                {t.today}
+              </ToggleViewButton>
+              <ActionButton onClick={() => onNavigate("PREV")}>
+                <LeftOutlined />
+              </ActionButton>
+              <ActionButton onClick={() => onNavigate("NEXT")}>
+                <RightOutlined />
+              </ActionButton>
+              <ConfigProvider locale={currentLocale}>
+                <StyledDatePicker
+                  picker="month"
+                  value={dayjs(date)}
+                  onChange={handleDateChange}
+                  suffixIcon={null}
+                  format="MMMM YYYY"
+                  style={{ width: "100%" }}
+                />
+              </ConfigProvider>
+            </NavButtons>
+
+            <div>
+              {hasRole(["ADMIN", "COMPANY_ADMIN"]) && (
+                <CompanyDropdown
+                  selectedItem={company}
+                  onSelect={(selectedCompany) => setCompany(selectedCompany)}
+                />
+              )}
+            </div>
+            <NavButtons>
+              {viewArray.map((v: any) => (
+                <ToggleViewButton
+                  key={v}
+                  onClick={() => onView(v)}
+                  style={{ fontWeight: view === v ? "bold" : "normal" }}
+                >
+                  {t["calendar"][v] || capitalize(v)}
+                </ToggleViewButton>
+              ))}
+              {hasRole(["BRANCH_ADMIN"]) && (
+                <AddButton onClick={() => handleModalToggle(true)} />
+              )}
+            </NavButtons>
+          </>
+        )}
       </ToolbarContainer>
     );
   }

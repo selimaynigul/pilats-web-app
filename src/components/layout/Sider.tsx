@@ -34,6 +34,10 @@ const StyledSider = styled(Sider)<{ isMobile: boolean }>`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+
+  @media (max-width: 768px) {
+    margin: 0;
+  }
 `;
 
 const LogoContainer = styled.div<{ collapsed: boolean; isMobile: boolean }>`
