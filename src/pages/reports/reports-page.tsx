@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { Space, Button } from "antd";
 import { Card } from "components";
 import { ReloadOutlined } from "@ant-design/icons";
-import { Report, PaginatedResponse } from "types/report.types";
+import { Report, PaginatedResponse } from "types/types";
 import { ReportListView } from "./reports-table-view";
 import reportService from "services/report-service";
 
@@ -17,18 +17,18 @@ const ReportsPage: React.FC = () => {
         pageSize: 10000,
         sort: "DESC",
         pageNo: 0,
-      }
+      },
     }),
     []
   );
-  
+
   const fetchReports = async () => {
     setLoading(true);
     try {
-            const response = await reportService.getReports(params);
+      const response = await reportService.getReports(params);
       setData(response.data);
     } catch (error) {
-      console.error('Failed to fetch reports:', error);
+      console.error("Failed to fetch reports:", error);
     } finally {
       setLoading(false);
     }
@@ -40,7 +40,7 @@ const ReportsPage: React.FC = () => {
 
   const toolbar = (
     <Space>
-      <Button 
+      <Button
         icon={<ReloadOutlined />}
         onClick={fetchReports}
         loading={loading}

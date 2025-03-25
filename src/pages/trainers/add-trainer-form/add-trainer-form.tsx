@@ -104,11 +104,13 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
     form
       .validateFields()
       .then((values) => {
-        let modifiedValues;
+        let modifiedValues = values;
+
         if (hasRole(["BRANCH_ADMIN"])) {
           const branchId = getBranchId();
           modifiedValues = { ...values, branch: branchId };
         }
+
         onSubmit(modifiedValues);
         form.resetFields();
       })

@@ -340,7 +340,7 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
                 onBlur={() => setTrainerExpanded(false)}
               >
                 {trainers.map((trainer: any) => {
-                  if (trainer.active) {
+                  if (trainer.passive) {
                     return (
                       <Select.Option key={trainer.id} value={trainer.id}>
                         {trainer.ucGetResponse.name}{" "}

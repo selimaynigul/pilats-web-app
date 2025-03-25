@@ -1,6 +1,6 @@
-import { ColumnsType } from 'antd/es/table';
-import { Typography, Tag } from 'antd';
-import { Report } from 'types/report.types';
+import { ColumnsType } from "antd/es/table";
+import { Typography, Tag } from "antd";
+import { Report } from "types/types";
 import { JsonViewer } from "@textea/json-viewer";
 
 const { Text } = Typography;
@@ -22,17 +22,16 @@ interface ReportRecord {
 
 const getEntityId = (record: ReportRecord) => {
   switch (record.entityName) {
-    case 'COMPANY':
+    case "COMPANY":
       return record.companyId;
-    case 'BRANCH':
+    case "BRANCH":
       return record.branchId;
-    case 'USER':
+    case "USER":
       return record.userId;
     default:
       return null;
   }
 };
-
 
 export const getReportColumns = (): ColumnsType<Report> => [
   {
@@ -40,32 +39,32 @@ export const getReportColumns = (): ColumnsType<Report> => [
     dataIndex: "userEmail",
     key: "userEmail",
     width: 300,
-    render: (text: string) => <Text copyable>{text}</Text>
+    render: (text: string) => <Text copyable>{text}</Text>,
   },
   {
     title: "Role",
     dataIndex: "userRole",
     key: "userRole",
-    width: 150
+    width: 150,
   },
   {
     title: "Change Date",
     dataIndex: "changeDate",
     key: "changeDate",
     width: 150,
-    render: (date: string) => new Date(date).toLocaleString()
+    render: (date: string) => new Date(date).toLocaleString(),
   },
   {
     title: "Entity",
     dataIndex: "entityName",
     key: "entityName",
-    width: 200
+    width: 200,
   },
   {
     title: "Operation",
     dataIndex: "operation",
     key: "operation",
-    width: 200
+    width: 200,
   },
   {
     title: "Previous Value",
@@ -85,7 +84,6 @@ export const getReportColumns = (): ColumnsType<Report> => [
         </div>
       );
     },
-    
   },
   {
     title: "Updated Value",
@@ -105,7 +103,6 @@ export const getReportColumns = (): ColumnsType<Report> => [
         </div>
       );
     },
-    
   },
   {
     title: "Status",
@@ -117,6 +114,5 @@ export const getReportColumns = (): ColumnsType<Report> => [
         {success ? "Success" : "Failed"}
       </Tag>
     ),
-    
-  }
+  },
 ];

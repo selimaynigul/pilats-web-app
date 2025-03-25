@@ -221,14 +221,6 @@ const InactiveIcon = styled.div`
   justify-content: center;
   align-items: center;
   border: 3px solid white;
-
-  &:before {
-    content: "";
-    background: white;
-    width: 10px;
-    height: 3px;
-    border-radius: 10px;
-  }
 `;
 
 const CompanyDetailButton = styled.div`
@@ -359,8 +351,8 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
 
     const payload = {
       id: trainer.id,
-      isActive: values.active, // Checkbox state for active status
-      temporarilyPassive: !values.active && values.endDate ? true : false, // Set to true only if inactive and endDate exists
+      passive: values.active, // Checkbox state for active status
+      /*  temporarilyPassive: !values.active && values.endDate ? true : false, */ // Set to true only if inactive and endDate exists */
       /* passiveEndDate: values.active
         ? null
         : values.endDate?.format("YYYY-MM-DD"), // Null if active; otherwise, endDate */
@@ -502,11 +494,14 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
 
         <ProfileSection>
           <AvatarContainer onClick={handleAvatarClick}>
-            {!trainer.active && <InactiveIcon title="Not working" />}
+            {!trainer.passive && <InactiveIcon title="Not working" />}
             <AvatarWrapper>
               <Avatar
                 size={150}
-                src={"https://prod-grad.onrender.com/api/v1/images" + trainer.imageUrl}
+                src={
+                  "https://prod-grad.onrender.com/api/v1/images" +
+                  trainer.imageUrl
+                }
                 icon={<UserOutlined />}
               />
               <UploadOverlay>
@@ -616,17 +611,7 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
             </Form.Item>
             <Form.Item label="Phone Number" required>
               <Input.Group compact>
-                <Form.Item
-                  name="countryCode"
-                  noStyle
-                  initialValue="+90"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please select a country code!",
-                    },
-                  ]}
-                >
+                <Form.Item name="countryCode" noStyle initialValue="+90">
                   <Select style={{ width: "30%" }}>
                     {countryCodes.map(({ code, country }) => (
                       <Select.Option key={code} value={code}>
@@ -748,12 +733,7 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
             >
               <Input />
             </Form.Item>
-            <Form.Item
-              name="active"
-              label="Is Active"
-              valuePropName="checked"
-              rules={[{ required: true, message: "Please select the status" }]}
-            >
+            <Form.Item name="active" label="Is Active" valuePropName="checked">
               <Checkbox onChange={handleCheckboxChange}>Is Active</Checkbox>
             </Form.Item>
             {!isActive && (

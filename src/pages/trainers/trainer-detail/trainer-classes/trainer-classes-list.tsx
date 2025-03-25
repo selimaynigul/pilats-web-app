@@ -156,7 +156,7 @@ const TrainerClassesList: React.FC<{ trainer: any }> = ({ trainer }) => {
       <Header>
         <h2>{t.sessions}</h2>
       </Header>
-      {trainer && !trainer?.active && (
+      {trainer && !trainer?.passive && (
         <Alert
           message="Deactive trainers cannot have classes!"
           type="info"
