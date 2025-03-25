@@ -26,6 +26,8 @@
   "searchBranch": "Search Branch",
   "myBranch": "My Branch",
   "company": "Company",
+  "companyAdmin": "Company Admin",
+  "branchAdmin": "Branch Admin",
   "branch": "Branch",
   "customer": "Customer",
   "session": "Session",

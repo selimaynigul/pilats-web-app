@@ -26,6 +26,8 @@
   "searchBranch": "Şube Ara",
   "myBranch": "Şubem",
   "company": "Şirket",
+  "companyAdmin": "Şirket Yöneticisi",
+  "branchAdmin": "Şube Yöneticisi",
   "branch": "Şube",
   "customer": "Müşteri",
   "session": "Ders",
