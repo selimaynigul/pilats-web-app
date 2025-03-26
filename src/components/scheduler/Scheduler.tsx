@@ -194,7 +194,7 @@ const Scheduler: React.FC = () => {
 
   const selectSlot = (slotInfo: { start: Date; end: Date }) => {
     if (loading) return;
-    if (hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN"])) {
+    if (hasRole(["BRANCH_ADMIN"])) {
       setSelectedRange(slotInfo);
       setIsModalVisible(true);
     }
@@ -342,8 +342,9 @@ const Scheduler: React.FC = () => {
             content={
               <div>
                 {dayEvents.slice(1).map((event, index) => (
-                  <div style={{ marginBottom: 5 }}>
+                  <div style={{ marginBottom: 5, width: 200 }}>
                     <CustomEvent
+                      showTime={true}
                       key={index}
                       event={event}
                       dayEvents={dayEvents}

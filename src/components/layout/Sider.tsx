@@ -35,7 +35,7 @@ const StyledSider = styled(Sider)<{ isMobile: boolean }>`
   flex-direction: column;
   justify-content: space-between;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     margin: 0;
   }
 `;
@@ -129,7 +129,11 @@ const Sidebar: React.FC<SiderProps> = ({
       "/reports": "reports",
     };
 
-    const currentKey = pathToKey[loc.pathname] || "companies";
+    const matchedEntry = Object.entries(pathToKey).find(([path]) =>
+      loc.pathname.includes(path)
+    );
+
+    const currentKey = matchedEntry ? matchedEntry[1] : "companies";
     setSelectedKey(currentKey);
   }, [loc.pathname]);
 

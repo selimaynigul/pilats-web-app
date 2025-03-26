@@ -9,6 +9,10 @@ import {
   CloseOutlined,
 } from "@ant-design/icons";
 import { useLanguage } from "hooks";
+import { StyledAvatar } from "./layoutStyles";
+import { getUserName, hasRole } from "utils/permissionUtils";
+import { useAuth } from "contexts/AuthProvider";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const { Header } = Layout;
 
@@ -56,6 +60,7 @@ const SearchIcon = styled.div`
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  margin-right: 8px;
 `;
 
 export const Title = styled.h2`
@@ -80,13 +85,32 @@ const AppHeader: React.FC<HeaderProps> = ({
   pageTitle,
 }) => {
   const { t } = useLanguage();
+  const getUserInitial = () => {
+    const name = getUserName() || "U";
+    return name.charAt(0).toUpperCase();
+  };
+
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+  const location = useLocation();
+
+  const handleLogout = () => {
+    logout(location);
+  };
 
   const profileMenu = (
     <Menu>
-      <Menu.Item key="settings" icon={<SettingOutlined />}>
-        {t.roleManagement}
-      </Menu.Item>
+      {hasRole(["ADMIN", "COMPANY_ADMIN"]) && (
+        <Menu.Item
+          onClick={() => navigate("/role-management")}
+          key="settings"
+          icon={<SettingOutlined />}
+        >
+          {t.roleManagement}
+        </Menu.Item>
+      )}
       <Menu.Item
+        onClick={handleLogout}
         key="logout"
         icon={<LogoutOutlined style={{ color: "red" }} />}
         style={{ color: "red" }}
@@ -116,7 +140,7 @@ const AppHeader: React.FC<HeaderProps> = ({
             trigger={["click"]}
             placement="bottomRight"
           >
-            <ProfilePhoto />
+            <StyledAvatar>{getUserInitial()}</StyledAvatar>
           </Dropdown>
         </div>
       )}

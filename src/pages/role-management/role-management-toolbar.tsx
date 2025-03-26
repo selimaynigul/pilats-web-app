@@ -26,6 +26,10 @@ const CountContainer = styled.div`
   border-radius: 50px;
   display: flex;
   align-items: center;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const ActionContainer = styled.div`
@@ -36,6 +40,10 @@ const ActionContainer = styled.div`
   border-radius: 50px;
   align-items: center;
   padding: 10px;
+
+  @media (max-width: 768px) {
+    margin-left: auto;
+  }
 `;
 
 export const TabButton = styled(Button)`

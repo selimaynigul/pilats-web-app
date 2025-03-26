@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo } from "react";
 import styled from "styled-components";
-import { Row, Col, Spin, Button, message } from "antd";
+import { Row, Col, Spin, Button, message, Menu, Dropdown } from "antd";
 import AdminCard from "./admin-list-card";
-import { usePagination } from "hooks";
+import { useLanguage, usePagination } from "hooks";
 import {
   branchAdminService,
   companyAdminService,
@@ -10,6 +10,9 @@ import {
 } from "services";
 import { Link } from "react-router-dom";
 import { hasRole } from "utils/permissionUtils";
+import { ListItem } from "components";
+import { mapToItemData } from "utils/utils";
+import { DeleteOutlined } from "@ant-design/icons";
 
 const LoadMoreContainer = styled.div`
   text-align: center;
@@ -27,6 +30,8 @@ const AdminList: React.FC<TrainerListProps> = ({
   company,
   isBranchMode,
 }) => {
+  const { t } = useLanguage();
+
   const params = useMemo(
     () => ({
       pageSize: 8,
@@ -72,16 +77,33 @@ const AdminList: React.FC<TrainerListProps> = ({
       });
   };
 
+  const menu = (adminId: string | number) => (
+    <Menu>
+      <Menu.Item
+        key="delete"
+        icon={<DeleteOutlined style={{ color: "red" }} />}
+        onClick={() => handleDelete(adminId)}
+      >
+        Delete Admin
+      </Menu.Item>
+    </Menu>
+  );
+
   return (
     <>
       <Row gutter={[16, 16]}>
         {admins.map((admin: any, index: number) => (
           <Col xs={24} sm={12} md={8} lg={6} key={index}>
-            <AdminCard
-              onDelete={() => handleDelete(admin.id)}
-              isBranchMode={isBranchMode}
-              admin={admin}
-            />
+            <Dropdown overlay={menu(admin.id)} trigger={["click"]}>
+              <div style={{ cursor: "pointer" }}>
+                <ListItem
+                  data={mapToItemData({
+                    ...admin,
+                    jobName: isBranchMode ? t.branchAdmin : t.companyAdmin,
+                  })}
+                />
+              </div>
+            </Dropdown>
           </Col>
         ))}
       </Row>

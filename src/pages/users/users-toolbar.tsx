@@ -27,6 +27,10 @@ const CountContainer = styled.div`
   border-radius: 50px;
   display: flex;
   align-items: center;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const ActionContainer = styled.div`
@@ -38,6 +42,10 @@ const ActionContainer = styled.div`
   border-radius: 50px;
   align-items: center;
   padding: 10px;
+
+  @media (max-width: 768px) {
+    margin-left: auto;
+  }
 `;
 
 const CountNumber = styled.span`
@@ -52,7 +60,7 @@ const UsersToolbar: React.FC<{
   const [isModalVisible, setIsModalVisible] = React.useState(false);
   const { t } = useLanguage();
 
-  const handleAddTrainer = (values: any) => {
+  const handleAddUser = (values: any) => {
     const payload = {
       uaRegisterRequest: {
         email: values.email,
@@ -75,12 +83,16 @@ const UsersToolbar: React.FC<{
     userService
       .register(payload)
       .then(() => {
-        message.success("Trainer is added");
+        message.success("User is added");
         setIsModalVisible(false);
         window.location.reload();
       })
       .catch((err) => {
-        console.error("Error adding trainer:", err);
+        if (err.response?.data.errorCode === 102) {
+          message.error("User with this email already exists");
+          console.error("Error adding user:", err);
+          return;
+        }
         handleError(err);
       });
   };
@@ -102,7 +114,7 @@ const UsersToolbar: React.FC<{
       <AddUserModal
         visible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
-        onSubmit={handleAddTrainer}
+        onSubmit={handleAddUser}
       />
     </ToolbarContainer>
   );

@@ -4,7 +4,8 @@ import { Row, Col, Spin, Button } from "antd";
 import UserCard from "./user-list-card";
 import { usePagination } from "hooks";
 import { userService } from "services";
-import { Link } from "react-router-dom";
+import { ListItem } from "components";
+import { mapToItemData } from "utils/utils";
 
 const LoadMoreContainer = styled.div`
   text-align: center;
@@ -48,7 +49,14 @@ const UserList: React.FC<TrainerListProps> = ({
       <Row gutter={[16, 16]}>
         {users.map((user: any, index: number) => (
           <Col xs={24} sm={12} md={8} lg={6} key={index}>
-            <UserCard user={user} />
+            <ListItem
+              data={mapToItemData({
+                ...user,
+                detailUrl: "/users",
+                passive: true, // TODO: Change this to real data
+              })}
+              type="user"
+            />
           </Col>
         ))}
       </Row>
@@ -60,8 +68,6 @@ const UserList: React.FC<TrainerListProps> = ({
           <Button onClick={loadMore}>Load More</Button>
         </LoadMoreContainer>
       )}
-
-      {!hasMore && !loading && <></>}
     </>
   );
 };

@@ -104,6 +104,7 @@ const AppLayout: React.FC = () => {
     "/users": "users",
     "/packages": "packages",
     "/reports": "reports",
+    "/role-management": "roleManagement",
   };
 
   const pageTitle = t[pathToTranslationKey[basePath] || "dashboard"];

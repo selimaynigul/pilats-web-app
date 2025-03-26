@@ -28,6 +28,10 @@ const CountContainer = styled.div`
   border-radius: 50px;
   display: flex;
   align-items: center;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const ActionContainer = styled.div`
@@ -39,6 +43,10 @@ const ActionContainer = styled.div`
   border-radius: 50px;
   align-items: center;
   padding: 10px;
+
+  @media (max-width: 768px) {
+    margin-left: auto;
+  }
 `;
 
 const CountNumber = styled.span`
@@ -83,10 +91,16 @@ const TrainersToolbar: React.FC<{
         window.location.reload();
       })
       .catch((err) => {
-        console.error("Error adding trainer:", err);
+        if (err.response?.data.errorCode === 102) {
+          message.error("Trainer with this email already exists");
+          console.error("Error adding trainer:", err);
+          return;
+        }
         handleError(err);
+      })
+      .finally(() => {
+        setLoading(false);
       });
-    setLoading(false);
   };
 
   return (

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Popover, Avatar, Tooltip, Button, message, Modal } from "antd";
 import {
   AntDesignOutlined,
@@ -40,9 +40,18 @@ const CustomEvent: React.FC<{
   dayEvents: any[];
   fetch: () => any;
   highlightedEventId?: any;
-}> = ({ event, dayEvents, fetch, highlightedEventId }) => {
+  showTime?: boolean;
+  ismobile?: boolean;
+}> = ({ event, dayEvents, fetch, highlightedEventId, showTime }) => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [popoverVisible, setPopoverVisible] = useState(false);
+
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 1024);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleDelete = () => {
     sessionService
@@ -79,8 +88,17 @@ const CustomEvent: React.FC<{
             }
             more={more}
           >
-            <strong style={{ display: "block" }}>{(event as any)?.name}</strong>
-            {moreEventsCount === 0 && (
+            <strong
+              style={{
+                display: "block",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {(event as any)?.name}
+            </strong>
+            {((moreEventsCount === 0 && !isMobile) || showTime) && (
               <small>
                 {dayjs(event.start).format("HH:mm")} -{" "}
                 {dayjs(event.end).format("HH:mm")}
