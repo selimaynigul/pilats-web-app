@@ -13,11 +13,14 @@ import { CompanyDropdown } from "components";
 import { ToolbarProps, View } from "react-big-calendar";
 import { capitalize, hasRole } from "utils/permissionUtils";
 import styled from "styled-components";
+import { TbLayoutList } from "react-icons/tb";
+import { TbLayoutListFilled } from "react-icons/tb";
+
 import { useLanguage } from "hooks";
 import enUS from "antd/es/locale/en_US";
 import trTR from "antd/es/locale/tr_TR";
-import "dayjs/locale/tr"; // Import Turkish locale
-import "dayjs/locale/en"; // Import English locale
+import "dayjs/locale/tr";
+import "dayjs/locale/en";
 
 // Styled components
 const StyledDatePicker = styled(DatePicker)`
@@ -166,15 +169,41 @@ const Toolbar: React.FC<
               )}
             </div>
             <NavButtons>
-              {viewArray.map((v: any) => (
-                <ToggleViewButton
-                  key={v}
-                  onClick={() => onView(v)}
-                  style={{ fontWeight: view === v ? "bold" : "normal" }}
-                >
-                  {t["calendar"][v] || capitalize(v)}
-                </ToggleViewButton>
-              ))}
+              {viewArray.map((v: any) => {
+                const isAgenda = v === "agenda";
+                const isActive = view === v;
+
+                return (
+                  <ToggleViewButton
+                    key={v}
+                    onClick={() => onView(v)}
+                    style={{
+                      fontWeight: isActive ? "bold" : "normal",
+                      borderRadius: isAgenda ? "50%" : undefined, // Yuvarlak buton sadece agenda ise
+                      width: isAgenda ? 36 : undefined,
+                      height: isAgenda ? 36 : undefined,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: isAgenda ? 0 : undefined,
+                    }}
+                    title={
+                      isAgenda ? t["calendar"]?.agenda || "Agenda" : undefined
+                    }
+                  >
+                    {isAgenda ? (
+                      isActive ? (
+                        <TbLayoutListFilled size={18} />
+                      ) : (
+                        <TbLayoutList size={18} />
+                      )
+                    ) : (
+                      t["calendar"]?.[v] || capitalize(v)
+                    )}
+                  </ToggleViewButton>
+                );
+              })}
+
               {hasRole(["BRANCH_ADMIN"]) && (
                 <AddButton onClick={() => handleModalToggle(true)} />
               )}

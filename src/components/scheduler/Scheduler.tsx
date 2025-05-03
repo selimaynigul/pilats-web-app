@@ -22,7 +22,9 @@ import { useNavigate } from "react-router-dom";
 import { useLanguage } from "hooks";
 import "moment/locale/tr";
 import "moment/locale/en-gb";
+import { View } from "react-big-calendar";
 
+const validViews: View[] = ["month", "week", "day", "agenda"];
 const DragAndDropCalendar = withDragAndDrop(Calendar);
 const localizer = momentLocalizer(moment);
 
@@ -36,12 +38,17 @@ type EventDropArgs = {
 const Scheduler: React.FC = () => {
   const { date: urlDate } = useParams<{ date?: string }>();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const nameInputRef = useRef<any>(null);
   const sessionId = searchParams.get("session");
+  const paramView = searchParams.get("v");
+  const initialView: View = validViews.includes(paramView as View)
+    ? (paramView as View)
+    : "month";
   const [highlightedEventId, setHighlightedEventId] = useState<string | null>(
     sessionId
   );
+  const [currentView, setCurrentView] = useState(initialView);
   const [loading, setLoading] = useState(false);
   const [sessions, setSessions] = useState<any[]>([]);
   const { t, userLanguage } = useLanguage();
@@ -157,7 +164,12 @@ const Scheduler: React.FC = () => {
     setDate(middleDate);
 
     localStorage.setItem("savedCalendarDate", middleDate.toISOString());
-    navigate(`/sessions/${dayjs(middleDate).format("YYYY-MM")}`);
+
+    const newParams = new URLSearchParams(searchParams.toString());
+    navigate({
+      pathname: `/sessions/${dayjs(middleDate).format("YYYY-MM")}`,
+      search: `?${newParams.toString()}`,
+    });
   };
 
   const fetchSessions = (
@@ -308,6 +320,13 @@ const Scheduler: React.FC = () => {
     };
   };
 
+  const handleViewChange = (view: View) => {
+    setCurrentView(view);
+    const newParams = new URLSearchParams(searchParams.toString());
+    newParams.set("v", view);
+    setSearchParams(newParams);
+  };
+
   const getDaySessions = (date: Date | string) => {
     const validDate = typeof date === "string" ? new Date(date) : date;
 
@@ -382,6 +401,8 @@ const Scheduler: React.FC = () => {
       <DragAndDropCalendar
         defaultDate={date}
         date={date}
+        view={currentView}
+        onView={handleViewChange}
         draggableAccessor={() => hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN"])}
         events={sessions}
         localizer={localizer}
@@ -399,6 +420,7 @@ const Scheduler: React.FC = () => {
               setCompany={setCompany}
               company={company}
               setIsModalVisible={setIsModalVisible}
+              onView={handleViewChange}
             />
           ),
           event: ({ event }) => {
