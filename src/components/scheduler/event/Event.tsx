@@ -1,19 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Popover, Avatar, Tooltip, Button, message, Modal } from "antd";
-import {
-  AntDesignOutlined,
-  ArrowRightOutlined,
-  CalendarOutlined,
-  ClockCircleOutlined,
-  DeleteOutlined,
-  EditFilled,
-  UserOutlined,
-} from "@ant-design/icons";
+import { message } from "antd";
 import styled from "styled-components";
 import dayjs from "dayjs";
 import { sessionService } from "services";
-import { Link } from "react-router-dom";
-import { hasRole } from "utils/permissionUtils";
 import EditSessionForm from "../edit-session-form/edit-session-form";
 import { StyledModal } from "../SchedulerStyles";
 import EventPopover from "./EventPopover";
@@ -29,6 +18,8 @@ const Container = styled.div<{ more?: boolean }>`
   position: relative;
   box-sizing: border-box;
   transition: 0.1s;
+  width: 100%;
+  height: 100%;
 
   &:hover {
     background: #4d3abd;
@@ -73,7 +64,7 @@ const CustomEvent: React.FC<{
   const more = dayEvents.length > 1;
   const moreEventsCount = dayEvents.length - 1;
   return (
-    <div style={{ position: "relative" }}>
+    <div style={{ position: "relative", width: "100%", height: "100%" }}>
       <EventPopover
         event={event}
         handleEditClick={handleEditClick}
@@ -81,31 +72,27 @@ const CustomEvent: React.FC<{
         visible={popoverVisible}
         setVisible={setPopoverVisible}
       >
-        <div>
-          <Container
-            className={
-              event.id == highlightedEventId ? "highlighted-event" : ""
-            }
-            more={more}
+        <Container
+          className={event.id == highlightedEventId ? "highlighted-event" : ""}
+          more={more}
+        >
+          <strong
+            style={{
+              display: "block",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
           >
-            <strong
-              style={{
-                display: "block",
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
-            >
-              {(event as any)?.name}
-            </strong>
-            {((moreEventsCount === 0 && !isMobile) || showTime) && (
-              <small>
-                {dayjs(event.start).format("HH:mm")} -{" "}
-                {dayjs(event.end).format("HH:mm")}
-              </small>
-            )}
-          </Container>
-        </div>
+            {(event as any)?.name}
+          </strong>
+          {((moreEventsCount === 0 && !isMobile) || showTime) && (
+            <small>
+              {dayjs(event.start).format("HH:mm")} -{" "}
+              {dayjs(event.end).format("HH:mm")}
+            </small>
+          )}
+        </Container>
       </EventPopover>
 
       {/* Edit Session Modal */}

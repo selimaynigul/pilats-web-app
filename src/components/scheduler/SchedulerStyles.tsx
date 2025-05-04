@@ -78,6 +78,33 @@ export const CalendarWrapper = styled.div`
     overflow: hidden; /* Hides the overflowing text */
     text-overflow: ellipsis;
   }
+
+  /* .rbc-event {
+  }
+ */
+
+  .rbc-event-label {
+    display: none;
+  }
+`;
+
+const test = styled.div`
+  .rbc-time-content > * + * > * {
+    border: none;
+  }
+
+  .rbc-time-content > .rbc-time-gutter {
+    background: white; /* sol zaman kolonunu ayrı tut */
+  }
+
+  /* 1. gün, 3. gün, 5. gün... */
+  .rbc-time-content .rbc-day-slot:nth-child(2n + 1) {
+    background-color: #e6e3ff; /* açık mor tonu */
+  }
+
+  /* 2. gün, 4. gün... */
+  .rbc-time-content .rbc-day-slot:nth-child(2n) {
+  }
 `;
 
 export const EventTitle = styled.h3`

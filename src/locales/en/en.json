@@ -37,6 +37,7 @@
     "month": "Month",
     "week": "Week",
     "day": "Day",
-    "agenda": "Agenda"
+    "agenda": "Agenda",
+    "listView": "List View"
   }
 }

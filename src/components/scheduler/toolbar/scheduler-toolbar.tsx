@@ -6,21 +6,32 @@ import {
   ToggleViewButton,
 } from "./ToolbarStyles";
 import { RightOutlined, LeftOutlined } from "@ant-design/icons";
-import { Form, ConfigProvider, DatePicker } from "antd";
+import { Form, ConfigProvider, DatePicker, Tooltip } from "antd";
 import dayjs from "dayjs";
+import isoWeek from "dayjs/plugin/isoWeek";
+import weekOfYear from "dayjs/plugin/weekOfYear";
+import advancedFormat from "dayjs/plugin/advancedFormat";
 import AddButton from "components/AddButton";
 import { CompanyDropdown } from "components";
 import { ToolbarProps, View } from "react-big-calendar";
-import { capitalize, hasRole } from "utils/permissionUtils";
+import { hasRole } from "utils/permissionUtils";
 import styled from "styled-components";
 import { TbLayoutList } from "react-icons/tb";
-import { TbLayoutListFilled } from "react-icons/tb";
 
 import { useLanguage } from "hooks";
 import enUS from "antd/es/locale/en_US";
 import trTR from "antd/es/locale/tr_TR";
 import "dayjs/locale/tr";
 import "dayjs/locale/en";
+import {
+  MdOutlineCalendarViewMonth,
+  MdOutlineCalendarViewWeek,
+  MdOutlineViewDay,
+} from "react-icons/md";
+import { Dropdown, MenuProps } from "antd";
+dayjs.extend(isoWeek);
+dayjs.extend(weekOfYear);
+dayjs.extend(advancedFormat);
 
 // Styled components
 const StyledDatePicker = styled(DatePicker)`
@@ -93,18 +104,70 @@ const Toolbar: React.FC<
       if (!visible) form.resetFields();
     };
 
-    const viewArray = Array.isArray(views)
-      ? views
-      : (Object.keys(views).filter(
-          (key) => views[key as keyof typeof views]
-        ) as View[]);
+    const viewOptions: { key: View; icon: React.ReactNode; label: string }[] = [
+      {
+        key: "month",
+        icon: <MdOutlineCalendarViewMonth />,
+        label: t["calendar"]?.month || "Month",
+      },
+      {
+        key: "week",
+        icon: <MdOutlineCalendarViewWeek />,
+        label: t["calendar"]?.week || "Week",
+      },
+      {
+        key: "day",
+        icon: <MdOutlineViewDay />,
+        label: t["calendar"]?.day || "Day",
+      },
+      {
+        key: "agenda",
+        icon: <TbLayoutList />,
+        label: t["calendar"]?.agenda || "Agenda",
+      },
+    ];
 
-    const handleDateChange = (date: unknown, dateString: string | string[]) => {
+    const items: MenuProps["items"] = viewOptions.map((item) => ({
+      key: item.key,
+      label: (
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {item.icon}
+          <span>{item.label}</span>
+        </div>
+      ),
+      onClick: () => onView(item.key),
+    }));
+
+    const getPickerType = () => {
+      if (view === "day") return "date";
+      if (view === "week") return "date"; // still 'date', ama gösterim mantığı haftaya göre
+      return "month";
+    };
+
+    const handleDateChange = (date: unknown) => {
       if (dayjs.isDayjs(date)) {
-        onNavigate("DATE", date.toDate());
+        if (view === "week") {
+          const startOfWeek = date.startOf("week"); // haftanın ilk günü
+          onNavigate("DATE", startOfWeek.toDate());
+        } else if (view === "day") {
+          onNavigate("DATE", date.toDate());
+        } else {
+          const startOfMonth = date.startOf("month");
+          onNavigate("DATE", startOfMonth.toDate());
+        }
       } else {
         console.warn("Invalid date format received", date);
       }
+    };
+
+    const getDateFormat = (date: dayjs.Dayjs) => {
+      if (view === "week") {
+        const start = date.startOf("week"); // Pazartesi
+        const end = date.endOf("week"); // Pazar
+        return `${start.format("DD MMM")} - ${end.format("DD MMM YYYY")}`;
+      }
+      if (view === "day") return date.format("DD MMMM YYYY");
+      return date.format("MMMM YYYY");
     };
 
     return (
@@ -114,11 +177,11 @@ const Toolbar: React.FC<
             <div>
               <ConfigProvider locale={currentLocale}>
                 <StyledDatePicker
-                  picker="month"
+                  picker={getPickerType()}
                   value={dayjs(date)}
                   onChange={handleDateChange}
                   suffixIcon={null}
-                  format="MMMM YYYY"
+                  format={getDateFormat}
                   style={{ width: "100%" }}
                 />
               </ConfigProvider>
@@ -150,11 +213,11 @@ const Toolbar: React.FC<
               </ActionButton>
               <ConfigProvider locale={currentLocale}>
                 <StyledDatePicker
-                  picker="month"
+                  picker={getPickerType()}
                   value={dayjs(date)}
                   onChange={handleDateChange}
                   suffixIcon={null}
-                  format="MMMM YYYY"
+                  format={getDateFormat}
                   style={{ width: "100%" }}
                 />
               </ConfigProvider>
@@ -169,41 +232,14 @@ const Toolbar: React.FC<
               )}
             </div>
             <NavButtons>
-              {viewArray.map((v: any) => {
-                const isAgenda = v === "agenda";
-                const isActive = view === v;
-
-                return (
-                  <ToggleViewButton
-                    key={v}
-                    onClick={() => onView(v)}
-                    style={{
-                      fontWeight: isActive ? "bold" : "normal",
-                      borderRadius: isAgenda ? "50%" : undefined, // Yuvarlak buton sadece agenda ise
-                      width: isAgenda ? 36 : undefined,
-                      height: isAgenda ? 36 : undefined,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      padding: isAgenda ? 0 : undefined,
-                    }}
-                    title={
-                      isAgenda ? t["calendar"]?.agenda || "Agenda" : undefined
-                    }
-                  >
-                    {isAgenda ? (
-                      isActive ? (
-                        <TbLayoutListFilled size={18} />
-                      ) : (
-                        <TbLayoutList size={18} />
-                      )
-                    ) : (
-                      t["calendar"]?.[v] || capitalize(v)
-                    )}
-                  </ToggleViewButton>
-                );
-              })}
-
+              <Dropdown menu={{ items }} trigger={["click"]}>
+                <ToggleViewButton
+                  style={{ display: "flex", alignItems: "center", gap: 8 }}
+                >
+                  {viewOptions.find((v) => v.key === view)?.icon}
+                  {viewOptions.find((v) => v.key === view)?.label}
+                </ToggleViewButton>
+              </Dropdown>
               {hasRole(["BRANCH_ADMIN"]) && (
                 <AddButton onClick={() => handleModalToggle(true)} />
               )}

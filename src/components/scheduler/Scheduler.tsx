@@ -311,6 +311,17 @@ const Scheduler: React.FC = () => {
       };
     }
 
+    if (currentView === "week" || currentView === "day") {
+      return {
+        style: {
+          background: "transparent",
+          border: "none",
+          color: "#fff",
+          borderRadius: "15px",
+        },
+      };
+    }
+
     return {
       style: {
         backgroundColor: "transparent",
@@ -343,7 +354,7 @@ const Scheduler: React.FC = () => {
     const moreEventsCount = dayEvents.length - 1;
 
     return (
-      <div>
+      <>
         <CustomEvent
           event={firstEvent}
           dayEvents={dayEvents}
@@ -387,7 +398,7 @@ const Scheduler: React.FC = () => {
             <MoreButton>+{moreEventsCount} more</MoreButton>
           </Popover>
         )}
-      </div>
+      </>
     );
   };
 
