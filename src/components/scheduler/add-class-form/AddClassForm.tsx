@@ -94,6 +94,7 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
   const [trainers, setTrainers] = useState<any>([]);
   const [branchOptions, setBranchOptions] = useState<any[]>([]);
   const [selectedBranch, setSelectedBranch] = useState<any>(null);
+  const [selectedDate, setSelectedDate] = useState<dayjs.Dayjs | null>(null);
 
   useEffect(() => {
     const isSingleDay = selectedRange
@@ -138,9 +139,48 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
     setSelectedBranch(branchId);
     form.setFieldsValue({ trainer: null });
   };
-
   const handleFinish = (values: any) => {
     values = { ...values, repeatFrequency };
+
+    const now = dayjs();
+    const selectedDate = values.startDate;
+    const [startTime, endTime] = values.timeRange || [null, null];
+
+    const startDateTime = selectedDate
+      .hour(dayjs(startTime).hour())
+      .minute(dayjs(startTime).minute());
+
+    const endDateTime = selectedDate
+      .hour(dayjs(endTime).hour())
+      .minute(dayjs(endTime).minute());
+
+    if (startDateTime.isBefore(now)) {
+      message.warning("Geçmiş bir zaman için ders oluşturulamaz.");
+      return;
+    }
+
+    if (startDateTime.isSameOrAfter(endDateTime)) {
+      message.warning("Dersin başlangıç saati bitiş saatinden önce olmalı.");
+      return;
+    }
+
+    if (values.repeat) {
+      const endDate = values.endDate;
+      if (!endDate || !selectedDate) {
+        message.warning(
+          "Tekrarlayan dersler için geçerli bir bitiş tarihi girin."
+        );
+        return;
+      }
+
+      const diff = dayjs(endDate).diff(selectedDate, "day");
+
+      if (diff < 1) {
+        message.warning("End date, start date'ten en az 1 gün sonra olmalı.");
+        return;
+      }
+    }
+
     onSubmit(values);
     form.resetFields();
     setRepeat(false);
@@ -258,6 +298,10 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
               style={{ width: "100%" }}
               suffixIcon={null}
               format={dateFormat}
+              disabledDate={(current) =>
+                current && current < dayjs().startOf("day")
+              }
+              onChange={(date) => setSelectedDate(date)}
             />
           </Form.Item>
         </div>
@@ -278,6 +322,31 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
               minuteStep={5}
               style={{ width: "100%" }}
               suffixIcon={null}
+              disabledTime={() => {
+                if (!selectedDate) return {};
+
+                const isToday = selectedDate.isSame(dayjs(), "day");
+
+                if (isToday) {
+                  const currentHour = dayjs().hour();
+                  const currentMinute = dayjs().minute();
+
+                  return {
+                    disabledHours: () =>
+                      Array.from({ length: 24 }, (_, i) => i).filter(
+                        (hour) => hour < currentHour
+                      ),
+                    disabledMinutes: (hour) =>
+                      hour === currentHour
+                        ? Array.from({ length: 60 }, (_, i) => i).filter(
+                            (min) => min < currentMinute
+                          )
+                        : [],
+                  };
+                }
+
+                return {};
+              }}
             />
           </Form.Item>
         </div>
@@ -425,6 +494,9 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
                   suffixIcon={null}
                   placeholder="Select end date"
                   format={dateFormat} // Use custom format function
+                  disabledDate={(current) =>
+                    current && current < dayjs().startOf("day")
+                  }
                 />
               </Form.Item>
             </div>

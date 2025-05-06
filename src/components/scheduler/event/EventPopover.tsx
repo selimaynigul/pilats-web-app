@@ -14,6 +14,8 @@ import dayjs from "dayjs";
 import { Link } from "react-router-dom";
 import { hasRole } from "utils/permissionUtils";
 import { useLanguage } from "hooks";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+dayjs.extend(isSameOrAfter);
 
 const TrainerInfo = styled.div`
   border: 1px solid white;
@@ -150,9 +152,14 @@ const EventPopover: React.FC<EventPopoverProps> = ({
         <strong>{event.name}</strong>
         {hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN"]) && (
           <ActionButtons>
-            <EditButton type="primary" onClick={handleEditClick}>
-              <EditFilled />
-            </EditButton>
+            {/* Edit sadece bugünkü ve sonraki etkinliklerde gösterilsin */}
+            {dayjs(event.start).isSameOrAfter(dayjs(), "day") && (
+              <EditButton type="primary" onClick={handleEditClick}>
+                <EditFilled />
+              </EditButton>
+            )}
+
+            {/* Delete her zaman gösterilsin */}
             <DeleteButton onClick={handleDelete} type="primary">
               <DeleteOutlined />
             </DeleteButton>

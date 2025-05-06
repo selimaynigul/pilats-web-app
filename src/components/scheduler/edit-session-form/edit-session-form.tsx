@@ -19,6 +19,8 @@ import {
 import dayjs from "dayjs";
 import { sessionService, trainerService } from "services";
 import { getBranchId } from "utils/permissionUtils";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+dayjs.extend(isSameOrAfter);
 
 const StyleOverrides = styled.div`
   .custom-input {
@@ -73,6 +75,9 @@ const EditSessionForm: React.FC<EditSessionFormProps> = ({
   const [form] = Form.useForm();
   const [trainers, setTrainers] = useState<any[]>([]);
   const [trainerExpanded, setTrainerExpanded] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<dayjs.Dayjs>(
+    dayjs(session.startDate)
+  );
 
   useEffect(() => {
     if (trainerExpanded) {
@@ -96,19 +101,50 @@ const EditSessionForm: React.FC<EditSessionFormProps> = ({
   const handleSubmit = (values: any) => {
     const [startTime, endTime] = values.timeRange || [null, null];
 
+    const newDate = dayjs(values.date);
+    const originalDate = dayjs(session.startDate);
+    const now = dayjs();
+
+    const startDateTime = newDate
+      .hour(dayjs(startTime).hour())
+      .minute(dayjs(startTime).minute());
+
+    const endDateTime = newDate
+      .hour(dayjs(endTime).hour())
+      .minute(dayjs(endTime).minute());
+
+    // 1. Başlangıç zamanı geçmişte mi?
+    if (startDateTime.isBefore(now)) {
+      message.warning("Ders zamanı geçmişte olamaz.");
+      return;
+    }
+
+    // 2. Başlangıç saati bitişten sonra mı?
+    if (startDateTime.isSameOrAfter(endDateTime)) {
+      message.warning("Başlangıç saati, bitiş saatinden önce olmalı.");
+      return;
+    }
+
+    // 3. Tarih ileri bir günden bugüne taşınıyorsa ve saat şu anın öncesindeyse
+    const wasFuture = originalDate.isAfter(now, "day");
+    const isTodayNow = newDate.isSame(now, "day");
+
+    if (wasFuture && isTodayNow && startDateTime.isBefore(now)) {
+      message.warning(
+        "Dersi bugüne taşıdığınız için, başlangıç saatinin şu anki saatten sonra olması gerekir."
+      );
+      return;
+    }
+
     const payload = {
       id: session.id,
       name: values.name,
       description: values.description,
-      startDate: dayjs(values.date)
-        .hour(dayjs(startTime).hour())
-        .minute(dayjs(startTime).minute())
+      startDate: startDateTime
         .second(0)
         .millisecond(0)
-        .format("YYYY-MM-DDTHH:mm:ss"), // Explicitly format as ISO 8601
-      endDate: dayjs(values.date)
-        .hour(dayjs(endTime).hour())
-        .minute(dayjs(endTime).minute())
+        .format("YYYY-MM-DDTHH:mm:ss"),
+      endDate: endDateTime
         .second(0)
         .millisecond(0)
         .format("YYYY-MM-DDTHH:mm:ss"),
@@ -127,6 +163,7 @@ const EditSessionForm: React.FC<EditSessionFormProps> = ({
         console.error("Update error:", error);
       });
   };
+
   const dateFormat = (value: dayjs.Dayjs) => value.format("MMMM D, YYYY"); // Custom format
 
   return (
@@ -185,6 +222,10 @@ const EditSessionForm: React.FC<EditSessionFormProps> = ({
               style={{ width: "100%" }}
               suffixIcon={null}
               format={dateFormat}
+              disabledDate={(current) =>
+                current && current < dayjs().startOf("day")
+              }
+              onChange={(value) => setSelectedDate(value!)}
             />
           </Form.Item>
         </div>
@@ -211,6 +252,31 @@ const EditSessionForm: React.FC<EditSessionFormProps> = ({
               format="HH:mm"
               style={{ width: "100%" }}
               suffixIcon={null}
+              disabledTime={() => {
+                if (!selectedDate) return {};
+
+                const isToday = selectedDate.isSame(dayjs(), "day");
+
+                if (isToday) {
+                  const currentHour = dayjs().hour();
+                  const currentMinute = dayjs().minute();
+
+                  return {
+                    disabledHours: () =>
+                      Array.from({ length: 24 }, (_, i) => i).filter(
+                        (hour) => hour < currentHour
+                      ),
+                    disabledMinutes: (selectedHour: number) =>
+                      selectedHour === currentHour
+                        ? Array.from({ length: 60 }, (_, i) => i).filter(
+                            (min) => min < currentMinute
+                          )
+                        : [],
+                  };
+                }
+
+                return {};
+              }}
             />
           </Form.Item>
         </div>

@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { Row, Col } from "antd";
 import { CalendarOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import { Body } from "components";
+import MeasurementsContainer from "./measurement-info/measurement-info-container";
 
 const Container = styled.div`
   border-radius: 20px;
@@ -41,7 +42,9 @@ const Header = styled.div`
   }
 `;
 
-const Content = styled.div``;
+const Content = styled.div`
+  height: calc(100% - 45px);
+`;
 
 const CardContainer = styled.div`
   position: relative;
@@ -345,7 +348,7 @@ const UserData: React.FC<{ user: any }> = ({ user }) => {
             </Row>
           </Sessions>
         );
-      case "measurements":
+      case "measurements_1":
         return (
           <BodyMeasurements>
             <div>
@@ -451,6 +454,8 @@ const UserData: React.FC<{ user: any }> = ({ user }) => {
             </div>
           </BodyMeasurements>
         );
+      case "measurements":
+        return <MeasurementsContainer />;
       default:
         return null;
     }

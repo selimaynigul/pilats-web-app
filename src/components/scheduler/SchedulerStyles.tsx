@@ -9,16 +9,36 @@ export const CalendarWrapper = styled.div`
   flex-direction: column;
   height: 100%;
 
+  .rbc-current-time-indicator {
+    background: #5d46e5;
+    height: 2px;
+  }
+
+  .rbc-current-time-indicator::before {
+    content: "";
+    position: absolute;
+    left: -5px; /* Çizginin biraz soluna yerleştir */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 10px;
+    height: 10px;
+    background-color: #5d46e5;
+    border-radius: 50%;
+  }
+
   .rbc-month-view {
     border: none;
   }
   .rbc-header {
     border: none;
-    margin-bottom: 10px;
 
     span {
       color: #4d3abd;
     }
+  }
+
+  .rbc-month-header {
+    margin-bottom: 10px;
   }
 
   .rbc-toolbar button {
@@ -79,9 +99,9 @@ export const CalendarWrapper = styled.div`
     text-overflow: ellipsis;
   }
 
-  /* .rbc-event {
+  .rbc-event {
+    padding: 0px 2px 2px 2px;
   }
- */
 
   .rbc-event-label {
     display: none;

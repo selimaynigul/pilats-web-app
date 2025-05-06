@@ -100,6 +100,7 @@ const Scheduler: React.FC = () => {
 
   const messages = useMemo(
     () => ({
+      showMore: (count: any) => "+" + count + "more",
       today: t.today || "Today",
       month: t.month || "Month",
       week: t.week || "Week",
@@ -206,6 +207,16 @@ const Scheduler: React.FC = () => {
 
   const selectSlot = (slotInfo: { start: Date; end: Date }) => {
     if (loading) return;
+
+    const now = new Date();
+    const selectedStart = new Date(slotInfo.start);
+
+    // Tarih kontrolü: Bugünün öncesi ise engelle
+    if (selectedStart < new Date(now.setHours(0, 0, 0, 0))) {
+      message.warning("Geçmiş tarihler seçilemez.");
+      return;
+    }
+
     if (hasRole(["BRANCH_ADMIN"])) {
       setSelectedRange(slotInfo);
       setIsModalVisible(true);
@@ -263,6 +274,30 @@ const Scheduler: React.FC = () => {
   };
 
   const moveSession = ({ event, start, end }: EventDropArgs) => {
+    const now = dayjs();
+    const originalStart = dayjs(event.start);
+    const newStart = dayjs(start);
+
+    // 1. Geçmiş bir dersi taşıma
+    if (originalStart.isBefore(now, "day")) {
+      message.warning("Geçmişteki bir dersi taşıyamazsınız.");
+      return;
+    }
+
+    // 2. Dersi geçmiş bir tarihe taşıma
+    if (newStart.isBefore(now, "day")) {
+      message.warning("Bir dersi geçmiş bir tarihe taşıyamazsınız.");
+      return;
+    }
+
+    // 3. Dersi bugüne taşıyorsak ve başlangıç saati şu anki saatten önceyse uyarı ver
+    if (newStart.isSame(now, "day") && newStart.isBefore(now)) {
+      message.warning(
+        "Bu dersin başlangıç saati şu anki saatten önce. Lütfen saat bilgisini güncelleyin."
+      );
+      return;
+    }
+
     const updatedSession = {
       ...event,
       startDate: dayjs(start).format("YYYY-MM-DDTHH:mm:ss"),
@@ -349,59 +384,6 @@ const Scheduler: React.FC = () => {
     );
   };
 
-  const renderSessions = (dayEvents: any[]) => {
-    const firstEvent = dayEvents[0];
-    const moreEventsCount = dayEvents.length - 1;
-
-    return (
-      <>
-        <CustomEvent
-          event={firstEvent}
-          dayEvents={dayEvents}
-          fetch={() => {
-            if (visibleRange) {
-              return fetchSessions(visibleRange.start, visibleRange.end, true);
-            }
-          }}
-          highlightedEventId={highlightedEventId}
-        />
-
-        {moreEventsCount > 0 && (
-          <Popover
-            trigger="click"
-            content={
-              <div>
-                {dayEvents.slice(1).map((event, index) => (
-                  <div style={{ marginBottom: 5, width: 200 }}>
-                    <CustomEvent
-                      showTime={true}
-                      key={index}
-                      event={event}
-                      dayEvents={dayEvents}
-                      fetch={() => {
-                        if (visibleRange) {
-                          return fetchSessions(
-                            visibleRange.start,
-                            visibleRange.end,
-                            true
-                          );
-                        }
-                      }}
-                      highlightedEventId={highlightedEventId}
-                    />
-                  </div>
-                ))}
-              </div>
-            }
-            arrow={false}
-          >
-            <MoreButton>+{moreEventsCount} more</MoreButton>
-          </Popover>
-        )}
-      </>
-    );
-  };
-
   return (
     <CalendarWrapper>
       {loading && (
@@ -410,6 +392,7 @@ const Scheduler: React.FC = () => {
         </LoadingOverlay>
       )}
       <DragAndDropCalendar
+        popup
         defaultDate={date}
         date={date}
         view={currentView}
@@ -434,9 +417,27 @@ const Scheduler: React.FC = () => {
               onView={handleViewChange}
             />
           ),
-          event: ({ event }) => {
-            const dayEvents = getDaySessions((event as any).startDate);
-            return renderSessions(dayEvents);
+          event: ({ event }: { event: any }) => {
+            const dayEvents = getDaySessions(event.startDate);
+            const showTime = dayEvents.length <= 1;
+
+            return (
+              <CustomEvent
+                event={event}
+                dayEvents={dayEvents}
+                showTime={showTime}
+                fetch={() => {
+                  if (visibleRange) {
+                    return fetchSessions(
+                      visibleRange.start,
+                      visibleRange.end,
+                      true
+                    );
+                  }
+                }}
+                highlightedEventId={highlightedEventId}
+              />
+            );
           },
         }}
         eventPropGetter={eventPropGetter}

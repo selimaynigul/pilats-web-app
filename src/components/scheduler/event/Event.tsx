@@ -7,13 +7,12 @@ import EditSessionForm from "../edit-session-form/edit-session-form";
 import { StyledModal } from "../SchedulerStyles";
 import EventPopover from "./EventPopover";
 
-const Container = styled.div<{ more?: boolean }>`
+const Container = styled.div`
   background: #5d46e5;
   border-bottom: 5px solid #4d3abd;
   color: white;
-  padding: 10px;
-  border-radius: ${(props) => (props.more ? "0 15px 15px 15px" : "15px")};
-  border-radius: 15px;
+  padding: 2px 10px;
+  border-radius: 12px;
   cursor: pointer;
   position: relative;
   box-sizing: border-box;
@@ -61,8 +60,6 @@ const CustomEvent: React.FC<{
     setPopoverVisible(false);
   };
 
-  const more = dayEvents.length > 1;
-  const moreEventsCount = dayEvents.length - 1;
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
       <EventPopover
@@ -74,7 +71,6 @@ const CustomEvent: React.FC<{
       >
         <Container
           className={event.id == highlightedEventId ? "highlighted-event" : ""}
-          more={more}
         >
           <strong
             style={{
@@ -86,8 +82,15 @@ const CustomEvent: React.FC<{
           >
             {(event as any)?.name}
           </strong>
-          {((moreEventsCount === 0 && !isMobile) || showTime) && (
-            <small>
+          {!isMobile && showTime && (
+            <small
+              style={{
+                opacity: 0.8,
+                fontSize: 10,
+                display: "block",
+                marginTop: 2,
+              }}
+            >
               {dayjs(event.start).format("HH:mm")} -{" "}
               {dayjs(event.end).format("HH:mm")}
             </small>
