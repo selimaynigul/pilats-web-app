@@ -3,14 +3,15 @@ import styled from "styled-components";
 import { Avatar, Spin } from "antd";
 import { Link, useParams } from "react-router-dom";
 import { BsBuilding, BsEnvelopeFill } from "react-icons/bs";
-import { 
+import {
   PhoneFilled,
-   WhatsAppOutlined, 
-   UserOutlined, 
-   UploadOutlined,
-  } from "@ant-design/icons";
+  WhatsAppOutlined,
+  UserOutlined,
+  UploadOutlined,
+} from "@ant-design/icons";
 import { companyService, branchService, imageService } from "services";
 import { capitalize } from "utils/permissionUtils";
+import { Helmet } from "react-helmet";
 
 const Container = styled.div`
   background: white;
@@ -170,35 +171,42 @@ const CompanyInfo: React.FC<{ setBranches: any }> = ({ setBranches }) => {
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
-  
+
     const confirm = window.confirm("Do you want to upload this image?");
     if (!confirm) return;
-  
+
     const formData = new FormData();
     formData.append("name", file.name);
     formData.append("type", file.type);
     formData.append("data", file);
     formData.append("id", company.id);
-  
+
     await imageService.postCompanyImage(formData);
     window.location.reload();
   };
 
   return (
-    <Container>
-      <ProfileSection>
-      <AvatarContainer onClick={handleAvatarClick}>
+    <>
+      <Helmet>
+        <title>Pilats - {company.companyName}</title>
+      </Helmet>
+      <Container>
+        <ProfileSection>
+          <AvatarContainer onClick={handleAvatarClick}>
             <AvatarWrapper>
               <Avatar
                 size={150}
-                src = {"https://prod-grad.onrender.com/api/v1/images" + company.imageUrl}
+                src={
+                  "https://prod-grad.onrender.com/api/v1/images" +
+                  company.imageUrl
+                }
                 icon={<UserOutlined />}
               />
               <UploadOverlay>
                 <UploadOutlined className="upload-icon" />
               </UploadOverlay>
             </AvatarWrapper>
-            <input 
+            <input
               type="file"
               ref={fileInputRef}
               style={{ display: "none" }}
@@ -207,38 +215,39 @@ const CompanyInfo: React.FC<{ setBranches: any }> = ({ setBranches }) => {
             />
           </AvatarContainer>
           <Name>{capitalize(company.companyName)}</Name>
-        <Title>İstanbul</Title>
-      </ProfileSection>
+          <Title>İstanbul</Title>
+        </ProfileSection>
 
-      <InfoSection>
-        <InfoItem>
-          <span>Email:</span> {company.mail}
-        </InfoItem>
-        <InfoItem>
-          <span>Phone:</span> {company.telNo}
-        </InfoItem>
-        <InfoItem>
-          <span>Location:</span> {company?.location || "No address available"}
-        </InfoItem>
-      </InfoSection>
-      <ContactInfo>
-        <a href={`mailto:${company.mail}`} style={{ color: "#4a4a4a" }}>
-          <ContactButton>
-            <BsEnvelopeFill />
-          </ContactButton>
-        </a>
-        <a href={`tel:${company.telNo}`} style={{ color: "#4a4a4a" }}>
-          <ContactButton>
-            <PhoneFilled />
-          </ContactButton>
-        </a>
-        <a href={`tel:${company.telNo}`} style={{ color: "#4a4a4a" }}>
-          <ContactButton>
-            <WhatsAppOutlined />
-          </ContactButton>
-        </a>
-      </ContactInfo>
-    </Container>
+        <InfoSection>
+          <InfoItem>
+            <span>Email:</span> {company.mail}
+          </InfoItem>
+          <InfoItem>
+            <span>Phone:</span> {company.telNo}
+          </InfoItem>
+          <InfoItem>
+            <span>Location:</span> {company?.location || "No address available"}
+          </InfoItem>
+        </InfoSection>
+        <ContactInfo>
+          <a href={`mailto:${company.mail}`} style={{ color: "#4a4a4a" }}>
+            <ContactButton>
+              <BsEnvelopeFill />
+            </ContactButton>
+          </a>
+          <a href={`tel:${company.telNo}`} style={{ color: "#4a4a4a" }}>
+            <ContactButton>
+              <PhoneFilled />
+            </ContactButton>
+          </a>
+          <a href={`tel:${company.telNo}`} style={{ color: "#4a4a4a" }}>
+            <ContactButton>
+              <WhatsAppOutlined />
+            </ContactButton>
+          </a>
+        </ContactInfo>
+      </Container>
+    </>
   );
 };
 

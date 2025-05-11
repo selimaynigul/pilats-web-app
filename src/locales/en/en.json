@@ -40,5 +40,7 @@
     "agenda": "Agenda",
     "listView": "List View"
   },
-  "more": "more"
+  "more": "more",
+  "login": "Login",
+  "register": "Register"
 }

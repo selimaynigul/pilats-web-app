@@ -3,6 +3,7 @@ import { Card } from "components";
 import PackageList from "./package-list/package-list";
 import PackagesToolbar from "./packages-toolbar";
 import { useLanguage } from "hooks";
+import { Helmet } from "react-helmet";
 
 const PackagesPage: React.FC = () => {
   const { t } = useLanguage();
@@ -17,20 +18,25 @@ const PackagesPage: React.FC = () => {
   };
 
   return (
-    <Card
-      toolbar={
-        <PackagesToolbar
-          packageCount={packageCount}
-          selectedCompany={company}
-          setSelectedCompany={setCompany}
+    <>
+      <Helmet>
+        <title>Pilats - {t.packages}</title>
+      </Helmet>
+      <Card
+        toolbar={
+          <PackagesToolbar
+            packageCount={packageCount}
+            selectedCompany={company}
+            setSelectedCompany={setCompany}
+          />
+        }
+      >
+        <PackageList
+          onTrainerCountChange={updateTrainerCount}
+          company={company}
         />
-      }
-    >
-      <PackageList
-        onTrainerCountChange={updateTrainerCount}
-        company={company}
-      />
-    </Card>
+      </Card>
+    </>
   );
 };
 

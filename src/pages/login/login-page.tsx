@@ -8,6 +8,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { authService } from "services";
 import LoginForm from "./login-form";
 import RegisterForm from "pages/register/register-form";
+import { Helmet } from "react-helmet";
+import { useLanguage } from "hooks";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -137,6 +139,7 @@ const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const location = useLocation();
+  const { t } = useLanguage();
 
   const isLogin = location.pathname === "/login";
 
@@ -172,6 +175,9 @@ const LoginPage: React.FC = () => {
   };
   return (
     <Wrapper>
+      <Helmet>
+        <title>Pilats - {isLogin ? t.login : t.register}</title>
+      </Helmet>
       <Cover>
         <StyledCarousel autoplay autoplaySpeed={8000}>
           <TestSlide>

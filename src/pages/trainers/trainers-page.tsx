@@ -6,6 +6,7 @@ import { hasRole } from "utils/permissionUtils";
 import { useSearchParams } from "react-router-dom";
 import { branchService, companyService } from "services";
 import { useLanguage } from "hooks";
+import { Helmet } from "react-helmet";
 
 const TrainersPage: React.FC = () => {
   const [trainerCount, setTrainerCount] = useState(0);
@@ -80,20 +81,25 @@ const TrainersPage: React.FC = () => {
   };
 
   return (
-    <Card
-      toolbar={
-        <TrainersToolbar
-          trainerCount={trainerCount}
-          selectedCompany={company}
-          setSelectedCompany={setCompany}
+    <>
+      <Helmet>
+        <title>Pilats - {t.trainers}</title>
+      </Helmet>
+      <Card
+        toolbar={
+          <TrainersToolbar
+            trainerCount={trainerCount}
+            selectedCompany={company}
+            setSelectedCompany={setCompany}
+          />
+        }
+      >
+        <TrainerList
+          onTrainerCountChange={updateTrainerCount}
+          company={company}
         />
-      }
-    >
-      <TrainerList
-        onTrainerCountChange={updateTrainerCount}
-        company={company}
-      />
-    </Card>
+      </Card>
+    </>
   );
 };
 

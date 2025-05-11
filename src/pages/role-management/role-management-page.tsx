@@ -4,6 +4,7 @@ import RoleManagementToolbar from "./role-management-toolbar";
 import AdminList from "./admin-list/admin-list";
 import { hasRole } from "utils/permissionUtils";
 import { useLanguage } from "hooks";
+import { Helmet } from "react-helmet";
 
 const RoleManagementPage: React.FC = () => {
   const { t } = useLanguage();
@@ -28,24 +29,29 @@ const RoleManagementPage: React.FC = () => {
   };
 
   return (
-    <Card
-      toolbar={
-        <RoleManagementToolbar
-          trainerCount={trainerCount}
-          selectedCompany={company}
-          setSelectedCompany={setCompany}
+    <>
+      <Helmet>
+        <title>Pilats - {t.roleManagement}</title>
+      </Helmet>
+      <Card
+        toolbar={
+          <RoleManagementToolbar
+            trainerCount={trainerCount}
+            selectedCompany={company}
+            setSelectedCompany={setCompany}
+            isBranchMode={isBranchMode}
+            setIsBranchMode={setIsBranchMode}
+          />
+        }
+      >
+        <AdminList
           isBranchMode={isBranchMode}
-          setIsBranchMode={setIsBranchMode}
+          onAdminCountChange={updateTrainerCount}
+          company={company}
         />
-      }
-    >
-      <AdminList
-        isBranchMode={isBranchMode}
-        onAdminCountChange={updateTrainerCount}
-        company={company}
-      />
-      <div></div>
-    </Card>
+        <div></div>
+      </Card>
+    </>
   );
 };
 

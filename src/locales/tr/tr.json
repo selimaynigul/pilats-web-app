@@ -40,5 +40,7 @@
     "agenda": "Ajanda",
     "listView": "Liste Görünümü"
   },
-  "more": "daha"
+  "more": "daha",
+  "login": "Giriş Yap",
+  "register": "Kayıt Ol"
 }

@@ -5,11 +5,13 @@ import { ReloadOutlined } from "@ant-design/icons";
 import { Report, PaginatedResponse } from "types/types";
 import { ReportListView } from "./reports-table-view";
 import reportService from "services/report-service";
+import { useLanguage } from "hooks";
+import { Helmet } from "react-helmet";
 
 const ReportsPage: React.FC = () => {
   const [data, setData] = useState<Report[]>([]);
   const [loading, setLoading] = useState(false);
-  const [total, setTotal] = useState(0);
+  const { t } = useLanguage();
 
   const params = useMemo(
     () => ({
@@ -51,9 +53,14 @@ const ReportsPage: React.FC = () => {
   );
 
   return (
-    <Card toolbar={toolbar}>
-      <ReportListView data={data} loading={loading} />
-    </Card>
+    <>
+      <Helmet>
+        <title>Pilats - {t.reports}</title>
+      </Helmet>
+      <Card toolbar={toolbar}>
+        <ReportListView data={data} loading={loading} />
+      </Card>
+    </>
   );
 };
 
