@@ -5,7 +5,9 @@ import dayjs from "dayjs";
 import { sessionService } from "services";
 import EditSessionForm from "../edit-session-form/edit-session-form";
 import { StyledModal } from "../SchedulerStyles";
+import { useLocation, useNavigate } from "react-router-dom";
 import EventPopover from "./EventPopover";
+import EventDrawer from "./EventDrawer";
 
 const Container = styled.div`
   background: #5d46e5;
@@ -23,18 +25,46 @@ const Container = styled.div`
   &:hover {
     background: #4d3abd;
   }
+
+  @media (max-width: 1024px) {
+    padding: 1px 2px;
+    border-radius: 3px;
+    border: none;
+
+    strong {
+      font-size: 0.8rem;
+      font-weight: 200;
+    }
+  }
+
+  @media (min-width: 1025px) {
+    strong {
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
 `;
 
 const CustomEvent: React.FC<{
   event: any;
   dayEvents: any[];
   fetch: () => any;
-  highlightedEventId?: any;
   showTime?: boolean;
   ismobile?: boolean;
-}> = ({ event, dayEvents, fetch, highlightedEventId, showTime }) => {
+}> = ({ event, dayEvents, fetch, showTime }) => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [popoverVisible, setPopoverVisible] = useState(false);
+
+  const location = useLocation();
+  const navigate = useNavigate();
+  const searchParams = new URLSearchParams(location.search);
+  const sessionIdInQuery = searchParams.get("session");
+
+  const [isDrawerVisible, setIsDrawerVisible] = useState(
+    sessionIdInQuery === String(event.id)
+  );
 
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
   useEffect(() => {
@@ -60,6 +90,20 @@ const CustomEvent: React.FC<{
     setPopoverVisible(false);
   };
 
+  const openDrawer = () => {
+    const params = new URLSearchParams(location.search);
+    params.set("session", event.id);
+    navigate({ search: params.toString() }, { replace: true });
+    setIsDrawerVisible(true);
+  };
+
+  const closeDrawer = () => {
+    const params = new URLSearchParams(location.search);
+    params.delete("session");
+    navigate({ search: params.toString() }, { replace: true });
+    setIsDrawerVisible(false);
+  };
+
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
       <EventPopover
@@ -69,19 +113,8 @@ const CustomEvent: React.FC<{
         visible={popoverVisible}
         setVisible={setPopoverVisible}
       >
-        <Container
-          className={event.id == highlightedEventId ? "highlighted-event" : ""}
-        >
-          <strong
-            style={{
-              display: "block",
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {(event as any)?.name}
-          </strong>
+        <Container onDoubleClick={openDrawer}>
+          <strong>{(event as any)?.name}</strong>
           {!isMobile && showTime && (
             <small
               style={{
@@ -110,6 +143,14 @@ const CustomEvent: React.FC<{
           onUpdated={fetch}
         />
       </StyledModal>
+
+      <EventDrawer
+        open={isDrawerVisible}
+        onClose={closeDrawer}
+        event={event}
+        onEdit={handleEditClick}
+        onDelete={handleDelete}
+      />
     </div>
   );
 };

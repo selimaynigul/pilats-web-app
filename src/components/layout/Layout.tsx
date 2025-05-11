@@ -94,20 +94,8 @@ const AppLayout: React.FC = () => {
   };
 
   const pathSegments = location.pathname.split("/").filter(Boolean);
-  const basePath = `/${pathSegments[0] || ""}`;
-
-  const pathToTranslationKey: any = {
-    "/": "dashboard",
-    "/companies": "companies",
-    "/sessions": "sessions",
-    "/trainers": "trainers",
-    "/users": "users",
-    "/packages": "packages",
-    "/reports": "reports",
-    "/role-management": "roleManagement",
-  };
-
-  const pageTitle = t[pathToTranslationKey[basePath] || "dashboard"];
+  const basePath = `${pathSegments[0] || ""}`;
+  const pageTitle = t[basePath || "dashboard"];
 
   return (
     <Layout style={{ height: "100vh" }}>
@@ -166,7 +154,10 @@ const AppLayout: React.FC = () => {
             </ProfileContainer>
           )}
         </Heading>
-        <StyledContent isMobile={isMobile}>
+        <StyledContent
+          isSessionsPage={basePath === "sessions"}
+          isMobile={isMobile}
+        >
           <Outlet />
         </StyledContent>
       </Layout>

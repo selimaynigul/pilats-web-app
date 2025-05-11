@@ -102,7 +102,7 @@ const EditButton = styled(Button)`
   &:hover {
     background: transparent !important;
     color: grey !important;
-    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 12px;
+    box-shadow: rgba(149, 157, 165, 0.4) 0px 8px 12px;
   }
 `;
 
@@ -117,7 +117,7 @@ const DeleteButton = styled(Button)`
   &:hover {
     background: #f54263 !important;
     color: white !important;
-    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 12px;
+    box-shadow: rgba(255, 50, 94, 0.2) 0px 8px 12px;
   }
 `;
 

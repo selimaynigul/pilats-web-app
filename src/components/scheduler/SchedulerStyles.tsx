@@ -99,8 +99,17 @@ export const CalendarWrapper = styled.div`
     text-overflow: ellipsis;
   }
 
+  .rbc-show-more {
+    position: absolute;
+    top: 28px;
+  }
+
   .rbc-event {
     padding: 0px 2px 2px 2px;
+
+    @media (max-width: 1024px) {
+      padding: 0;
+    }
   }
 
   .rbc-event-label {

@@ -27,7 +27,7 @@ export const getCompanyId = () => {
 
 export const getCompanyName = () => {
   const user = getUser();
-  
+
   if (hasRole(["BRANCH_ADMIN"])) {
     return `${user?.companyName} - ${user?.branchName}`;
   } else if (hasRole(["COMPANY_ADMIN"])) {

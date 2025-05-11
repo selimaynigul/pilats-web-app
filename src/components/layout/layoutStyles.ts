@@ -14,17 +14,21 @@ export const theme = {
 
 const { Content } = Layout;
 
-export const StyledContent = styled(Content)<{ isMobile: boolean }>`
+export const StyledContent = styled(Content)<{
+  isSessionsPage: boolean;
+  isMobile: boolean;
+}>`
   background: ${({ theme }) => theme.contentBg};
-  padding: ${({ isMobile }) => (isMobile ? "10px" : "20px")};
+  padding: ${({ isMobile, isSessionsPage }) =>
+    isMobile ? (isSessionsPage ? "10px 0px 0px 0px" : "10px") : "20px"};
   border-radius: ${({ isMobile }) => (isMobile ? "0" : "30px")};
   margin: ${({ isMobile }) => (isMobile ? "0" : "16px 16px 16px 0")};
   display: flex;
   flex-direction: column;
   height: 100dvh;
 
-  overflow-y: scroll;
-
+  /*   overflow-y: scroll;
+ */
   &::-webkit-scrollbar-track {
     margin: 24px 0;
   }

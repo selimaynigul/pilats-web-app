@@ -45,9 +45,7 @@ const Scheduler: React.FC = () => {
   const initialView: View = validViews.includes(paramView as View)
     ? (paramView as View)
     : "month";
-  const [highlightedEventId, setHighlightedEventId] = useState<string | null>(
-    sessionId
-  );
+
   const [currentView, setCurrentView] = useState(initialView);
   const [loading, setLoading] = useState(false);
   const [sessions, setSessions] = useState<any[]>([]);
@@ -100,7 +98,7 @@ const Scheduler: React.FC = () => {
 
   const messages = useMemo(
     () => ({
-      showMore: (count: any) => "+" + count + "more",
+      showMore: (count: any) => `+${count} ${t.more}`,
       today: t.today || "Today",
       month: t.month || "Month",
       week: t.week || "Week",
@@ -114,22 +112,6 @@ const Scheduler: React.FC = () => {
     }),
     [t]
   );
-
-  useEffect(() => {
-    if (highlightedEventId) {
-      const timer = setTimeout(() => setHighlightedEventId(null), 2000);
-      return () => clearTimeout(timer);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (sessionId) {
-      setHighlightedEventId(sessionId);
-
-      const timer = setTimeout(() => setHighlightedEventId(null), 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [sessionId]);
 
   useEffect(() => {
     if (urlDate && dayjs(urlDate, "YYYY-MM", true).isValid()) {
@@ -328,24 +310,6 @@ const Scheduler: React.FC = () => {
   };
 
   const eventPropGetter = (event: any) => {
-    const isHighlightedDay =
-      highlightedEventId &&
-      getDaySessions((event as any).startDate).some(
-        (dayEvent: any) => dayEvent.id === highlightedEventId
-      );
-
-    if (isHighlightedDay) {
-      return {
-        className: "highlighted-event",
-        style: {
-          animation: "highlight 1s ease-out",
-          backgroundColor: "transparent",
-          border: "none",
-          boxShadow: "none",
-        },
-      };
-    }
-
     if (currentView === "week" || currentView === "day") {
       return {
         style: {
@@ -435,7 +399,6 @@ const Scheduler: React.FC = () => {
                     );
                   }
                 }}
-                highlightedEventId={highlightedEventId}
               />
             );
           },
