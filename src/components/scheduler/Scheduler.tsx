@@ -1,19 +1,18 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
-import { Calendar, momentLocalizer, Views } from "react-big-calendar";
+import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
-import { useParams, useSearchParams } from "react-router-dom"; // Import useParams
+import { useParams, useSearchParams } from "react-router-dom";
 import dayjs from "dayjs";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import CustomEvent from "./event/Event";
-import { message, Popover, Spin } from "antd";
+import { message, Spin } from "antd";
 import AddClassForm from "components/scheduler/add-class-form/AddClassForm";
 import CustomToolbar from "components/scheduler/toolbar/scheduler-toolbar";
 import {
   CalendarWrapper,
   LoadingOverlay,
-  MoreButton,
   StyledModal,
 } from "components/scheduler/SchedulerStyles";
 import { sessionService } from "services";
@@ -40,7 +39,6 @@ const Scheduler: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const nameInputRef = useRef<any>(null);
-  const sessionId = searchParams.get("session");
   const paramView = searchParams.get("v");
   const initialView: View = validViews.includes(paramView as View)
     ? (paramView as View)

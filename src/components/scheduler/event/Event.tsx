@@ -104,6 +104,22 @@ const CustomEvent: React.FC<{
     setIsDrawerVisible(false);
   };
 
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleMouseDown = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseMove = () => {
+    setIsDragging(true);
+  };
+
+  const handleDoubleClick = () => {
+    if (!isDragging) {
+      openDrawer();
+    }
+  };
+
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
       <EventPopover
@@ -113,7 +129,11 @@ const CustomEvent: React.FC<{
         visible={popoverVisible}
         setVisible={setPopoverVisible}
       >
-        <Container onDoubleClick={openDrawer}>
+        <Container
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onDoubleClick={handleDoubleClick}
+        >
           <strong>{(event as any)?.name}</strong>
           {!isMobile && showTime && (
             <small
@@ -147,7 +167,6 @@ const CustomEvent: React.FC<{
       <EventDrawer
         open={isDrawerVisible}
         onClose={closeDrawer}
-        event={event}
         onEdit={handleEditClick}
         onDelete={handleDelete}
       />
