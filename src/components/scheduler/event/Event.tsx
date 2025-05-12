@@ -60,7 +60,7 @@ const CustomEvent: React.FC<{
   const location = useLocation();
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search);
-  const sessionIdInQuery = searchParams.get("session");
+  const sessionIdInQuery = searchParams.get("id");
 
   const [isDrawerVisible, setIsDrawerVisible] = useState(
     sessionIdInQuery === String(event.id)
@@ -92,14 +92,14 @@ const CustomEvent: React.FC<{
 
   const openDrawer = () => {
     const params = new URLSearchParams(location.search);
-    params.set("session", event.id);
+    params.set("id", event.id);
     navigate({ search: params.toString() }, { replace: true });
     setIsDrawerVisible(true);
   };
 
   const closeDrawer = () => {
     const params = new URLSearchParams(location.search);
-    params.delete("session");
+    params.delete("id");
     navigate({ search: params.toString() }, { replace: true });
     setIsDrawerVisible(false);
   };

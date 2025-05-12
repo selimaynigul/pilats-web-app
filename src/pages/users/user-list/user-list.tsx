@@ -55,7 +55,6 @@ const UserList: React.FC<TrainerListProps> = ({
                 detailUrl: "/users",
                 passive: true, // TODO: Change this to real data
               })}
-              type="user"
             />
           </Col>
         ))}

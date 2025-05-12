@@ -10,6 +10,9 @@ const sessionService = {
   search: (params = {}) => apiClient.post("/session/search", params),
 
   getById: (id: number) => apiClient.get(`/session/${id}`),
+
+  getCustomerSessions: (params = {}) =>
+    apiClient.post("/session/searchWithCustomerLastEvent", params),
 };
 
 export default sessionService;

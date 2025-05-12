@@ -103,7 +103,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
         const sessionDate = new Date(selectedSession.startDate)
           .toISOString()
           .slice(0, 7);
-        navigate(`/sessions/${sessionDate}?session=${id}`);
+        navigate(`/sessions/${sessionDate}?id=${id}`);
       }
     } else {
       navigate(`/${selectedCategory}/${id}`);
