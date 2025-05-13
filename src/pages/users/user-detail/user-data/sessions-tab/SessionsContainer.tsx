@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Col, Row, Spin } from "antd";
+import { Alert, Col, Row, Spin } from "antd";
 import styled from "styled-components";
 import SessionCard from "components/SessionCard";
 import { sessionService } from "services";
@@ -46,8 +46,15 @@ const SessionsContainer: React.FC = () => {
 
   return (
     <Sessions onScroll={loadMore}>
-      {loading && sessions.length === 0 ? (
+      {loading ? (
         <Spin />
+      ) : sessions.length === 0 ? (
+        <Alert
+          message="Bu kullanıcıya herhangi bir ders atanmamış."
+          type="info"
+          showIcon
+          style={{ borderRadius: 8 }}
+        />
       ) : (
         <Row gutter={[16, 16]}>
           {sessions.map((session: any) => (

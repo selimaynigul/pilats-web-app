@@ -188,9 +188,7 @@ const AddPackageForm: React.FC<AddPackageFormProps> = ({
           <Select
             placeholder="Select branch"
             loading={branchLoading}
-            disabled={
-              !branches.length || !form.getFieldValue("isBranchSpecific")
-            }
+            disabled={!form.getFieldValue("isBranchSpecific")}
           >
             {branches.map((branch: any) => (
               <Select.Option key={branch.id} value={branch.id}>

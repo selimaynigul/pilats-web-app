@@ -75,6 +75,7 @@ const PackagesContainer: React.FC = () => {
                   creditCount: pkg.creditCount,
                   remainingCreditCount: pkg.remainingCreditCount,
                 }}
+                onDelete={() => handleDelete(pkg.id)}
                 mode="customer"
               />
             </Col>

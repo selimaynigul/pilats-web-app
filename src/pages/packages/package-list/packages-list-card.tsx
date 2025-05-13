@@ -7,9 +7,10 @@ import {
   LeftOutlined,
 } from "@ant-design/icons";
 import { Dropdown, Menu, Modal, message } from "antd";
-import { companyPackageService } from "services";
+import { companyPackageService, userService } from "services";
 import { capitalize } from "utils/permissionUtils";
 import ProgressBar from "components/ProgressBar";
+import customerPackageService from "services/customer-package-service";
 
 interface Package {
   id: string | number;
@@ -167,22 +168,45 @@ const PackageCard: React.FC<CardProps> = ({
   } = pkg;
 
   const [showProgress, setShowProgress] = useState(false);
+  const [assignModalVisible, setAssignModalVisible] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+
+  const handleUserSearch = async (value: string) => {
+    setSearchLoading(true);
+    try {
+      const res = await userService.search({
+        ucSearchRequest: { name: value },
+      });
+      console.log(res);
+      setSearchResults(res?.data || []);
+    } catch (error) {
+      message.error("Kullanıcılar alınamadı");
+    } finally {
+      setSearchLoading(false);
+    }
+  };
 
   const handleDelete = () => {
     Modal.confirm({
-      title: "Delete Package",
-      content: "Are you sure you want to delete this package?",
-      okText: "Yes",
+      title: "Paketi Sil",
+      content: "Bu paketi silmek istediğinize emin misiniz?",
+      okText: "Evet",
       okType: "danger",
-      cancelText: "No",
+      cancelText: "Hayır",
       onOk: async () => {
         try {
-          await companyPackageService.delete(parseInt(id.toString()));
-          message.success("Package deleted successfully");
-          onDelete && onDelete(id);
+          if (mode === "admin") {
+            await companyPackageService.delete(parseInt(id.toString()));
+          } else {
+            await customerPackageService.delete(parseInt(id.toString()));
+          }
+          message.success("Paket silindi");
+          onDelete?.(id);
         } catch (error) {
-          message.error("Failed to delete package");
           console.error(error);
+          message.error("Silme işlemi başarısız oldu");
         }
       },
     });
@@ -210,12 +234,21 @@ const PackageCard: React.FC<CardProps> = ({
 
   const menu = (
     <Menu>
+      {mode === "admin" && (
+        <Menu.Item
+          key="assign"
+          icon={<MoreOutlined />}
+          onClick={() => setAssignModalVisible(true)}
+        >
+          Kullanıcıya Ata
+        </Menu.Item>
+      )}
       <Menu.Item
         key="delete"
         icon={<DeleteOutlined style={{ color: "red" }} />}
         onClick={handleDelete}
       >
-        Delete
+        Sil
       </Menu.Item>
     </Menu>
   );
@@ -236,7 +269,10 @@ const PackageCard: React.FC<CardProps> = ({
               alignItems: "center",
               cursor: "pointer",
             }}
-            onClick={() => setShowProgress((prev) => !prev)}
+            onClick={() => {
+              if (mode === "admin") return;
+              setShowProgress((prev) => !prev);
+            }}
           >
             <strong style={{ color: "#4f46e5" }}>
               {showProgress ? "Kalan Kullanımlar" : "Özellikler"}
@@ -302,12 +338,98 @@ const PackageCard: React.FC<CardProps> = ({
     </CardContainer>
   );
 
-  return mode === "admin" ? (
-    <Dropdown overlay={menu} trigger={["click"]}>
-      {renderCardContent()}
-    </Dropdown>
-  ) : (
-    renderCardContent()
+  return (
+    <>
+      <Dropdown overlay={menu} trigger={["click"]}>
+        {renderCardContent()}
+      </Dropdown>
+
+      <Modal
+        title="Paketi Kullanıcıya Ata"
+        open={assignModalVisible}
+        onCancel={() => {
+          setAssignModalVisible(false);
+          setSearchValue("");
+          setSearchResults([]);
+        }}
+        footer={null}
+      >
+        <p>Kullanıcı Ara:</p>
+        <input
+          type="text"
+          value={searchValue}
+          onChange={(e) => {
+            const val = e.target.value;
+            setSearchValue(val);
+            if (val.trim().length > 0) handleUserSearch(val);
+            else setSearchResults([]);
+          }}
+          placeholder="İsim, e-posta, vs..."
+          style={{
+            width: "100%",
+            padding: "8px",
+            borderRadius: "6px",
+            border: "1px solid #ccc",
+            marginBottom: "10px",
+          }}
+        />
+
+        {searchLoading ? (
+          <p>Yükleniyor...</p>
+        ) : (
+          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+            {searchResults.map((user) => (
+              <li
+                key={user.id}
+                onClick={async () => {
+                  try {
+                    await customerPackageService.assign({
+                      customerId: user.id,
+                      companyPackageId: pkg.id,
+                    });
+                    message.success("Paket başarıyla atandı");
+                    setAssignModalVisible(false);
+                    setSearchValue("");
+                    setSearchResults([]);
+                  } catch (error: any) {
+                    console.error(error);
+
+                    if (error.response?.data.errorCode === 1901) {
+                      message.error("Kullanıcıya daha önce paket tanımlanmış");
+                    }
+                  }
+                }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "8px",
+                  cursor: "pointer",
+                  borderBottom: "1px solid #eee",
+                }}
+              >
+                <img
+                  src={
+                    user.avatarUrl ||
+                    "https://ui-avatars.com/api/?name=" +
+                      encodeURIComponent(user.ucGetResponse.name)
+                  }
+                  alt={user.name}
+                  style={{ width: 32, height: 32, borderRadius: "50%" }}
+                />
+                <div>
+                  <strong>
+                    {user.ucGetResponse.name} {user.ucGetResponse.surname}
+                  </strong>
+                  {/* Email'i istersen altına ekleyebilirsin */}
+                  {/* <div style={{ fontSize: "12px", color: "#999" }}>{user.email}</div> */}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Modal>
+    </>
   );
 };
 
