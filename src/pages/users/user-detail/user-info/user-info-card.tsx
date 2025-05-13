@@ -40,6 +40,7 @@ import moment from "moment";
 import { PlusOutlined } from "@ant-design/icons";
 import { Divider } from "antd";
 import { capitalize } from "utils/permissionUtils";
+import { Helmet } from "react-helmet";
 
 const countryCodes = [
   { code: "+90", country: "TR" },
@@ -395,6 +396,11 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
   };
   return (
     <>
+      <Helmet>
+        <title>
+          Pilats - {user.ucGetResponse.name} {user.ucGetResponse.surname}
+        </title>
+      </Helmet>
       <Container>
         {/*  {!trainer.active && <Status>Not active</Status>} */}
         <ActionButtons>
@@ -411,7 +417,9 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
             <AvatarWrapper>
               <Avatar
                 size={150}
-                src={"https://prod-grad.onrender.com/api/v1/images" + user.imageUrl}
+                src={
+                  "https://prod-grad.onrender.com/api/v1/images" + user.imageUrl
+                }
                 icon={<UserOutlined />}
               />
               <UploadOverlay>

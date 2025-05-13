@@ -13,6 +13,13 @@ const sessionService = {
 
   getCustomerSessions: (params = {}) =>
     apiClient.post("/session/searchWithCustomerLastEvent", params),
+
+  getSessionCustomers: (params = {}) =>
+    apiClient.post("/session/searchCustomers", params),
+
+  join: (params = {}) => apiClient.post("/session/joinSession", params),
+
+  unjoin: (params = {}) => apiClient.post("/session/unjoinSession", params),
 };
 
 export default sessionService;

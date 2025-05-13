@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Drawer, Avatar, Button, Input, Progress } from "antd";
+import React, { useEffect, useRef, useState } from "react";
+import { Drawer, Avatar, Button, Input, Progress, message } from "antd";
 import {
   CalendarOutlined,
   ClockCircleOutlined,
@@ -7,105 +7,23 @@ import {
   EditFilled,
   ArrowRightOutlined,
   UserOutlined,
-  PlusOutlined,
   AntDesignOutlined,
 } from "@ant-design/icons";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import { hasRole } from "utils/permissionUtils";
 import { useLanguage } from "hooks";
 import { Collapse } from "antd";
 import { MdPersonAddAlt1 } from "react-icons/md";
-
+import { sessionService, userService } from "services";
+import { useSearchParams } from "react-router-dom";
 import "dayjs/locale/tr";
+import EventStatusAlert from "./EventStatusAlert";
 const { Panel } = Collapse;
 dayjs.locale("tr");
-
 dayjs.extend(isSameOrAfter);
-
-const event = {
-  name: "Yoga Class",
-  description: "Yeni başlayanlar için 5 haftalık yoga dersi.",
-  trainerId: 1,
-  trainerName: "Ayşe",
-  trainerSurname: "Yılmaz",
-  start: "2025-05-12T10:00:00",
-  end: "2025-03-12T11:00:00",
-  capacity: 15,
-  company: {
-    id: 101,
-    name: "FitLife Holding",
-  },
-  branch: {
-    id: 205,
-    name: "Ataşehir Şubesi",
-  },
-
-  attendees: [
-    {
-      id: 1,
-      firstName: "Ali",
-      lastName: "Kaya",
-      avatar: "https://api.dicebear.com/7.x/miniavs/svg?seed=AliKaya",
-    },
-    {
-      id: 2,
-      firstName: "Zeynep",
-      lastName: "Demir",
-      avatar: "https://api.dicebear.com/7.x/miniavs/svg?seed=ZeynepDemir",
-    },
-    {
-      id: 3,
-      firstName: "Mehmet",
-      lastName: "Çelik",
-      avatar: "https://api.dicebear.com/7.x/miniavs/svg?seed=MehmetCelik",
-    },
-    /*  {
-      id: 4,
-      firstName: "Ayşe",
-      lastName: "Yılmaz",
-      avatar: "https://api.dicebear.com/7.x/miniavs/svg?seed=AyseYilmaz",
-    },
-    {
-      id: 5,
-      firstName: "Burak",
-      lastName: "Aydın",
-      avatar: "https://api.dicebear.com/7.x/miniavs/svg?seed=BurakAydin",
-    },
-    {
-      id: 6,
-      firstName: "Elif",
-      lastName: "Koç",
-      avatar: "https://api.dicebear.com/7.x/miniavs/svg?seed=ElifKoc",
-    },
-    {
-      id: 7,
-      firstName: "Mert",
-      lastName: "Erdoğan",
-      avatar: "https://api.dicebear.com/7.x/miniavs/svg?seed=MertErdogan",
-    },
-    {
-      id: 8,
-      firstName: "Nazlı",
-      lastName: "Kurt",
-      avatar: "https://api.dicebear.com/7.x/miniavs/svg?seed=NazliKurt",
-    },
-    {
-      id: 9,
-      firstName: "Emre",
-      lastName: "Şahin",
-      avatar: "https://api.dicebear.com/7.x/miniavs/svg?seed=EmreSahin",
-    },
-    {
-      id: 10,
-      firstName: "Selin",
-      lastName: "Aslan",
-      avatar: "https://api.dicebear.com/7.x/miniavs/svg?seed=SelinAslan",
-    }, */
-  ],
-};
 
 const EventDrawer: React.FC<{
   open: boolean;
@@ -113,19 +31,89 @@ const EventDrawer: React.FC<{
   onEdit: () => void;
   onDelete: () => void;
 }> = ({ open, onClose, onEdit, onDelete }) => {
+  const [searchParams] = useSearchParams();
+  const sessionId = parseInt(searchParams.get("id") || "0", 10);
+  const [attendees, setAttendees] = useState<any[]>([]);
+  const [loadingAttendees, setLoadingAttendees] = useState(true);
+  const hasFetched = useRef(false);
+  const navigate = useNavigate();
+
+  const [event, setEvent] = useState<any | null>(null);
+
   const { t } = useLanguage();
 
   const [showSearch, setShowSearch] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
-  const [attendees, setAttendees] = useState(event.attendees);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
 
-  const showAttendance = dayjs().isAfter(dayjs(event.end));
-  const getAttendanceStatus = (userId: number) =>
-    userId % 2 === 0 ? "Katıldı" : "Katılmadı"; // demo amaçlı
+  const [searchValue, setSearchValue] = useState("");
+
+  /*  const showAttendance = dayjs().isAfter(dayjs(event?.start), "day"); */
+  const showAttendance = true;
+
+  useEffect(() => {
+    if (!open || hasFetched.current) return;
+
+    const fetchData = async () => {
+      if (!sessionId) return;
+
+      try {
+        // 1. Etkinlik detayını çek
+        const sessionRes: any = await sessionService.search({ id: sessionId });
+        console.log("fetching session", sessionRes);
+        const sessionData = sessionRes.data[0];
+        setEvent({
+          name: sessionData.name,
+          description: sessionData?.description,
+          trainerId: sessionData.trainerId,
+          trainerName: sessionData.trainerName,
+          trainerSurname: sessionData.trainerSurname,
+          start: sessionData.startDate,
+          end: sessionData.endDate,
+          capacity: sessionData.totalCapacity,
+          company: {
+            id: sessionData.companyId,
+            name: sessionData.companyName,
+          },
+          branch: {
+            id: sessionData.branchId,
+            name: sessionData.branchName,
+          },
+        });
+
+        // 2. Katılımcıları çek
+        const customerRes = await sessionService.getSessionCustomers({
+          searchByPageDto: {
+            sort: "DESC",
+            pageNo: 0,
+            pageSize: 100,
+          },
+          sessionId,
+          sessionCustomerEventsList: ["JOINED", "ATTENDED"],
+        });
+
+        const attendees = customerRes.data.map((item: any) => ({
+          id: item.customerId,
+          firstName: item.ucGetResponse?.name,
+          lastName: item.ucGetResponse?.surname,
+          avatar: null,
+          present: item.customerLastEvent === "ATTENDED",
+        }));
+
+        setAttendees(attendees);
+      } catch (error) {
+        console.error("Etkinlik veya katılımcı bilgisi alınamadı:", error);
+      } finally {
+        setLoadingAttendees(false);
+      }
+    };
+
+    fetchData();
+    hasFetched.current = true;
+  }, []);
 
   return (
     <StyledDrawer
-      title={event.name}
+      title={event?.name}
       placement="right"
       onClose={onClose}
       open={open}
@@ -134,7 +122,7 @@ const EventDrawer: React.FC<{
       extra={
         hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN"]) && (
           <ActionButtonGroup>
-            {dayjs(event.start).isSameOrAfter(dayjs(), "day") && (
+            {dayjs(event?.start).isSameOrAfter(dayjs(), "day") && (
               <SquareButton icon={<EditFilled />} onClick={onEdit} />
             )}
             <SquareButton icon={<DeleteOutlined />} danger onClick={onDelete} />
@@ -143,46 +131,54 @@ const EventDrawer: React.FC<{
       }
     >
       <Wrapper>
-        <Paragraph>{event.description}</Paragraph>
+        {event?.start && event?.end && (
+          <EventStatusAlert startDate={event.start} endDate={event.end} />
+        )}
+
+        <Paragraph>{event?.description}</Paragraph>
+
         <InfoBar>
           <DateTimeBox>
             <CalendarOutlined />
-            <small>{dayjs(event.start).format("D MMMM YYYY")}</small>
+            <small>{dayjs(event?.start).format("D MMMM YYYY")}</small>
           </DateTimeBox>
           <DateTimeBox>
             <ClockCircleOutlined />
             <small>
-              {dayjs(event.start).format("HH:mm")} -{" "}
-              {dayjs(event.end).format("HH:mm")}
+              {dayjs(event?.start).format("HH:mm")} -{" "}
+              {dayjs(event?.end).format("HH:mm")}
             </small>
           </DateTimeBox>
         </InfoBar>
-        <Link to={`/companies/${event.company.id}/branches/${event.branch.id}`}>
+
+        <Link to={`/companies/${event?.company.id}`}>
           <InfoBoxRow>
             <TrainerAvatar>
               <AntDesignOutlined />
             </TrainerAvatar>
             <TrainerInfo>
-              <strong>{event.company.name}</strong>
-              <small>{event.branch.name}</small>
+              <strong>{event?.company?.name}</strong>
+              <small>{event?.branch?.name}</small>
             </TrainerInfo>
             <ArrowRightOutlined style={{ color: "gray" }} />
           </InfoBoxRow>
         </Link>
-        <Link to={`/trainers/${event.trainerId}`}>
+
+        <Link to={`/trainers/${event?.trainerId}`}>
           <TrainerBox>
             <TrainerAvatar>
               <UserOutlined />
             </TrainerAvatar>
             <TrainerInfo>
               <strong>
-                {event.trainerName} {event.trainerSurname}
+                {event?.trainerName} {event?.trainerSurname}
               </strong>
               <small>Expert Yoga Trainer</small>
             </TrainerInfo>
             <ArrowRightOutlined style={{ color: "gray" }} />
           </TrainerBox>
         </Link>
+
         <Collapse
           ghost
           expandIconPosition="end"
@@ -197,7 +193,7 @@ const EventDrawer: React.FC<{
                 <AttendeeHeader>
                   <ProgressWrapper>
                     <RoundedProgress
-                      percent={(attendees.length / event.capacity) * 100}
+                      percent={(attendees.length / event?.capacity) * 100}
                       strokeWidth={40}
                       strokeColor="#7e97f2"
                       trailColor="#ddd"
@@ -205,71 +201,152 @@ const EventDrawer: React.FC<{
                     />
                     <CenteredText>
                       <strong>
-                        {" "}
-                        {attendees.length}/{event.capacity}{" "}
-                      </strong>
+                        {attendees.length}/{event?.capacity}
+                      </strong>{" "}
                       attendees
                     </CenteredText>
                   </ProgressWrapper>
 
                   <FullWidthButton
                     icon={<MdPersonAddAlt1 />}
-                    disabled={attendees.length >= event.capacity}
+                    disabled={attendees.length >= event?.capacity}
                     onClick={() => setShowSearch(true)}
                   />
                 </AttendeeHeader>
               ) : (
-                <Input.Search
-                  autoFocus
-                  placeholder="Kullanıcı ara..."
-                  allowClear
-                  enterButton="Ara"
-                  value={searchValue}
-                  onChange={(e) => setSearchValue(e.target.value)}
-                  onBlur={() => setShowSearch(false)}
-                  onSearch={(value) => {
-                    const newUser = {
-                      id: Date.now(),
-                      firstName: value,
-                      lastName: "Eklenen",
-                      avatar:
-                        "https://api.dicebear.com/7.x/miniavs/svg?seed=" +
-                        value,
-                    };
-                    setAttendees([...attendees, newUser]);
-                    setShowSearch(false);
-                    setSearchValue("");
-                  }}
-                  style={{ marginBottom: 12 }}
-                />
+                <div style={{ marginBottom: 12 }}>
+                  <Input
+                    autoFocus
+                    placeholder="Kullanıcı ara..."
+                    allowClear
+                    value={searchValue}
+                    onChange={async (e) => {
+                      const value = e.target.value;
+                      setSearchValue(value);
+
+                      if (!value.trim()) {
+                        setSearchResults([]);
+                        return;
+                      }
+
+                      try {
+                        const res = await userService.search({
+                          ucSearchRequest: { name: value },
+                        });
+                        setSearchResults(res.data);
+                        console.log("Kullanıcı arama sonuçları:", res.data);
+                      } catch (err) {
+                        console.error("Kullanıcı arama hatası:", err);
+                      }
+                    }}
+                  />
+                  <SearchResults>
+                    {searchResults.map((user) => (
+                      <SearchResultItem
+                        key={user.id}
+                        onClick={async () => {
+                          console.log(
+                            "Selected user:",
+                            user.ucGetResponse.name
+                          );
+                          try {
+                            await sessionService.join({
+                              sessionId,
+                              customerId: user.id,
+                            });
+
+                            const newUser = {
+                              id: user.id,
+                              firstName: user.ucGetResponse.name,
+                              lastName: user.ucGetResponse.surname,
+                              avatar: null,
+                              present: false,
+                            };
+
+                            setAttendees((prev) => [...prev, newUser]);
+                            setSearchValue("");
+                            setSearchResults([]);
+                            setShowSearch(false);
+                          } catch (err: any) {
+                            const errorCode = err?.response?.data?.errorCode;
+                            if (err.response?.status === 500) {
+                              message.error(
+                                "Kullanıcıya tanımlı bir paket bulunamadı."
+                              );
+                            } else if (errorCode === 2003) {
+                              message.error(
+                                "Bu kullanıcı zaten bu etkinliğe kayıtlı."
+                              );
+                            } else if (errorCode === 1902) {
+                              message.error("Kullanıcının kredisi yok.");
+                            } else {
+                              console.error("Kayıt hatası:", err);
+                              message.error(
+                                "Bir hata oluştu. Lütfen tekrar deneyin."
+                              );
+                            }
+                          }
+                        }}
+                      >
+                        <Avatar size={32}>{user.name?.[0]}</Avatar>
+                        <div>
+                          <strong>
+                            {user.ucGetResponse.name}{" "}
+                            {user.ucGetResponse.surname}
+                          </strong>
+                        </div>
+                      </SearchResultItem>
+                    ))}
+                  </SearchResults>
+                </div>
               )}
             </StickyAttendeeHeader>
 
             <AttendeeList>
-              {attendees.map((user: any) => (
-                <AttendeeRow key={user.id}>
-                  <AttendeeInfo>
-                    <Avatar size={40} src={user.avatar} />
-                    <div>
-                      <AttendeeName>
-                        {user.firstName} {user.lastName}
-                      </AttendeeName>
-                      {showAttendance && (
-                        <AttendanceStatus $present={user.id % 2 === 0}>
-                          {getAttendanceStatus(user.id)}
-                        </AttendanceStatus>
-                      )}
-                    </div>
-                  </AttendeeInfo>
-                  <DeleteButton
-                    onClick={() =>
-                      setAttendees((prev) =>
-                        prev.filter((att: any) => att.id !== user.id)
-                      )
-                    }
-                  />
-                </AttendeeRow>
-              ))}
+              {loadingAttendees ? (
+                <p>Katılımcılar yükleniyor...</p>
+              ) : attendees.length === 0 ? (
+                <p>Henüz katılımcı yok.</p>
+              ) : (
+                attendees.map((user: any) => (
+                  <AttendeeRow
+                    key={user.id}
+                    onClick={() => navigate(`/users/${user.id}`)}
+                  >
+                    <AttendeeInfo>
+                      <Avatar size={40} src={user.avatar}>
+                        {user.firstName?.[0]}
+                      </Avatar>
+                      <div>
+                        <AttendeeName>
+                          {user.firstName} {user.lastName}
+                        </AttendeeName>
+                        {showAttendance && (
+                          <AttendanceStatus $present={user.present}>
+                            {user.present ? "Katıldı" : "Katılmadı"}
+                          </AttendanceStatus>
+                        )}
+                      </div>
+                    </AttendeeInfo>
+                    <DeleteButton
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        try {
+                          await sessionService.unjoin({
+                            sessionId,
+                            customerId: user.id,
+                          });
+                          setAttendees((prev) =>
+                            prev.filter((att: any) => att.id !== user.id)
+                          );
+                        } catch (err) {
+                          console.error("Unjoin hatası:", err);
+                        }
+                      }}
+                    />
+                  </AttendeeRow>
+                ))
+              )}
             </AttendeeList>
           </Panel>
         </Collapse>
@@ -281,6 +358,12 @@ const EventDrawer: React.FC<{
 export default EventDrawer;
 
 const StyledDrawer = styled(Drawer)``;
+
+const EventStatus = styled.div`
+  background: blue;
+  height: 10px;
+  width: 100%;
+`;
 
 const RoundedProgress = styled(Progress)`
   .ant-progress-bg {
@@ -493,5 +576,29 @@ const DeleteButton = styled(DeleteOutlined)`
 
   &:hover {
     color: #d9363e;
+  }
+`;
+
+const SearchResults = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 8px;
+`;
+
+const SearchResultItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f5f5f5;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #e6f7ff;
   }
 `;

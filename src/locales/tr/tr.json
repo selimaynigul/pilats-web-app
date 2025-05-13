@@ -42,5 +42,11 @@
   },
   "more": "daha",
   "login": "Giriş Yap",
-  "register": "Kayıt Ol"
+  "register": "Kayıt Ol",
+  "day": "gün",
+  "hour": "saat",
+  "minute": "dakika",
+  "startsIn": "içinde başlayacak.",
+  "ongoing": "Etkinlik şu anda devam ediyor.",
+  "ended": "Etkinlik sona erdi."
 }

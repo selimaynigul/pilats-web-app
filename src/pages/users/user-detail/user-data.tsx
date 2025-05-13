@@ -67,7 +67,7 @@ const UserData: React.FC<{ user: any }> = ({ user }) => {
   }, [searchParams]);
 
   const handleTabClick = (tab: keyof typeof TABS) => {
-    setSearchParams({ tab });
+    setSearchParams({ tab }, { replace: true });
     setActiveTab(TABS[tab]);
   };
 
