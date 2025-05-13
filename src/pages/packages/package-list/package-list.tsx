@@ -20,8 +20,6 @@ const PackageList: React.FC<PackageListProps> = ({
   onTrainerCountChange,
   company,
 }) => {
-
-
   const params = useMemo(
     () => ({
       pageSize: 8,
@@ -51,15 +49,24 @@ const PackageList: React.FC<PackageListProps> = ({
         {packages.map((item: any, index: number) => (
           <Col xs={24} sm={12} md={12} lg={6} key={index}>
             <PackageCard
-              id={item.id}
-              title={item.name}
-              price={item.price}
-              description={item.description}
-              features={[
-                { value: item.creditCount, label: "katılım hakkı" },
-                { value: item.changeCount, label: "iptal hakkı" },
-                { value: item.bonusCount, label: "bonus hakkı" },
-              ]}
+              package={{
+                id: item.id,
+                title: item.name,
+                price: item.price,
+                description: item.description,
+                features: [
+                  { value: item.creditCount, label: "katılım hakkı" },
+                  { value: item.changeCount, label: "iptal hakkı" },
+                  { value: item.bonusCount, label: "bonus hakkı" },
+                ],
+                bonusCount: item.bonusCount,
+                remainingBonusCount: item.remainingBonusCount,
+                changeCount: item.changeCount,
+                remainingChangeCount: item.remainingChangeCount,
+                creditCount: item.creditCount,
+                remainingCreditCount: item.remainingCreditCount,
+              }}
+              mode="admin"
               onDelete={() => {
                 window.location.reload();
               }}

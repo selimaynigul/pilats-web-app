@@ -1,20 +1,37 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import { MoreOutlined, DeleteOutlined } from "@ant-design/icons";
+import {
+  MoreOutlined,
+  DeleteOutlined,
+  RightOutlined,
+  LeftOutlined,
+} from "@ant-design/icons";
 import { Dropdown, Menu, Modal, message } from "antd";
 import { companyPackageService } from "services";
 import { capitalize } from "utils/permissionUtils";
+import ProgressBar from "components/ProgressBar";
 
-interface CardProps {
+interface Package {
   id: string | number;
   title: string;
   price: number;
   description: string;
   features: Array<{ value: string; label: string }>;
-  onDelete?: (id: string | number) => void;
+  bonusCount: number;
+  remainingBonusCount: number;
+  changeCount: number;
+  remainingChangeCount: number;
+  creditCount: number;
+  remainingCreditCount: number;
 }
 
-const CardContainer = styled.div`
+interface CardProps {
+  package: Package;
+  onDelete?: (id: string | number) => void;
+  mode?: "customer" | "admin";
+}
+
+const CardContainer = styled.div<{ mode?: "customer" | "admin" }>`
   position: relative;
   background: white;
   border-radius: 20px;
@@ -22,7 +39,7 @@ const CardContainer = styled.div`
   border: 1px solid #e5e5e5;
 
   &:hover {
-    cursor: pointer;
+    cursor: ${(props) => (props.mode === "admin" ? "pointer" : "default")};
     box-shadow: 0px 8px 42px -5px rgba(93, 70, 229, 0.2);
   }
 `;
@@ -60,6 +77,9 @@ const FeatureList = styled.div`
   border-radius: 10px;
   padding: 15px;
   margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 `;
 
 const FeatureItem = styled.div`
@@ -94,14 +114,60 @@ const InfoContainer = styled.div`
   padding: 0 15px 15px;
 `;
 
+const StyledOuterSliders = styled.div`
+  overflow: hidden;
+  width: 100%;
+`;
+
+const StyledSliders = styled.div<{ offset: number; duration: number }>`
+  display: flex;
+  flex-wrap: nowrap;
+  width: 100%;
+  transform: translateX(${(props) => props.offset}%);
+  transition: transform ${(props) => props.duration}ms;
+
+  > div {
+    width: 100%;
+    flex-shrink: 0;
+  }
+`;
+
+const ProgressItem = styled.div`
+  margin-bottom: 6px;
+  display: flex;
+  flex-direction: column;
+`;
+
+const ProgressHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: #444;
+`;
+
 const PackageCard: React.FC<CardProps> = ({
-  id,
-  title,
-  price,
-  description,
-  features,
+  package: pkg,
   onDelete,
+  mode = "admin",
 }) => {
+  const {
+    id,
+    title,
+    price,
+    description,
+    features,
+    bonusCount,
+    remainingBonusCount,
+    changeCount,
+    remainingChangeCount,
+    creditCount,
+    remainingCreditCount,
+  } = pkg;
+
+  const [showProgress, setShowProgress] = useState(false);
+
   const handleDelete = () => {
     Modal.confirm({
       title: "Delete Package",
@@ -122,6 +188,26 @@ const PackageCard: React.FC<CardProps> = ({
     });
   };
 
+  const renderUsageProgress = (
+    label: string,
+    total: number,
+    remaining: number
+  ) => {
+    if (total === 0) return null;
+
+    return (
+      <ProgressItem>
+        <ProgressHeader>
+          <span>{label}</span>
+          <span style={{ color: "#b8b3e3", fontWeight: "bold" }}>
+            {remaining}/{total}
+          </span>
+        </ProgressHeader>
+        <ProgressBar total={total} current={remaining} height={8} />
+      </ProgressItem>
+    );
+  };
+
   const menu = (
     <Menu>
       <Menu.Item
@@ -134,28 +220,94 @@ const PackageCard: React.FC<CardProps> = ({
     </Menu>
   );
 
-  return (
+  const renderCardContent = () => (
+    <CardContainer mode={mode}>
+      <CardHeader>
+        <Title>{capitalize(title)}</Title>
+        <Price>₺{price}</Price>
+      </CardHeader>
+      <InfoContainer>
+        <Description>{description}</Description>
+        <FeatureList>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              cursor: "pointer",
+            }}
+            onClick={() => setShowProgress((prev) => !prev)}
+          >
+            <strong style={{ color: "#4f46e5" }}>
+              {showProgress ? "Kalan Kullanımlar" : "Özellikler"}
+            </strong>
+            {mode !== "admin" && (
+              <span
+                style={{
+                  color: "#4f46e5",
+                  marginLeft: "auto",
+                  fontSize: "16px",
+                }}
+              >
+                {showProgress ? <LeftOutlined /> : <RightOutlined />}
+              </span>
+            )}
+          </div>
+
+          <StyledOuterSliders>
+            <StyledSliders offset={showProgress ? -100 : 0} duration={300}>
+              {/* Özellikler Slide */}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  padding: "12px 0",
+                }}
+              >
+                {features.map((feature, index) => (
+                  <FeatureItem key={index}>
+                    <FeatureValue>✔</FeatureValue>
+                    <FeatureLabel>
+                      {feature.value} {feature.label}
+                    </FeatureLabel>
+                  </FeatureItem>
+                ))}
+              </div>
+
+              {/* Kalan Kullanımlar Slide */}
+              {mode !== "admin" && (
+                <div style={{ marginTop: "10px" }}>
+                  {renderUsageProgress(
+                    "Katılım hakkı",
+                    creditCount,
+                    remainingCreditCount
+                  )}
+                  {renderUsageProgress(
+                    "İptal hakkı",
+                    changeCount,
+                    remainingChangeCount
+                  )}
+                  {renderUsageProgress(
+                    "Bonus hakkı",
+                    bonusCount,
+                    remainingBonusCount
+                  )}
+                </div>
+              )}
+            </StyledSliders>
+          </StyledOuterSliders>
+        </FeatureList>
+      </InfoContainer>
+    </CardContainer>
+  );
+
+  return mode === "admin" ? (
     <Dropdown overlay={menu} trigger={["click"]}>
-      <CardContainer>
-        <CardHeader>
-          <Title>{capitalize(title)}</Title>
-          <Price>₺{price}</Price>
-        </CardHeader>
-        <InfoContainer>
-          <Description>{description}</Description>
-          <FeatureList>
-            {features.map((feature, index) => (
-              <FeatureItem key={index}>
-                <FeatureValue>✔</FeatureValue>
-                <FeatureLabel>
-                  {feature.value} {feature.label}
-                </FeatureLabel>
-              </FeatureItem>
-            ))}
-          </FeatureList>
-        </InfoContainer>
-      </CardContainer>
+      {renderCardContent()}
     </Dropdown>
+  ) : (
+    renderCardContent()
   );
 };
 

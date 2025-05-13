@@ -56,18 +56,26 @@ const PackagesContainer: React.FC = () => {
       ) : (
         <Row gutter={[16, 16]}>
           {packages.map((pkg) => (
-            <Col xs={24} sm={12} md={8} key={pkg.id}>
+            <Col xs={24} sm={12} key={pkg.id}>
               <PackageCard
-                id={pkg.id}
-                title={pkg.name} // dikkat: "title" değil "name"
-                price={pkg.price}
-                description={pkg.description}
-                features={[
-                  { value: "✔", label: `${pkg.creditCount} credit` },
-                  { value: "✔", label: `${pkg.bonusCount} bonus` },
-                  { value: "✔", label: `${pkg.changeCount} change rights` },
-                ]}
-                onDelete={handleDelete}
+                package={{
+                  id: pkg.id,
+                  title: pkg.name,
+                  price: pkg.price,
+                  description: pkg.description,
+                  features: [
+                    { value: pkg.creditCount, label: "katılım hakkı" },
+                    { value: pkg.changeCount, label: "iptal hakkı" },
+                    { value: pkg.bonusCount, label: "bonus hakkı" },
+                  ],
+                  bonusCount: pkg.bonusCount,
+                  remainingBonusCount: pkg.remainingBonusCount,
+                  changeCount: pkg.changeCount,
+                  remainingChangeCount: pkg.remainingChangeCount,
+                  creditCount: pkg.creditCount,
+                  remainingCreditCount: pkg.remainingCreditCount,
+                }}
+                mode="customer"
               />
             </Col>
           ))}

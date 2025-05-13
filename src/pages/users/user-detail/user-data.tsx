@@ -9,11 +9,6 @@ const Container = styled.div`
   border-radius: 20px;
   padding: 12px;
   height: 100%;
-
-  h2 {
-    color: ${({ theme }) => theme.primary};
-    margin-bottom: 24px;
-  }
 `;
 
 const Header = styled.div`
