@@ -20,6 +20,7 @@ import {
 import { BsEnvelopeFill, BsWhatsapp } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import { ItemData, ListItemType } from "types/types";
+import { capitalize } from "utils/permissionUtils";
 
 interface ListItemProps {
   data: ItemData;
@@ -61,7 +62,7 @@ const ListItem: React.FC<ListItemProps> = ({ data, type = "default" }) => {
                 gap: 12,
               }}
             >
-              {isActive === false && <InactiveIcon title="Inactive" />}
+              {!isActive && <InactiveIcon title="Inactive" />}
               <Avatar
                 size={60}
                 src={imageUrl ?? undefined}
@@ -69,7 +70,7 @@ const ListItem: React.FC<ListItemProps> = ({ data, type = "default" }) => {
               >
                 {title?.[0]?.toUpperCase()}
               </Avatar>
-              <Meta title={title} description={subtitle ?? ""} />
+              <Meta title={capitalize(title)} description={subtitle ?? ""} />
             </div>
           </Link>
         ) : (
@@ -82,7 +83,8 @@ const ListItem: React.FC<ListItemProps> = ({ data, type = "default" }) => {
               gap: 12,
             }}
           >
-            {isActive === false && <InactiveIcon title="Inactive" />}
+            {!isActive && <InactiveIcon title="Inactive" />}{" "}
+            {/* TODO: isActive düzeltilecek ters şu an*/}
             <Avatar
               size={60}
               src={imageUrl ?? undefined}
@@ -90,7 +92,7 @@ const ListItem: React.FC<ListItemProps> = ({ data, type = "default" }) => {
             >
               {title?.[0]?.toUpperCase()}
             </Avatar>
-            <Meta title={title} description={subtitle ?? ""} />
+            <Meta title={capitalize(title)} description={subtitle ?? ""} />
           </div>
         )
       }

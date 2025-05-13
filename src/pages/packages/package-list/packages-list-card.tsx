@@ -40,7 +40,6 @@ const CardContainer = styled.div<{ mode?: "customer" | "admin" }>`
   border: 1px solid #e5e5e5;
 
   &:hover {
-    cursor: ${(props) => (props.mode === "admin" ? "pointer" : "default")};
     box-shadow: 0px 8px 42px -5px rgba(93, 70, 229, 0.2);
   }
 `;
@@ -51,6 +50,10 @@ const CardHeader = styled.div`
   align-items: center;
   padding: 15px;
   border-bottom: 1px solid #e5e5e5;
+
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 const Title = styled.h2`
@@ -254,11 +257,13 @@ const PackageCard: React.FC<CardProps> = ({
   );
 
   const renderCardContent = () => (
-    <CardContainer mode={mode}>
-      <CardHeader>
-        <Title>{capitalize(title)}</Title>
-        <Price>₺{price}</Price>
-      </CardHeader>
+    <CardContainer mode={mode} onClick={(e) => e.stopPropagation()}>
+      <Dropdown overlay={menu} trigger={["click"]}>
+        <CardHeader>
+          <Title>{capitalize(title)}</Title>
+          <Price>₺{price}</Price>
+        </CardHeader>
+      </Dropdown>
       <InfoContainer>
         <Description>{description}</Description>
         <FeatureList>
@@ -340,9 +345,7 @@ const PackageCard: React.FC<CardProps> = ({
 
   return (
     <>
-      <Dropdown overlay={menu} trigger={["click"]}>
-        {renderCardContent()}
-      </Dropdown>
+      {renderCardContent()}
 
       <Modal
         title="Paketi Kullanıcıya Ata"

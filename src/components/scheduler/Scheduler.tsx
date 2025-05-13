@@ -259,7 +259,7 @@ const Scheduler: React.FC = () => {
     const newStart = dayjs(start);
 
     // 1. Geçmiş bir dersi taşıma
-    if (originalStart.isBefore(now, "day")) {
+    if (originalStart.isBefore(now, "minute")) {
       message.warning("Geçmişteki bir dersi taşıyamazsınız.");
       return;
     }
@@ -271,9 +271,13 @@ const Scheduler: React.FC = () => {
     }
 
     // 3. Dersi bugüne taşıyorsak ve başlangıç saati şu anki saatten önceyse uyarı ver
-    if (newStart.isSame(now, "day") && newStart.isBefore(now)) {
+    // 3. Ders bugüne taşınıyorsa ve başlangıç saati şu anki saatten önceyse taşıma
+    if (
+      newStart.isSame(now, "day") &&
+      newStart.isBefore(now, "minute") // saniye hassasiyetini önlemek için "minute"
+    ) {
       message.warning(
-        "Bu dersin başlangıç saati şu anki saatten önce. Lütfen saat bilgisini güncelleyin."
+        "Bir dersi bugüne taşıyorsanız, başlangıç saati şu anki saatten sonra olmalıdır."
       );
       return;
     }

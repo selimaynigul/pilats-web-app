@@ -21,19 +21,26 @@ const EventStatusAlert: React.FC<{ startDate: string; endDate: string }> = ({
 
   if (now.isBefore(start)) {
     const diff = dayjs.duration(start.diff(now));
-    const day = diff.days();
-    const hour = diff.hours();
-    const minute = diff.minutes();
+    const totalMinutes = diff.asMinutes();
 
-    const parts = [];
-    if (day > 0) parts.push(`${day} ${t.day}`);
-    if (hour > 0) parts.push(`${hour} ${t.hour}`);
-    if (minute > 0) parts.push(`${minute} ${t.minute}`);
+    if (totalMinutes < 1) {
+      message = t.startsSoon;
+    } else {
+      const day = diff.days();
+      const hour = diff.hours();
+      const minute = diff.minutes();
 
-    message =
-      userLanguage === "en"
-        ? `${t.startsIn} ${parts.join(" ")}.`
-        : `${parts.join(" ")} ${t.startsIn}`;
+      const parts = [];
+      if (day > 0) parts.push(`${day} ${t.day}`);
+      if (hour > 0) parts.push(`${hour} ${t.hour}`);
+      if (minute > 0) parts.push(`${minute} ${t.minute}`);
+
+      message =
+        userLanguage === "en"
+          ? `${t.startsIn} ${parts.join(" ")}.`
+          : `${parts.join(" ")} ${t.startsIn}`;
+    }
+
     type = "info";
   } else if (now.isAfter(start) && now.isBefore(end)) {
     message = t.ongoing;

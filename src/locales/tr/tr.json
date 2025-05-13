@@ -47,6 +47,7 @@
   "hour": "saat",
   "minute": "dakika",
   "startsIn": "içinde başlayacak.",
+  "startsSoon": "Az sonra başlıyor",
   "ongoing": "Etkinlik şu anda devam ediyor.",
   "ended": "Etkinlik sona erdi."
 }

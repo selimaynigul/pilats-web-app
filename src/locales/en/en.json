@@ -47,6 +47,7 @@
   "hour": "hour",
   "minute": "minute",
   "startsIn": "Starts in",
+  "startsSoon": "Starts soon",
   "ongoing": "The event is currently ongoing.",
   "ended": "The event has ended."
 }

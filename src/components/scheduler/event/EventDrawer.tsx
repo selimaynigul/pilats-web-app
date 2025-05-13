@@ -1,5 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Drawer, Avatar, Button, Input, Progress, message } from "antd";
+import {
+  Drawer,
+  Avatar,
+  Button,
+  Input,
+  Progress,
+  message,
+  Tooltip,
+} from "antd";
 import {
   CalendarOutlined,
   ClockCircleOutlined,
@@ -47,8 +55,7 @@ const EventDrawer: React.FC<{
 
   const [searchValue, setSearchValue] = useState("");
 
-  /*  const showAttendance = dayjs().isAfter(dayjs(event?.start), "day"); */
-  const showAttendance = true;
+  const showAttendance = dayjs().isAfter(dayjs(event?.start), "day");
 
   useEffect(() => {
     if (!open || hasFetched.current) return;
@@ -160,7 +167,7 @@ const EventDrawer: React.FC<{
               <strong>{event?.company?.name}</strong>
               <small>{event?.branch?.name}</small>
             </TrainerInfo>
-            <ArrowRightOutlined style={{ color: "gray" }} />
+            <ArrowRightOutlined style={{ color: "gray", marginLeft: "auto" }} />
           </InfoBoxRow>
         </Link>
 
@@ -175,7 +182,7 @@ const EventDrawer: React.FC<{
               </strong>
               <small>Expert Yoga Trainer</small>
             </TrainerInfo>
-            <ArrowRightOutlined style={{ color: "gray" }} />
+            <ArrowRightOutlined style={{ color: "gray", marginLeft: "auto" }} />
           </TrainerBox>
         </Link>
 
@@ -196,7 +203,7 @@ const EventDrawer: React.FC<{
                       percent={(attendees.length / event?.capacity) * 100}
                       strokeWidth={40}
                       strokeColor="#7e97f2"
-                      trailColor="#ddd"
+                      trailColor="#E6E3FF"
                       showInfo={false}
                     />
                     <CenteredText>
@@ -206,12 +213,13 @@ const EventDrawer: React.FC<{
                       attendees
                     </CenteredText>
                   </ProgressWrapper>
-
-                  <FullWidthButton
-                    icon={<MdPersonAddAlt1 />}
-                    disabled={attendees.length >= event?.capacity}
-                    onClick={() => setShowSearch(true)}
-                  />
+                  <Tooltip title="Katılımcı ekle">
+                    <FullWidthButton
+                      icon={<MdPersonAddAlt1 />}
+                      disabled={attendees.length >= event?.capacity}
+                      onClick={() => setShowSearch(true)}
+                    />
+                  </Tooltip>
                 </AttendeeHeader>
               ) : (
                 <div style={{ marginBottom: 12 }}>
