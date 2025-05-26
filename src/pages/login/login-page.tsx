@@ -148,7 +148,11 @@ const LoginPage: React.FC = () => {
     authService
       .login(values)
       .then((res) => {
-        login(res.data);
+        const from =
+          location.state?.from?.pathname ||
+          sessionStorage.getItem("redirectAfterLogin");
+
+        login(res.data, from);
       })
       .catch(() => {
         message.error("Login failed");

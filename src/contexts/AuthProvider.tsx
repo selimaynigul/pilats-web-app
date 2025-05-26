@@ -11,7 +11,7 @@ import { loginWithUpdate } from "utils/permissionUtils";
 
 interface AuthContextType {
   user: User | null;
-  login: (user: User) => void;
+  login: (user: User, from: string) => void;
   logout: (location: any) => void;
   hasRole: (role: string) => boolean;
 }
@@ -43,9 +43,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const login = (user: any) => {
+  const login = (user: any, from: string) => {
     localStorage.setItem("user", JSON.stringify(user));
-    const res = loginWithUpdate();
+    const res = loginWithUpdate(from);
     if (res) {
       message.success("Login successful");
     } /*  else {
@@ -53,8 +53,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } */
   };
 
-  const logout = (location: any) => {
+  const logout = (location: any = window.location.pathname) => {
     localStorage.clear();
+    sessionStorage.clear();
     setUser(null);
     navigate("/login", { state: { from: location }, replace: true });
   };

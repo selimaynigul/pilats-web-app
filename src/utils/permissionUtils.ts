@@ -109,14 +109,14 @@ const navigateToCompanyPage = (companyId: string) => {
   window.location.href = route;
 };
 
-export const loginWithUpdate = () => {
+export const loginWithUpdate = (from: string) => {
   const user = getUser();
   const role = user?.role;
 
   if (role === "ADMIN") {
     const combinedData = { ...user, name: "Admin" };
     localStorage.setItem("user", JSON.stringify(combinedData));
-    window.location.href = "./companies";
+    window.location.href = from || "./companies";
     return true;
   } else if (role === "COMPANY_ADMIN") {
     companyAdminService
@@ -143,7 +143,6 @@ export const loginWithUpdate = () => {
       .then((res) => {
         const combinedData = { ...user, ...res.data };
         localStorage.setItem("user", JSON.stringify(combinedData));
-
         const companyId = res.data?.companyId;
         if (companyId) {
           navigateToCompanyPage(companyId);

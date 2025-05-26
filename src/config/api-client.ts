@@ -9,7 +9,7 @@ const apiClient = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 500000,
+  timeout: 1000000,
 });
 
 // Add a request interceptor to include the token in the headers
@@ -34,6 +34,7 @@ apiClient.interceptors.response.use(
   },
   (error) => {
     if (error.response && error.response.status === 403) {
+      sessionStorage.setItem("redirectAfterLogin", window.location.pathname);
       localStorage.clear();
       window.location.href = "/login";
     }
