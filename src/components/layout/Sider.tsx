@@ -133,7 +133,7 @@ const Sidebar: React.FC<SiderProps> = ({
       loc.pathname.includes(path)
     );
 
-    const currentKey = matchedEntry ? matchedEntry[1] : "companies";
+    const currentKey = matchedEntry ? matchedEntry[1] : "a"; // TODO: fix this "a"
     setSelectedKey(currentKey);
   }, [loc.pathname]);
 

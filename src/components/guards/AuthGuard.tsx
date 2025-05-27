@@ -17,7 +17,6 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children, requiredRoles }) => {
   useEffect(() => {
     const isAuthenticated = hasRole(requiredRoles);
     if (!getToken()) {
-      message.warning("You need to log in to access this page.");
       logout(location);
     } else if (!isAuthenticated) {
       message.error(
