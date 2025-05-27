@@ -1,5 +1,5 @@
 // SchedulerStyles.ts
-import { Modal, Popover } from "antd";
+import { Modal } from "antd";
 import styled from "styled-components";
 
 export const CalendarWrapper = styled.div`
@@ -99,6 +99,9 @@ export const CalendarWrapper = styled.div`
     text-overflow: ellipsis;
   }
 
+  .rbc-row-segment {
+    max-height: 28px;
+  }
   .rbc-show-more {
     position: absolute;
     top: 28px;
@@ -115,25 +118,112 @@ export const CalendarWrapper = styled.div`
   .rbc-event-label {
     display: none;
   }
-`;
 
-const test = styled.div`
-  .rbc-time-content > * + * > * {
+  .rbc-label {
+  color: #5D46E5;
+  }
+
+  .rbc-button-link {
+  font-weight: bold;
+  }
+
+  .rbc-time-view .rbc-allday-cell  {
+    display: none;
+     
+    }
+
+  /* Remove background lines in week view */
+
+   .rbc-time-view {
     border: none;
   }
 
+  .rbc-time-content {
+    border: none;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: calc(100vh - 220px);
+
+    @media (max-width: 768px) {
+      max-height: calc(100vh - 180px);
+    }
+
+    @media (max-width: 480px) {
+      max-height: calc(100vh - 180px);
+    }
+  }
+  
+  .rbc-time-header-content {
+    border: none;
+  }
+
+  
   .rbc-time-content > .rbc-time-gutter {
-    background: white; /* sol zaman kolonunu ayrı tut */
+    background: transparent;
   }
 
-  /* 1. gün, 3. gün, 5. gün... */
+
+  .rbc-time-header,
+  .rbc-time-gutter,
+  .rbc-time-slot,
+  .rbc-timeslot-group,
+  .rbc-time-header.rbc-overflowing {
+    border: none;
+    background: transparent;
+  }
+
+   /* Alternating vertical backgrounds */
   .rbc-time-content .rbc-day-slot:nth-child(2n + 1) {
-    background-color: #e6e3ff; /* açık mor tonu */
+    border-right: 1px solid #E6E3FF;
+    border-left: 1px solid #E6E3FF;
   }
 
-  /* 2. gün, 4. gün... */
-  .rbc-time-content .rbc-day-slot:nth-child(2n) {
+  /* Alternating horizontal backgrounds */
+  .rbc-time-slot:nth-child(2n) {
+    background-color: rgba(245, 243, 255, 1);
   }
+
+  .rbc-time-slot:nth-child(2n + 1) {
+    background-color: rgba(230, 227, 255, 0.5);
+  }
+
+  /* Make left time slot transparent */
+  .rbc-time-gutter {
+    background: transparent !important;
+  }
+
+  .rbc-time-gutter .rbc-timeslot-group {
+    background: transparent !important;
+  }
+
+  .rbc-time-gutter .rbc-time-slot {
+    background: transparent !important;
+  }
+
+
+  // HERE
+   /* Ensure header stays fixed while content scrolls */
+   
+  .rbc-time-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: white;
+  }
+
+  .rbc-time-content::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .rbc-time-content::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .rbc-time-content::-webkit-scrollbar-thumb {
+    background-color: rgba(93, 70, 229, 0.2);
+    border-radius: 3px;
+  }
+      
 `;
 
 export const EventTitle = styled.h3`
@@ -174,3 +264,7 @@ export const StyledModal = styled(Modal)`
     overflow-y: scroll; */
   }
 `;
+
+
+
+

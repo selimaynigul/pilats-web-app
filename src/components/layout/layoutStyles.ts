@@ -26,9 +26,8 @@ export const StyledContent = styled(Content)<{
   display: flex;
   flex-direction: column;
   height: 100dvh;
-
-  /*   overflow-y: scroll;
- */
+/*   overflow-Y: hidden; */
+  
   &::-webkit-scrollbar-track {
     margin: 24px 0;
   }
