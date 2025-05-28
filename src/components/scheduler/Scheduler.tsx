@@ -112,11 +112,53 @@ const Scheduler: React.FC = () => {
   );
 
   useEffect(() => {
-    if (urlDate && dayjs(urlDate, "YYYY-MM", true).isValid()) {
-      const newDate = dayjs(urlDate, "YYYY-MM").toDate();
-      setDate(newDate);
+    // Eğer month view'dayız ve urlDate YYYY-MM-DD ise, sadece url'deki view parametresi de month ise kırp
+    if (
+      currentView === "month" &&
+      urlDate &&
+      dayjs(urlDate, "YYYY-MM-DD", true).isValid() &&
+      searchParams.get("v") === "month"
+    ) {
+      const monthUrl = urlDate.slice(0, 7); // YYYY-MM
+      const newParams = new URLSearchParams(searchParams.toString());
+      newParams.set("v", "month");
+      navigate({
+        pathname: `/sessions/${monthUrl}`,
+        search: `?${newParams.toString()}`,
+      });
+      return;
     }
-  }, [urlDate]);
+
+    // Eğer day view'dayız ve urlDate YYYY-MM ise, o ayın ilk gününe git
+    if (
+      currentView === "day" &&
+      urlDate &&
+      dayjs(urlDate, "YYYY-MM", true).isValid()
+    ) {
+      const firstDay = dayjs(urlDate, "YYYY-MM")
+        .startOf("month")
+        .format("YYYY-MM-DD");
+      const newParams = new URLSearchParams(searchParams.toString());
+      newParams.set("v", "day");
+      navigate({
+        pathname: `/sessions/${firstDay}`,
+        search: `?${newParams.toString()}`,
+      });
+      return;
+    }
+
+    // URL'den gelen tarihi hem YYYY-MM-DD hem YYYY-MM olarak kontrol et
+    if (urlDate) {
+      if (dayjs(urlDate, "YYYY-MM-DD", true).isValid()) {
+        setDate(dayjs(urlDate, "YYYY-MM-DD").toDate());
+        if (currentView !== "day") setCurrentView("day");
+      } else if (dayjs(urlDate, "YYYY-MM", true).isValid()) {
+        setDate(dayjs(urlDate, "YYYY-MM").toDate());
+        if (currentView === "day") setCurrentView("month");
+      }
+    }
+    // eslint-disable-next-line
+  }, [urlDate, currentView]);
 
   useEffect(() => {
     if (date) {
@@ -147,8 +189,16 @@ const Scheduler: React.FC = () => {
     localStorage.setItem("savedCalendarDate", middleDate.toISOString());
 
     const newParams = new URLSearchParams(searchParams.toString());
+
+    let urlDate;
+    if (currentView === "day") {
+      urlDate = dayjs(middleDate).format("YYYY-MM-DD");
+    } else {
+      urlDate = dayjs(middleDate).format("YYYY-MM");
+    }
+
     navigate({
-      pathname: `/sessions/${dayjs(middleDate).format("YYYY-MM")}`,
+      pathname: `/sessions/${urlDate}`,
       search: `?${newParams.toString()}`,
     });
   };
@@ -336,7 +386,17 @@ const Scheduler: React.FC = () => {
     setCurrentView(view);
     const newParams = new URLSearchParams(searchParams.toString());
     newParams.set("v", view);
-    setSearchParams(newParams);
+
+    // Eğer day view'dan çıkılıyorsa ve urlDate YYYY-MM-DD ise, YYYY-MM'ye kırp
+    if (view !== "day" && urlDate && urlDate.length === 10) {
+      const monthUrl = urlDate.slice(0, 7); // YYYY-MM
+      navigate({
+        pathname: `/sessions/${monthUrl}`,
+        search: `?${newParams.toString()}`,
+      });
+    } else {
+      setSearchParams(newParams);
+    }
   };
 
   const getDaySessions = (date: Date | string) => {
@@ -373,6 +433,16 @@ const Scheduler: React.FC = () => {
         messages={messages}
         style={{ height: 700 }}
         onRangeChange={updateVisibleDate}
+        scrollToTime={
+          ["day", "week"].includes(currentView)
+            ? (() => {
+                const now = new Date();
+                // scroll to 4 hours before the current time if the view is day or week
+                const scrollHour = Math.max(now.getHours() - 4, 0);
+                return new Date(1970, 1, 1, scrollHour, 0, 0);
+              })()
+            : undefined
+        }
         components={{
           toolbar: (props) => (
             <CustomToolbar

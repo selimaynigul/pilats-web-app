@@ -78,6 +78,10 @@ export const CalendarWrapper = styled.div`
     color: #4d3abd;
   }
 
+  .rbc-button-link > span {
+    font-weight: bold;
+  }
+
   .rbc-day-bg {
     border-color: #e6e3ff;
   }
@@ -120,21 +124,16 @@ export const CalendarWrapper = styled.div`
   }
 
   .rbc-label {
-  color: #5D46E5;
+    color: #5d46e5;
   }
 
-  .rbc-button-link {
-  font-weight: bold;
-  }
-
-  .rbc-time-view .rbc-allday-cell  {
+  .rbc-time-view .rbc-allday-cell {
     display: none;
-     
-    }
+  }
 
   /* Remove background lines in week view */
 
-   .rbc-time-view {
+  .rbc-time-view {
     border: none;
   }
 
@@ -152,16 +151,14 @@ export const CalendarWrapper = styled.div`
       max-height: calc(100vh - 180px);
     }
   }
-  
+
   .rbc-time-header-content {
     border: none;
   }
 
-  
   .rbc-time-content > .rbc-time-gutter {
     background: transparent;
   }
-
 
   .rbc-time-header,
   .rbc-time-gutter,
@@ -172,10 +169,10 @@ export const CalendarWrapper = styled.div`
     background: transparent;
   }
 
-   /* Alternating vertical backgrounds */
+  /* Alternating vertical backgrounds */
   .rbc-time-content .rbc-day-slot:nth-child(2n + 1) {
-    border-right: 1px solid #E6E3FF;
-    border-left: 1px solid #E6E3FF;
+    border-right: 1px solid #e6e3ff;
+    border-left: 1px solid #e6e3ff;
   }
 
   /* Alternating horizontal backgrounds */
@@ -200,10 +197,9 @@ export const CalendarWrapper = styled.div`
     background: transparent !important;
   }
 
-
   // HERE
-   /* Ensure header stays fixed while content scrolls */
-   
+  /* Ensure header stays fixed while content scrolls */
+
   .rbc-time-header {
     position: sticky;
     top: 0;
@@ -223,7 +219,6 @@ export const CalendarWrapper = styled.div`
     background-color: rgba(93, 70, 229, 0.2);
     border-radius: 3px;
   }
-      
 `;
 
 export const EventTitle = styled.h3`
@@ -264,7 +259,3 @@ export const StyledModal = styled(Modal)`
     overflow-y: scroll; */
   }
 `;
-
-
-
-

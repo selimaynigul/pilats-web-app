@@ -11,7 +11,7 @@ import EventDrawer from "./EventDrawer";
 
 const Container = styled.div`
   background: #5d46e5;
-  border-bottom: 5px solid #4d3abd;
+  border-bottom: 4px solid #4d3abd;
   color: white;
   padding: 2px 10px;
   border-radius: 12px;

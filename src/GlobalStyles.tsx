@@ -90,6 +90,14 @@ const GlobalStyle = createGlobalStyle`
  
 }
 
+.ant-picker-cell-selected > .ant-picker-cell-inner {
+  background: ${({ theme }) => theme.primary} !important;
+  border-radius: 50px !important;
+}
+
+.ant-picker-cell-in-view:hover > .ant-picker-cell-inner { 
+border-radius: 50px !important;
+}
 
 
 /* For WebKit browsers (Chrome, Safari) */
