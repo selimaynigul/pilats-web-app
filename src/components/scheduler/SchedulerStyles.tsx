@@ -86,6 +86,10 @@ export const CalendarWrapper = styled.div`
     border-color: #e6e3ff;
   }
 
+  .rbc-today {
+    background: #f6f5ff;
+  }
+
   .rbc-off-range-bg {
     background: #e6e3ff;
   }
@@ -113,6 +117,7 @@ export const CalendarWrapper = styled.div`
 
   .rbc-event {
     padding: 0px 2px 2px 2px;
+    height: 60px;
 
     @media (max-width: 1024px) {
       padding: 0;
@@ -131,7 +136,10 @@ export const CalendarWrapper = styled.div`
     display: none;
   }
 
-  /* Remove background lines in week view */
+  .rbc-slot-selection,
+  .rbc-selected-cell {
+    background: rgba(94, 70, 229, 0.21);
+  }
 
   .rbc-time-view {
     border: none;

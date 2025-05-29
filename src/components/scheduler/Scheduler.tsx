@@ -22,6 +22,9 @@ import { useLanguage } from "hooks";
 import "moment/locale/tr";
 import "moment/locale/en-gb";
 import { View } from "react-big-calendar";
+import isBetween from "dayjs/plugin/isBetween";
+import { start } from "repl";
+dayjs.extend(isBetween);
 
 const validViews: View[] = ["month", "week", "day", "agenda"];
 const DragAndDropCalendar = withDragAndDrop(Calendar);
@@ -39,12 +42,18 @@ const Scheduler: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const nameInputRef = useRef<any>(null);
+  const savedView = localStorage.getItem("savedCalendarView");
   const paramView = searchParams.get("v");
-  const initialView: View = validViews.includes(paramView as View)
-    ? (paramView as View)
-    : "month";
+  const initialView: View =
+    (paramView &&
+      validViews.includes(paramView as View) &&
+      (paramView as View)) ||
+    (savedView &&
+      validViews.includes(savedView as View) &&
+      (savedView as View)) ||
+    "month";
 
-  const [currentView, setCurrentView] = useState(initialView);
+  const [currentView, setCurrentView] = useState<View>(initialView);
   const [loading, setLoading] = useState(false);
   const [sessions, setSessions] = useState<any[]>([]);
   const { t, userLanguage } = useLanguage();
@@ -64,7 +73,11 @@ const Scheduler: React.FC = () => {
   } | null>(null);
 
   const [date, setDate] = useState<Date>(() => {
-    if (urlDate && dayjs(urlDate, "YYYY-MM", true).isValid()) {
+    if (
+      urlDate &&
+      (dayjs(urlDate, "YYYY-MM", true).isValid() ||
+        dayjs(urlDate, "YYYY-MM-DD", true).isValid())
+    ) {
       return dayjs(urlDate).toDate();
     }
     const savedDate = localStorage.getItem("savedCalendarDate");
@@ -112,52 +125,75 @@ const Scheduler: React.FC = () => {
   );
 
   useEffect(() => {
-    // Eğer month view'dayız ve urlDate YYYY-MM-DD ise, sadece url'deki view parametresi de month ise kırp
-    if (
-      currentView === "month" &&
-      urlDate &&
-      dayjs(urlDate, "YYYY-MM-DD", true).isValid() &&
-      searchParams.get("v") === "month"
-    ) {
-      const monthUrl = urlDate.slice(0, 7); // YYYY-MM
+    const viewParam = searchParams.get("v");
+
+    // Eğer urlDate hiç yoksa ve geçerli bir view varsa, bugünün tarihine yönlendir
+    if (!urlDate && viewParam && validViews.includes(viewParam as View)) {
+      const today = dayjs().format(
+        viewParam === "day" ? "YYYY-MM-DD" : "YYYY-MM"
+      );
       const newParams = new URLSearchParams(searchParams.toString());
-      newParams.set("v", "month");
       navigate({
-        pathname: `/sessions/${monthUrl}`,
+        pathname: `/sessions/${today}`,
         search: `?${newParams.toString()}`,
       });
       return;
     }
 
-    // Eğer day view'dayız ve urlDate YYYY-MM ise, o ayın ilk gününe git
-    if (
-      currentView === "day" &&
-      urlDate &&
-      dayjs(urlDate, "YYYY-MM", true).isValid()
-    ) {
-      const firstDay = dayjs(urlDate, "YYYY-MM")
-        .startOf("month")
-        .format("YYYY-MM-DD");
-      const newParams = new URLSearchParams(searchParams.toString());
-      newParams.set("v", "day");
-      navigate({
-        pathname: `/sessions/${firstDay}`,
-        search: `?${newParams.toString()}`,
-      });
-      return;
-    }
-
-    // URL'den gelen tarihi hem YYYY-MM-DD hem YYYY-MM olarak kontrol et
     if (urlDate) {
-      if (dayjs(urlDate, "YYYY-MM-DD", true).isValid()) {
-        setDate(dayjs(urlDate, "YYYY-MM-DD").toDate());
-        if (currentView !== "day") setCurrentView("day");
-      } else if (dayjs(urlDate, "YYYY-MM", true).isValid()) {
-        setDate(dayjs(urlDate, "YYYY-MM").toDate());
-        if (currentView === "day") setCurrentView("month");
+      const isValidDate =
+        dayjs(urlDate, "YYYY-MM", true).isValid() ||
+        dayjs(urlDate, "YYYY-MM-DD", true).isValid();
+
+      if (!isValidDate) {
+        console.warn("Geçersiz tarih:", urlDate);
+
+        const newParams = new URLSearchParams(searchParams.toString());
+        navigate({
+          pathname: `/sessions`,
+          search: `?${newParams.toString()}`,
+        });
+        return;
+      }
+
+      // Eğer month veya agenda view'dayız ve urlDate YYYY-MM-DD ise, sadece YYYY-MM'e indir
+      if (
+        (currentView === "month" || currentView === "agenda") &&
+        dayjs(urlDate, "YYYY-MM-DD", true).isValid() &&
+        (viewParam === "month" || viewParam === "agenda")
+      ) {
+        const monthUrl = urlDate.slice(0, 7); // YYYY-MM
+        const newParams = new URLSearchParams(searchParams.toString());
+        navigate({
+          pathname: `/sessions/${monthUrl}`,
+          search: `?${newParams.toString()}`,
+        });
+        return;
+      }
+
+      // Eğer week view'dayız ve urlDate YYYY-MM-DD ise (ve v=week), aynen bırak
+      if (
+        currentView === "week" &&
+        dayjs(urlDate, "YYYY-MM-DD", true).isValid() &&
+        viewParam === "week"
+      ) {
+        return;
+      }
+
+      // Eğer day view'dayız ve urlDate YYYY-MM formatındaysa, ilk güne git
+      if (currentView === "day" && dayjs(urlDate, "YYYY-MM", true).isValid()) {
+        const firstDay = dayjs(urlDate, "YYYY-MM")
+          .startOf("month")
+          .format("YYYY-MM-DD");
+        const newParams = new URLSearchParams(searchParams.toString());
+        navigate({
+          pathname: `/sessions/${firstDay}`,
+          search: `?${newParams.toString()}`,
+        });
+        setDate(dayjs(firstDay).toDate());
+        return;
       }
     }
-    // eslint-disable-next-line
   }, [currentView]);
 
   useEffect(() => {
@@ -178,14 +214,38 @@ const Scheduler: React.FC = () => {
   }, [visibleRange, params]);
 
   const updateVisibleDate = (range: { start: Date; end: Date } | Date[]) => {
+    console.log("Updating visible date range:", range);
     const startDate = Array.isArray(range) ? range[0] : range.start;
     const endDate = Array.isArray(range) ? range[range.length - 1] : range.end;
 
-    const middleDate = new Date(
-      (new Date(startDate).getTime() + new Date(endDate).getTime()) / 2
-    );
-    setDate(middleDate);
+    let middleDate: Date;
 
+    if (currentView === "agenda") {
+      const today = dayjs();
+      const start = dayjs(startDate);
+      const end = dayjs(endDate);
+
+      let targetMonth: dayjs.Dayjs;
+
+      if (today.isBetween(start, end, "day", "[]")) {
+        targetMonth = today.startOf("month"); // today clicked
+      } else if (start.isBefore(dayjs(date), "month")) {
+        targetMonth = dayjs(date).subtract(1, "month").startOf("month"); // prev clicked
+      } else if (start.isAfter(dayjs(date), "month")) {
+        targetMonth = dayjs(date).add(1, "month").startOf("month"); // next clicked
+      } else {
+        targetMonth = dayjs(date).startOf("month"); // fallback
+      }
+
+      middleDate = targetMonth.date(1).startOf("day").toDate();
+    } else {
+      middleDate = new Date(
+        (new Date(startDate).getTime() + new Date(endDate).getTime()) / 2
+      );
+    }
+
+    setDate(middleDate);
+    setSessions([]);
     localStorage.setItem("savedCalendarDate", middleDate.toISOString());
 
     const newParams = new URLSearchParams(searchParams.toString());
@@ -383,19 +443,16 @@ const Scheduler: React.FC = () => {
   };
 
   const handleViewChange = (view: View) => {
-    setCurrentView(view);
+    localStorage.setItem("savedCalendarView", view);
     const newParams = new URLSearchParams(searchParams.toString());
     newParams.set("v", view);
+    setSearchParams(newParams);
+    setCurrentView(view);
 
-    // Eğer day view'dan çıkılıyorsa ve urlDate YYYY-MM-DD ise, YYYY-MM'ye kırp
-    if (view !== "day" && urlDate && urlDate.length === 10) {
-      const monthUrl = urlDate.slice(0, 7); // YYYY-MM
-      navigate({
-        pathname: `/sessions/${monthUrl}`,
-        search: `?${newParams.toString()}`,
-      });
-    } else {
-      setSearchParams(newParams);
+    if (view === "agenda") {
+      // mevcut date ne olursa olsun ayın 1'ine çek
+      const startOfMonth = dayjs(date).startOf("month").toDate();
+      setDate(startOfMonth);
     }
   };
 
@@ -430,6 +487,7 @@ const Scheduler: React.FC = () => {
         resizable={false}
         messages={messages}
         style={{ height: 700 }}
+        length={dayjs(date).daysInMonth()}
         onRangeChange={updateVisibleDate}
         scrollToTime={
           ["day", "week"].includes(currentView)
