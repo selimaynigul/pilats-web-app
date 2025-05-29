@@ -371,36 +371,48 @@ const Scheduler: React.FC = () => {
     const originalStart = dayjs(event.start);
     const newStart = dayjs(start);
 
-    // 1. Geçmiş bir dersi taşıma
+    // 🔁 00:00 ise 1 gün geri al ve 23:59 yap
+    let adjustedEnd = dayjs(end);
+    if (
+      adjustedEnd.hour() === 0 &&
+      adjustedEnd.minute() === 0 &&
+      adjustedEnd.second() === 0
+    ) {
+      adjustedEnd = adjustedEnd
+        .subtract(1, "day")
+        .hour(23)
+        .minute(59)
+        .second(0);
+    }
+
+    // 🔐 Gün kontrolü
+    if (!dayjs(start).isSame(adjustedEnd, "day")) {
+      message.warning("Ders süresi bir günü aşamaz.");
+      return;
+    }
+
+    // ⏳ Geçmişe taşıma kontrolü
     if (originalStart.isBefore(now, "minute")) {
       message.warning("Geçmişteki bir dersi taşıyamazsınız.");
       return;
     }
 
-    // 2. Dersi geçmiş bir tarihe taşıma
     if (newStart.isBefore(now, "day")) {
       message.warning("Bir dersi geçmiş bir tarihe taşıyamazsınız.");
       return;
     }
 
-    // 3. Dersi bugüne taşıyorsak ve başlangıç saati şu anki saatten önceyse uyarı ver
-    // 3. Ders bugüne taşınıyorsa ve başlangıç saati şu anki saatten önceyse taşıma
-    if (
-      newStart.isSame(now, "day") &&
-      newStart.isBefore(now, "minute") // saniye hassasiyetini önlemek için "minute"
-    ) {
-      message.warning(
-        "Bir dersi bugüne taşıyorsanız, başlangıç saati şu anki saatten sonra olmalıdır."
-      );
+    if (newStart.isSame(now, "day") && newStart.isBefore(now, "minute")) {
+      message.warning("Bugün için başlangıç saati geçmiş olamaz.");
       return;
     }
 
     const updatedSession = {
       ...event,
       startDate: dayjs(start).format("YYYY-MM-DDTHH:mm:ss"),
-      endDate: dayjs(end).format("YYYY-MM-DDTHH:mm:ss"),
+      endDate: adjustedEnd.format("YYYY-MM-DDTHH:mm:ss"),
       start: new Date(start),
-      end: new Date(end),
+      end: adjustedEnd.toDate(),
     };
 
     setSessions((prev) =>
@@ -411,7 +423,7 @@ const Scheduler: React.FC = () => {
       .update({
         ...event,
         startDate: dayjs(start).format("YYYY-MM-DDTHH:mm:ss"),
-        endDate: dayjs(end).format("YYYY-MM-DDTHH:mm:ss"),
+        endDate: adjustedEnd.format("YYYY-MM-DDTHH:mm:ss"),
       })
       .then(() => {
         if (visibleRange) {
@@ -540,7 +552,7 @@ const Scheduler: React.FC = () => {
         selectable={hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN"])}
         onSelectSlot={selectSlot}
         onEventDrop={moveSession}
-        resizable
+        resizable={currentView == "day" || currentView == "week"}
         onEventResize={handleResize}
         messages={messages}
         style={{ height: 700 }}

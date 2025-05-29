@@ -19,6 +19,19 @@ const GlobalStyle = createGlobalStyle`
   border-radius: 20px !important;
   }
 
+  
+.ant-btn-variant-link > span {
+  color: ${({ theme }) => theme.primary} !important;
+
+}
+
+ .ant-checkbox-checked .ant-checkbox-inner,
+ .ant-radio-wrapper .ant-radio-checked .ant-radio-inner  {
+    background-color: ${({ theme }) => theme.primary} !important;
+    border-color: ${({ theme }) => theme.primary} !important;
+  }
+
+
   .ant-menu-item-selected {
   background: #5d46e5 !important;
   .anticon,
