@@ -157,6 +157,10 @@ export const CalendarWrapper = styled.div`
     background: rgba(94, 70, 229, 0.21);
   }
 
+  .rbc-events-container > * {
+    padding: 0px !important;
+  }
+
   .rbc-agenda-content {
     margin-top: 10px;
   }

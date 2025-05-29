@@ -483,6 +483,46 @@ const Scheduler: React.FC = () => {
 
   const [form] = Form.useForm();
 
+  const handleResize = ({
+    event,
+    start,
+    end,
+  }: {
+    event: any;
+    start: Date | string;
+    end: Date | string;
+  }) => {
+    const newStart = new Date(start);
+    const newEnd = new Date(end);
+
+    const updatedSession = {
+      ...event,
+      startDate: dayjs(newStart).format("YYYY-MM-DDTHH:mm:ss"),
+      endDate: dayjs(newEnd).format("YYYY-MM-DDTHH:mm:ss"),
+      start: newStart,
+      end: newEnd,
+    };
+
+    setSessions((prev) =>
+      prev.map((e) => (e.id === event.id ? updatedSession : e))
+    );
+
+    sessionService
+      .update({
+        ...event,
+        startDate: dayjs(newStart).format("YYYY-MM-DDTHH:mm:ss"),
+        endDate: dayjs(newEnd).format("YYYY-MM-DDTHH:mm:ss"),
+      })
+      .then(() => {
+        if (visibleRange) {
+          fetchSessions(visibleRange.start, visibleRange.end, false);
+        }
+      })
+      .catch(() => {
+        message.error("Event resize failed.");
+      });
+  };
+
   return (
     <CalendarWrapper>
       {loading && (
@@ -500,7 +540,8 @@ const Scheduler: React.FC = () => {
         selectable={hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN"])}
         onSelectSlot={selectSlot}
         onEventDrop={moveSession}
-        resizable={false}
+        resizable
+        onEventResize={handleResize}
         messages={messages}
         style={{ height: 700 }}
         length={dayjs(date).daysInMonth()}
