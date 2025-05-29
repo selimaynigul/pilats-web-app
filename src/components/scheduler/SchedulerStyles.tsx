@@ -32,9 +32,25 @@ export const CalendarWrapper = styled.div`
   .rbc-header {
     border: none;
 
-    span {
-      color: #4d3abd;
-    }
+    color: #4d3abd;
+  }
+
+  .rbc-agenda-time-cell,
+  .rbc-agenda-date-cell {
+    color: #4d3abd;
+  }
+
+  .rbc-agenda-view::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .rbc-agenda-view::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .rbc-agenda-view::-webkit-scrollbar-thumb {
+    background-color: rgba(93, 70, 229, 0.2);
+    border-radius: 3px;
   }
 
   .rbc-month-header {
@@ -141,11 +157,24 @@ export const CalendarWrapper = styled.div`
     background: rgba(94, 70, 229, 0.21);
   }
 
-  .rbc-time-view {
+  .rbc-agenda-content {
+    margin-top: 10px;
+  }
+
+  .rbc-time-view,
+  .rbc-agenda-view .rbc-agenda-table,
+  .rbc-agenda-view table.rbc-agenda-table tbody > tr > td + td,
+  .rbc-agenda-view table.rbc-agenda-table thead > tr > th {
     border: none;
   }
 
-  .rbc-time-content {
+  .rbc-agenda-view table.rbc-agenda-table tbody > tr > td + td,
+  .rbc-agenda-view table.rbc-agenda-table thead > tr > th {
+    border-left: 1px solid #e6e3ff;
+  }
+
+  .rbc-time-content,
+  .rbc-agenda-view {
     border: none;
     overflow-y: auto;
     overflow-x: hidden;

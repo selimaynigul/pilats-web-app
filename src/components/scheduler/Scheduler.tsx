@@ -221,6 +221,8 @@ const Scheduler: React.FC = () => {
     let middleDate: Date;
 
     if (currentView === "agenda") {
+      // TODO: direkt date dropdowndan seçilirse oraya gitmiyor 1 ay yaklaşıyor sadece.
+      // TODO: agenda viewdan week viewa geçince yanlış aralığı gösteriyor
       const today = dayjs();
       const start = dayjs(startDate);
       const end = dayjs(endDate);
@@ -245,6 +247,7 @@ const Scheduler: React.FC = () => {
     }
 
     setDate(middleDate);
+    messages.noEventsInRange = "";
     setSessions([]);
     localStorage.setItem("savedCalendarDate", middleDate.toISOString());
 
@@ -291,6 +294,7 @@ const Scheduler: React.FC = () => {
         message.error("Failed to load events.");
       })
       .finally(() => {
+        messages.noEventsInRange = t.noEventsInRange || "No events in range.";
         if (showLoading) setLoading(false);
       });
   };
@@ -444,15 +448,26 @@ const Scheduler: React.FC = () => {
 
   const handleViewChange = (view: View) => {
     localStorage.setItem("savedCalendarView", view);
+
     const newParams = new URLSearchParams(searchParams.toString());
     newParams.set("v", view);
     setSearchParams(newParams);
     setCurrentView(view);
 
+    // 📅 View'e göre date düzeltmesi yap
     if (view === "agenda") {
-      // mevcut date ne olursa olsun ayın 1'ine çek
       const startOfMonth = dayjs(date).startOf("month").toDate();
       setDate(startOfMonth);
+    }
+
+    if (view === "week") {
+      const startOfWeek = dayjs(date).startOf("week").toDate(); // Pazartesi baz alıyor
+      setDate(startOfWeek);
+    }
+
+    if (view === "day") {
+      const startOfDay = dayjs(date).startOf("day").toDate();
+      setDate(startOfDay);
     }
   };
 
