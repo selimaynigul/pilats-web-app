@@ -158,7 +158,7 @@ const Scheduler: React.FC = () => {
       }
     }
     // eslint-disable-next-line
-  }, [urlDate, currentView]);
+  }, [currentView]);
 
   useEffect(() => {
     if (date) {
@@ -419,10 +419,8 @@ const Scheduler: React.FC = () => {
       )}
       <DragAndDropCalendar
         popup
-        defaultDate={date}
         date={date}
         view={currentView}
-        onView={handleViewChange}
         draggableAccessor={() => hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN"])}
         events={sessions}
         localizer={localizer}
