@@ -72,20 +72,21 @@ const StyledNameInput = styled(Input)`
 
 interface AddClassFormProps {
   visible: boolean;
-  onCancel: () => void;
   onSubmit: (values: any) => void;
   selectedRange: { start: Date; end: Date } | null;
   nameRef: React.RefObject<any>;
+  currentView: string;
+  form: any;
 }
 
 const AddClassForm: React.FC<AddClassFormProps> = ({
   visible,
-  onCancel,
   onSubmit,
   selectedRange,
   nameRef,
+  currentView,
+  form,
 }) => {
-  const [form] = Form.useForm();
   const [repeat, setRepeat] = useState(false);
   const [repeatFrequency, setRepeatFrequency] = useState("weekly");
   const [showDescription, setShowDescription] = useState(false);
@@ -104,11 +105,22 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
         )
       : true;
     setRepeat(!isSingleDay);
-    form.setFieldsValue({
-      startDate: selectedRange ? dayjs(selectedRange.start) : null,
-      endDate: !isSingleDay ? dayjs(selectedRange?.end) : null,
+
+    const startTime = selectedRange ? dayjs(selectedRange.start) : null;
+    const endTime = selectedRange ? dayjs(selectedRange.end) : null;
+
+    const initialValues: any = {
+      startDate: startTime?.startOf("day") || null,
+      endDate: !isSingleDay ? endTime : null,
       repeat: !isSingleDay,
-    });
+    };
+
+    // Eğer month view değilse, saat bilgilerini ekle
+    if (selectedRange && currentView !== "month") {
+      initialValues.timeRange = [startTime, endTime];
+    }
+
+    form.setFieldsValue(initialValues);
   }, [selectedRange, form]);
 
   useEffect(() => {
@@ -134,6 +146,15 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
         message.error("Failed to fetch trainers.");
       });
   }, []);
+
+  useEffect(() => {
+    if (!visible) {
+      form.resetFields();
+      setRepeat(false);
+      setRepeatFrequency("weekly");
+      setShowDescription(false);
+    }
+  }, [visible]);
 
   const handleBranchChange = (branchId: number) => {
     setSelectedBranch(branchId);

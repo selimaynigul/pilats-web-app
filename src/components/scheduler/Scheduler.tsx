@@ -7,7 +7,7 @@ import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import CustomEvent from "./event/Event";
-import { message, Spin } from "antd";
+import { Form, message, Spin } from "antd";
 import AddClassForm from "components/scheduler/add-class-form/AddClassForm";
 import CustomToolbar from "components/scheduler/toolbar/scheduler-toolbar";
 import {
@@ -214,7 +214,6 @@ const Scheduler: React.FC = () => {
   }, [visibleRange, params]);
 
   const updateVisibleDate = (range: { start: Date; end: Date } | Date[]) => {
-    console.log("Updating visible date range:", range);
     const startDate = Array.isArray(range) ? range[0] : range.start;
     const endDate = Array.isArray(range) ? range[range.length - 1] : range.end;
 
@@ -482,6 +481,8 @@ const Scheduler: React.FC = () => {
     );
   };
 
+  const [form] = Form.useForm();
+
   return (
     <CalendarWrapper>
       {loading && (
@@ -550,8 +551,11 @@ const Scheduler: React.FC = () => {
       />
 
       <StyledModal
-        visible={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
+        open={isModalVisible}
+        onCancel={() => {
+          setIsModalVisible(false);
+          form.resetFields();
+        }}
         footer={null}
         closable={false}
         afterOpenChange={(open) => {
@@ -561,11 +565,12 @@ const Scheduler: React.FC = () => {
         }}
       >
         <AddClassForm
+          form={form}
           visible={isModalVisible}
-          onCancel={() => setIsModalVisible(false)}
           onSubmit={addSession}
           selectedRange={selectedRange}
           nameRef={nameInputRef}
+          currentView={currentView}
         />
       </StyledModal>
     </CalendarWrapper>
