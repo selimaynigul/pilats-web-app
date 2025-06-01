@@ -98,6 +98,13 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
   const { t } = useLanguage();
 
   useEffect(() => {
+    // Prop doluysa ve henüz local state boşsa veya id’ler farklıysa güncelle
+    if (selectedItem && selectedItem.id !== selectedCompany?.id) {
+      setSelectedCompany(selectedItem);
+    }
+  }, [selectedItem]);
+
+  useEffect(() => {
     if (buttonRef.current) {
       const buttonWidth = buttonRef.current.offsetWidth;
       setInputWidth(`${buttonWidth + 35}px`);

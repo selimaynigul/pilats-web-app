@@ -38,7 +38,10 @@ type EventDropArgs = {
   isAllDay?: boolean;
 };
 
-const Scheduler: React.FC = () => {
+const Scheduler: React.FC<{
+  selectedCompany: any;
+  setSelectedCompany: any;
+}> = ({ selectedCompany, setSelectedCompany }) => {
   const { date: urlDate } = useParams<{ date?: string }>();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -58,10 +61,7 @@ const Scheduler: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [sessions, setSessions] = useState<any[]>([]);
   const { t, userLanguage } = useLanguage();
-  const [company, setCompany] = useState<any>({
-    companyName: hasRole(["ADMIN"]) ? t.selectCompany : t.selectBranch,
-    id: null,
-  });
+
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRange, setSelectedRange] = useState<{
     start: Date;
@@ -97,16 +97,21 @@ const Scheduler: React.FC = () => {
     const isAdmin = hasRole(["ADMIN"]);
     return {
       companyId: isAdmin
-        ? company?.branchName
-          ? company?.companyId
-          : company?.id
+        ? selectedCompany?.branchName
+          ? selectedCompany?.companyId
+          : selectedCompany?.id
         : getCompanyId(),
-      branchId: company.branchName ? company.id : null,
+      branchId: selectedCompany.companyParam
+        ? selectedCompany.branchParam ||
+          (selectedCompany.branchName ? selectedCompany.id : null)
+        : selectedCompany.branchName
+          ? selectedCompany.id
+          : null,
       searchByPageDto: {
         pageSize: 200,
       },
     };
-  }, [company]);
+  }, [selectedCompany]);
 
   useEffect(() => {
     if (userLanguage === "tr") {
@@ -604,8 +609,8 @@ const Scheduler: React.FC = () => {
           toolbar: (props) => (
             <CustomToolbar
               {...props}
-              setCompany={setCompany}
-              company={company}
+              setCompany={setSelectedCompany}
+              company={selectedCompany}
               setIsModalVisible={setIsModalVisible}
               onView={handleViewChange}
             />

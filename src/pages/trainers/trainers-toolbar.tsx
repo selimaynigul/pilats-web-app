@@ -104,7 +104,6 @@ const TrainersToolbar: React.FC<{
       });
   };
 
-  console.log("Selected company in toolbar:", selectedCompany);
   return (
     <ToolbarContainer>
       <CountContainer>
