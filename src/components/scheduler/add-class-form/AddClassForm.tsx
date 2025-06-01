@@ -15,6 +15,7 @@ import { addClassFormItems as formItems } from "./add-class-form-items";
 import dayjs from "dayjs";
 import styled from "styled-components";
 import {
+  TeamOutlined,
   UserOutlined,
   CalendarOutlined,
   ClockCircleOutlined,
@@ -44,6 +45,10 @@ const StyleOverrides = styled.div`
       flex: 1;
     }
   }
+
+  .ant-input-number-filled {
+    width: 100%;
+  }
 `;
 
 const CustomIcon = styled.span`
@@ -67,6 +72,17 @@ const StyledNameInput = styled(Input)`
   &:focus {
     border: none;
     border-bottom: 1px solid ${(props) => props.theme.primary};
+  }
+`;
+
+const NameInputStyles = styled.div`
+  .ant-input-filled {
+    font-weight: 500;
+    font-size: 1.1rem;
+    color: #333;
+  }
+  .ant-input-filled.ant-input-status-error:not(.ant-input-disabled) {
+    border-radius: 10px;
   }
 `;
 
@@ -219,8 +235,6 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
   }, [showDescription]);
 
   const handleTrainerSearch = (value: string) => {
-    if (!value) return;
-
     trainerService
       .search({
         ucSearchRequest: {
@@ -264,7 +278,9 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
         variant="filled"
       >
         <Form.Item name="className" rules={formItems.className.rules}>
-          <StyledNameInput ref={nameRef} placeholder="Enter class name" />
+          <NameInputStyles>
+            <StyledNameInput ref={nameRef} placeholder="Enter class name" />
+          </NameInputStyles>
         </Form.Item>
 
         {!showDescription && (
@@ -280,7 +296,7 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
         )}
 
         {showDescription && (
-          <Form.Item name="description" rules={formItems.description.rules}>
+          <Form.Item name="description">
             <div
               className="custom-input"
               style={{
@@ -337,7 +353,11 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
           <CustomIcon style={{ marginTop: 8 }}>
             <ClockCircleOutlined />
           </CustomIcon>
-          <Form.Item style={{ width: "100%" }} name="timeRange">
+          <Form.Item
+            style={{ width: "100%" }}
+            name="timeRange"
+            rules={formItems.time.rules}
+          >
             <TimePicker.RangePicker
               format="HH:mm"
               minuteStep={5}
@@ -430,7 +450,7 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
                 onBlur={() => setTrainerExpanded(false)}
               >
                 {trainers.map((trainer: any) => {
-                  if (trainer.passive) {
+                  if (trainer.passive || true) {
                     return (
                       <Select.Option key={trainer.id} value={trainer.id}>
                         {trainer.ucGetResponse.name}{" "}
@@ -441,6 +461,32 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
                 })}
               </Select>
             </Form.Item>
+            <div
+              className="custom-input"
+              style={{
+                display: "flex",
+                alignItems: "start",
+                marginLeft: 16,
+              }}
+            >
+              <CustomIcon style={{ marginTop: 8 }}>
+                <TeamOutlined />
+              </CustomIcon>
+              <Form.Item
+                name="totalCapacity"
+                rules={[
+                  { required: true, message: "Please enter a quota value." },
+                  {
+                    type: "number",
+                    min: 1,
+                    message: "Quota must be at least 1",
+                  },
+                ]}
+                style={{ width: "100%" }}
+              >
+                <InputNumber placeholder="Quota" min={1} step={1} />
+              </Form.Item>
+            </div>
           </div>
         )}
         <Form.Item

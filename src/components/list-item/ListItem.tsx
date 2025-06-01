@@ -123,7 +123,7 @@ const ListItem: React.FC<ListItemProps> = ({ data, type = "default" }) => {
                   href={`mailto:${contact.email}`}
                   style={{ color: "#4a4a4a" }}
                 >
-                  <ContactButton>
+                  <ContactButton title={contact.email}>
                     <BsEnvelopeFill />
                   </ContactButton>
                 </a>

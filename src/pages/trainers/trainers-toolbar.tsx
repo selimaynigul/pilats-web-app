@@ -4,7 +4,7 @@ import AddButton from "components/AddButton";
 import AddTrainerModal from "./add-trainer-form/add-trainer-form";
 import { trainerService } from "services";
 import { handleError } from "utils/apiHelpers";
-import { message } from "antd";
+import { Form, message } from "antd";
 import { CompanyDropdown } from "components";
 import moment from "moment";
 import { hasRole } from "utils/permissionUtils";
@@ -61,6 +61,7 @@ const TrainersToolbar: React.FC<{
   const [isModalVisible, setIsModalVisible] = React.useState(false);
   const [loading, setLoading] = useState(false);
   const { t } = useLanguage();
+  const [form] = Form.useForm();
 
   const handleAddTrainer = (values: any) => {
     const payload = {
@@ -103,6 +104,7 @@ const TrainersToolbar: React.FC<{
       });
   };
 
+  console.log("Selected company in toolbar:", selectedCompany);
   return (
     <ToolbarContainer>
       <CountContainer>
@@ -122,8 +124,13 @@ const TrainersToolbar: React.FC<{
       <AddTrainerModal
         loading={loading}
         visible={isModalVisible}
-        onClose={() => setIsModalVisible(false)}
+        onClose={() => {
+          form.resetFields();
+          setIsModalVisible(false);
+        }}
         onSubmit={handleAddTrainer}
+        company={selectedCompany}
+        form={form}
       />
     </ToolbarContainer>
   );

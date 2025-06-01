@@ -223,15 +223,13 @@ const Toolbar: React.FC<
               </ConfigProvider>
             </NavButtons>
 
-            <div>
+            <NavButtons>
               {hasRole(["ADMIN", "COMPANY_ADMIN"]) && (
                 <CompanyDropdown
                   selectedItem={company}
                   onSelect={(selectedCompany) => setCompany(selectedCompany)}
                 />
               )}
-            </div>
-            <NavButtons>
               <Dropdown menu={{ items }} trigger={["click"]}>
                 <ToggleViewButton
                   style={{ display: "flex", alignItems: "center", gap: 8 }}

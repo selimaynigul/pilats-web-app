@@ -65,6 +65,7 @@ const PackageList: React.FC<PackageListProps> = ({
                 remainingChangeCount: item.remainingChangeCount,
                 creditCount: item.creditCount,
                 remainingCreditCount: item.remainingCreditCount,
+                companyId: item.companyId,
               }}
               mode="admin"
               onDelete={() => {

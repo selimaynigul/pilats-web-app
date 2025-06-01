@@ -4,13 +4,6 @@ import { Helmet } from "react-helmet";
 import { useLanguage } from "hooks";
 import styled from "styled-components";
 
-const Container = styled.div`
-/*   overflow: hidden;
- */
-background: red;
-
-`
-
 const ClassesPage: React.FC = () => {
   const { t } = useLanguage();
 

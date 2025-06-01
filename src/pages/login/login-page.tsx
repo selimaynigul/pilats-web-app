@@ -154,8 +154,17 @@ const LoginPage: React.FC = () => {
 
         login(res.data, from);
       })
-      .catch(() => {
-        message.error("Login failed");
+      .catch((error: any) => {
+        console.error("Login error:", error);
+        if (error.response?.data.errorCode === 101) {
+          message.error("Invalid email or password");
+        } else if (error.response?.data.errorCode === 103) {
+          message.error("Account not found");
+        } else {
+          message.error(
+            error.response?.data?.message || "An unexpected error occurred"
+          );
+        }
       })
       .finally(() => {
         setLoading(false);

@@ -23,7 +23,8 @@ import "moment/locale/tr";
 import "moment/locale/en-gb";
 import { View } from "react-big-calendar";
 import isBetween from "dayjs/plugin/isBetween";
-import { start } from "repl";
+import Draggable from "react-draggable";
+import type { DraggableEvent, DraggableData } from "react-draggable";
 dayjs.extend(isBetween);
 
 const validViews: View[] = ["month", "week", "day", "agenda"];
@@ -82,6 +83,14 @@ const Scheduler: React.FC = () => {
     }
     const savedDate = localStorage.getItem("savedCalendarDate");
     return savedDate ? new Date(savedDate) : new Date();
+  });
+
+  const draggleRef = useRef<HTMLDivElement>(null!);
+  const [bounds, setBounds] = useState({
+    left: 0,
+    top: 0,
+    bottom: 0,
+    right: 0,
   });
 
   const params = useMemo(() => {
@@ -304,9 +313,18 @@ const Scheduler: React.FC = () => {
     const now = new Date();
     const selectedStart = new Date(slotInfo.start);
 
-    // Tarih kontrolü: Bugünün öncesi ise engelle
-    if (selectedStart < new Date(now.setHours(0, 0, 0, 0))) {
+    const nowDay = dayjs(now);
+    const startDay = dayjs(selectedStart);
+
+    // 🔒 1. Geçmiş gün kontrolü
+    if (startDay.isBefore(nowDay.startOf("day"))) {
       message.warning("Geçmiş tarihler seçilemez.");
+      return;
+    }
+
+    // ⏳ 2. Aynı günse ve saat geçmişse
+    if (startDay.isSame(nowDay, "day") && startDay.isBefore(nowDay)) {
+      message.warning("Başlangıç saati geçmiş olamaz.");
       return;
     }
 
@@ -346,6 +364,7 @@ const Scheduler: React.FC = () => {
       repeatEndDate: values.endDate
         ? dayjs(values.endDate).format("YYYY-MM-DD")
         : null,
+      totalCapacity: values.totalCapacity || 0,
     };
 
     sessionService
@@ -455,6 +474,19 @@ const Scheduler: React.FC = () => {
         boxShadow: "none",
       },
     };
+  };
+
+  const onStart = (_event: DraggableEvent, uiData: DraggableData) => {
+    const { clientWidth, clientHeight } = window.document.documentElement;
+    const targetRect = draggleRef.current?.getBoundingClientRect();
+    if (!targetRect) return;
+
+    setBounds({
+      left: -targetRect.left + uiData.x,
+      right: clientWidth - (targetRect.right - uiData.x),
+      top: -targetRect.top + uiData.y,
+      bottom: clientHeight - (targetRect.bottom - uiData.y),
+    });
   };
 
   const handleViewChange = (view: View) => {
@@ -616,6 +648,18 @@ const Scheduler: React.FC = () => {
             nameInputRef.current?.focus();
           }
         }}
+        maskStyle={{ background: "transparent" }}
+        modalRender={(modal) => (
+          <Draggable
+            handle=".ant-modal-content"
+            cancel=".ant-modal-body"
+            bounds={bounds}
+            nodeRef={draggleRef}
+            onStart={onStart}
+          >
+            <div ref={draggleRef}>{modal}</div>
+          </Draggable>
+        )}
       >
         <AddClassForm
           form={form}

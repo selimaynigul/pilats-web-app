@@ -18,9 +18,9 @@ const AddPackageForm: React.FC<AddPackageFormProps> = ({
   const [branches, setBranches] = useState([]);
   const [companySearchLoading, setCompanySearchLoading] = useState(false);
   const [branchLoading, setBranchLoading] = useState(false);
+  const [isBranchSpecific, setIsBranchSpecific] = useState(false);
 
   const handleCompanySearch = async (value: string) => {
-    if (!value) return;
     setCompanySearchLoading(true);
     try {
       const res = await companyService.search({ companyName: value });
@@ -63,7 +63,12 @@ const AddPackageForm: React.FC<AddPackageFormProps> = ({
       onCancel={onClose}
       footer={null}
     >
-      <Form form={form} layout="vertical" onFinish={handleSubmit}>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleSubmit}
+        variant="filled"
+      >
         <Form.Item
           label="Name"
           name="name"
@@ -72,11 +77,7 @@ const AddPackageForm: React.FC<AddPackageFormProps> = ({
           <Input placeholder="Enter package name" />
         </Form.Item>
 
-        <Form.Item
-          label="Description"
-          name="description"
-          rules={[{ required: true, message: "Please enter a description" }]}
-        >
+        <Form.Item label="Description" name="description">
           <Input.TextArea placeholder="Enter description" />
         </Form.Item>
 
@@ -153,6 +154,9 @@ const AddPackageForm: React.FC<AddPackageFormProps> = ({
             filterOption={false}
             onSearch={handleCompanySearch}
             onSelect={handleCompanySelect}
+            onFocus={() => {
+              handleCompanySearch("");
+            }}
             loading={companySearchLoading}
           >
             {companies.map((company: any) => (
@@ -169,34 +173,31 @@ const AddPackageForm: React.FC<AddPackageFormProps> = ({
           valuePropName="checked"
         >
           <Switch
-            onChange={(checked) =>
-              !checked && form.setFieldsValue({ branchId: null })
-            }
+            checked={isBranchSpecific}
+            onChange={(checked) => {
+              setIsBranchSpecific(checked);
+              if (!checked) {
+                form.setFieldsValue({ branchId: null });
+              }
+            }}
           />
         </Form.Item>
 
-        <Form.Item
-          label="Branch"
-          name="branchId"
-          rules={[
-            {
-              required: form.getFieldValue("isBranchSpecific"),
-              message: "Please select a branch",
-            },
-          ]}
-        >
-          <Select
-            placeholder="Select branch"
-            loading={branchLoading}
-            disabled={!form.getFieldValue("isBranchSpecific")}
+        {isBranchSpecific && (
+          <Form.Item
+            label="Branch"
+            name="branchId"
+            rules={[{ required: true, message: "Please select a branch" }]}
           >
-            {branches.map((branch: any) => (
-              <Select.Option key={branch.id} value={branch.id}>
-                {branch.branchName}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
+            <Select placeholder="Select branch" loading={branchLoading}>
+              {branches.map((branch: any) => (
+                <Select.Option key={branch.id} value={branch.id}>
+                  {branch.branchName}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+        )}
 
         <Form.Item>
           <Button type="primary" htmlType="submit">

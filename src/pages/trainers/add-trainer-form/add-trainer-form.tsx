@@ -10,6 +10,8 @@ interface AddTrainerFormProps {
   onClose: () => void;
   onSubmit: (values: any) => void;
   loading: boolean;
+  company?: any;
+  form: any;
 }
 
 const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
@@ -17,8 +19,9 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
   onClose,
   onSubmit,
   loading,
+  company,
+  form,
 }) => {
-  const [form] = Form.useForm();
   const [companies, setCompanies] = useState([]);
   const [branches, setBranches] = useState([]);
   const [companySearchLoading, setCompanySearchLoading] = useState(false);
@@ -38,6 +41,28 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
     fetchJobs();
   }, []);
 
+  useEffect(() => {
+    if (!visible) {
+      form.resetFields();
+      setBranches([]); // şube listesini temizle
+    }
+  }, [visible]);
+
+  /*  useEffect(() => {
+    // ADMIN ise tüm şirketler aransın
+    if (hasRole(["ADMIN"])) {
+      handleCompanySearch("All");
+    }
+
+    // company prop geldiyse formda otomatik setle
+    if (company?.id || company?.companyParam) {
+      form.setFieldsValue({ company: company.id });
+      fetchBranches(company.id);
+    }
+
+    fetchJobs();
+  }, [company]); */
+
   const fetchBranches = async (companyId: string) => {
     if (!companyId) return;
     setBranchLoading(true);
@@ -52,7 +77,6 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
   };
 
   const handleCompanySearch = async (value: string) => {
-    if (!value) return;
     let companyName;
     if (value === "All") {
       companyName = null;
@@ -76,7 +100,7 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
       const response = await jobService.getAll();
       setJobs(response.data);
     } catch (error) {
-      message.error("Failed to fetch jobs");
+      console.error("Failed to fetch jobs");
     } finally {
       setJobLoading(false);
     }
@@ -103,7 +127,7 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
   const handleSubmit = () => {
     form
       .validateFields()
-      .then((values) => {
+      .then((values: any) => {
         let modifiedValues = values;
 
         if (hasRole(["BRANCH_ADMIN"])) {
@@ -114,14 +138,19 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
         onSubmit(modifiedValues);
         form.resetFields();
       })
-      .catch((info) => {
+      .catch((info: any) => {
         console.error("Validation Failed:", info);
       });
   };
 
   return (
     <Modal title="Add Trainer" open={visible} onCancel={onClose} footer={null}>
-      <Form form={form} layout="vertical" onFinish={handleSubmit}>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleSubmit}
+        variant="filled"
+      >
         <Form.Item {...addTrainerFormItems.name} name="name">
           <Input placeholder="Enter trainer's name" />
         </Form.Item>
@@ -151,7 +180,7 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
             <Select
               placeholder="Select branch"
               loading={branchLoading}
-              disabled={!branches.length}
+              /*      disabled={!branches.length} */
             >
               {branches.map((branch: any) => (
                 <Select.Option key={branch.id} value={branch.id}>

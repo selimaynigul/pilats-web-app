@@ -296,7 +296,10 @@ export const StyledModal = styled(Modal)`
   .ant-modal-content {
     padding-bottom: 1px;
     max-width: 400px;
-    /*     max-height: 420px;
-    overflow-y: scroll; */
+    cursor: move;
+  }
+  .ant-modal-body {
+    cursor: default;
+    background: white;
   }
 `;

@@ -26,8 +26,8 @@ export const StyledContent = styled(Content)<{
   display: flex;
   flex-direction: column;
   height: 100dvh;
-/*   overflow-Y: hidden; */
-  
+  /*   overflow-Y: hidden; */
+
   &::-webkit-scrollbar-track {
     margin: 24px 0;
   }
@@ -166,4 +166,8 @@ export const CategoryItem = styled.div<{ isSelected: boolean }>`
   color: ${({ isSelected }) => (isSelected ? theme.primaryColor : "inherit")};
   background: ${({ isSelected }) =>
     isSelected ? theme.secondaryColor : "transparent"};
+
+  &:hover {
+    background: rgba(238, 237, 251, 0.57);
+  }
 `;

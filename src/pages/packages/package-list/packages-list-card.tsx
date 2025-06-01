@@ -6,7 +6,7 @@ import {
   RightOutlined,
   LeftOutlined,
 } from "@ant-design/icons";
-import { Dropdown, Menu, Modal, message } from "antd";
+import { Dropdown, Input, Menu, Modal, message } from "antd";
 import { companyPackageService, userService } from "services";
 import { capitalize } from "utils/permissionUtils";
 import ProgressBar from "components/ProgressBar";
@@ -24,6 +24,7 @@ interface Package {
   remainingChangeCount: number;
   creditCount: number;
   remainingCreditCount: number;
+  companyId: number;
 }
 
 interface CardProps {
@@ -183,8 +184,8 @@ const PackageCard: React.FC<CardProps> = ({
     try {
       const res = await userService.search({
         ucSearchRequest: { name: value },
+        companyId: pkg.companyId,
       });
-      console.log(res);
       setSearchResults(res?.data || []);
     } catch (error) {
       message.error("Kullanıcılar alınamadı");
@@ -348,9 +349,8 @@ const PackageCard: React.FC<CardProps> = ({
   return (
     <>
       {renderCardContent()}
-
       <Modal
-        title="Paketi Kullanıcıya Ata"
+        title="Paketi müşteriye ata"
         open={assignModalVisible}
         onCancel={() => {
           setAssignModalVisible(false);
@@ -358,18 +358,21 @@ const PackageCard: React.FC<CardProps> = ({
           setSearchResults([]);
         }}
         footer={null}
+        closable={false}
       >
-        <p>Kullanıcı Ara:</p>
-        <input
+        <Input
           type="text"
           value={searchValue}
+          onFocus={() => {
+            handleUserSearch("");
+          }}
           onChange={(e) => {
             const val = e.target.value;
             setSearchValue(val);
             if (val.trim().length > 0) handleUserSearch(val);
             else setSearchResults([]);
           }}
-          placeholder="İsim, e-posta, vs..."
+          placeholder="Müşteri ara"
           style={{
             width: "100%",
             padding: "8px",
@@ -381,6 +384,8 @@ const PackageCard: React.FC<CardProps> = ({
 
         {searchLoading ? (
           <p>Yükleniyor...</p>
+        ) : searchResults.length === 0 && searchValue.trim() ? (
+          <p>Kullanıcı bulunamadı</p>
         ) : (
           <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
             {searchResults.map((user) => (
@@ -426,8 +431,6 @@ const PackageCard: React.FC<CardProps> = ({
                   <strong>
                     {user.ucGetResponse.name} {user.ucGetResponse.surname}
                   </strong>
-                  {/* Email'i istersen altına ekleyebilirsin */}
-                  {/* <div style={{ fontSize: "12px", color: "#999" }}>{user.email}</div> */}
                 </div>
               </li>
             ))}

@@ -223,7 +223,7 @@ const CompanyBranchList: React.FC<{
           form.validateFields().then(handleAddBranch).catch(console.error);
         }}
       >
-        <Form form={form} layout="vertical">
+        <Form form={form} layout="vertical" variant="filled">
           <Form.Item
             name="branchName"
             label="Branch Name"

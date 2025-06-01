@@ -7,6 +7,7 @@ interface AddAdminModalProps {
   onClose: () => void;
   onSubmit: (values: any) => void;
   isBranchMode: boolean;
+  form: any;
 }
 
 const AddAdminModal: React.FC<AddAdminModalProps> = ({
@@ -14,8 +15,8 @@ const AddAdminModal: React.FC<AddAdminModalProps> = ({
   onClose,
   onSubmit,
   isBranchMode,
+  form,
 }) => {
-  const [form] = Form.useForm();
   const [companies, setCompanies] = useState([]);
   const [branches, setBranches] = useState([]);
   const [companySearchLoading, setCompanySearchLoading] = useState(false);
@@ -32,7 +33,6 @@ const AddAdminModal: React.FC<AddAdminModalProps> = ({
   }, [isBranchMode, form]);
 
   const handleCompanySearch = async (value: string) => {
-    if (!value) return;
     setCompanySearchLoading(true);
     try {
       const res = await companyService.search({ companyName: value });
@@ -63,11 +63,10 @@ const AddAdminModal: React.FC<AddAdminModalProps> = ({
   const handleSubmit = () => {
     form
       .validateFields()
-      .then((values) => {
+      .then((values: any) => {
         onSubmit(values);
-        form.resetFields();
       })
-      .catch((info) => {
+      .catch((info: any) => {
         console.error("Validation Failed:", info);
       });
   };
@@ -130,6 +129,7 @@ const AddAdminModal: React.FC<AddAdminModalProps> = ({
               onSearch={handleCompanySearch}
               onSelect={handleCompanySelect}
               loading={companySearchLoading}
+              onFocus={() => handleCompanySearch("")}
             >
               {companies.map((company: any) => (
                 <Select.Option key={company.id} value={company.id}>

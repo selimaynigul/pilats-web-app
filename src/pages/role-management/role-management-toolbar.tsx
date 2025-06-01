@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import AddButton from "components/AddButton";
 import AddAdminModal from "./add-admin-modal";
-import { Button, message, Tooltip } from "antd";
+import { Button, Form, message, Tooltip } from "antd";
 import { CompanyDropdown } from "components";
 import { hasRole } from "utils/permissionUtils";
 import { companyAdminService, branchAdminService } from "services";
@@ -110,12 +110,17 @@ const RoleManagementToolbar: React.FC<{
       } else {
         await companyAdminService.register(payload);
         message.success("Company Admin added successfully!");
+        form.resetFields();
         window.location.reload();
       }
       setIsModalVisible(false);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error adding admin:", err);
-      message.error("Failed to add admin. Please try again.");
+      if (err.response && err.response.data.errorCode === 102) {
+        message.error("Email already exists. Please use a different email.");
+      } else {
+        message.error("Failed to add admin. Please try again.");
+      }
     }
   };
 
@@ -124,6 +129,8 @@ const RoleManagementToolbar: React.FC<{
       setIsBranchMode((prev: any) => !prev);
     }
   };
+
+  const [form] = Form.useForm();
 
   return (
     <ToolbarContainer>
@@ -154,6 +161,7 @@ const RoleManagementToolbar: React.FC<{
         onClose={() => setIsModalVisible(false)}
         onSubmit={handleAddAdmin}
         isBranchMode={isBranchMode}
+        form={form}
       />
     </ToolbarContainer>
   );

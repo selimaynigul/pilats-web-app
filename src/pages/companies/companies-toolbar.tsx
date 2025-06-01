@@ -56,7 +56,11 @@ const CompaniesToolbar: React.FC<{
         window.location.reload();
       })
       .catch((err) => {
-        console.error("Error updating company:", err);
+        console.error("Error adding company:", err);
+
+        if (err.response && err.response.data) {
+          message.error(err.response.data.message || "Failed to add company");
+        }
         handleError(err);
       });
   };
@@ -77,7 +81,7 @@ const CompaniesToolbar: React.FC<{
           form.validateFields().then(handleAddCompany).catch(console.error);
         }}
       >
-        <Form form={form} layout="vertical">
+        <Form form={form} layout="vertical" variant="filled">
           <Form.Item
             name="companyName"
             label="Company Name"

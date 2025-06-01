@@ -5,21 +5,18 @@ export const addClassFormItems = {
   },
   description: {
     label: "Description",
-    rules: [{ required: true, message: "Please enter a description" }],
   },
   startDate: {
     label: "Date",
     rules: [{ required: true, message: "Please select the date" }],
   },
-  startTime: {
+  time: {
     label: "Time",
     rules: [{ required: true, message: "Please select the time" }],
   },
   trainer: {
     label: "Trainer",
-    rules: [
-      /* { required: true, message: "Please select a trainer" } */
-    ],
+    rules: [{ required: true, message: "Please select a trainer" }],
   },
   customDays: {
     label: "Custom Days Interval",

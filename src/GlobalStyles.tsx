@@ -112,6 +112,11 @@ const GlobalStyle = createGlobalStyle`
 border-radius: 50px !important;
 }
 
+.ant-picker-cell-today > .ant-picker-cell-inner::before {
+  
+  border-color: ${({ theme }) => theme.primary} !important;
+  border-radius: 20px !important;
+}
 
 /* For WebKit browsers (Chrome, Safari) */
 &::-webkit-scrollbar {
