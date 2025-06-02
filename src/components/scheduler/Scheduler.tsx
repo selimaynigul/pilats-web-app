@@ -227,51 +227,58 @@ const Scheduler: React.FC<{
     }
   }, [visibleRange, params]);
 
+  // Güncellenmiş, kopyala-yapıştır hazır `updateVisibleDate`
   const updateVisibleDate = (range: { start: Date; end: Date } | Date[]) => {
     const startDate = Array.isArray(range) ? range[0] : range.start;
     const endDate = Array.isArray(range) ? range[range.length - 1] : range.end;
 
     let middleDate: Date;
 
+    /* 1) Mevcut tarih (state) ile yeni aralığın ilk günü arasındaki AY farkı */
+    const monthsDiff = Math.abs(dayjs(startDate).diff(dayjs(date), "month"));
+
+    /* 2) Eğer fark ≥ 2 ay ise: direkt o ayın 1’ine git */
     if (currentView === "agenda") {
-      // TODO: direkt date dropdowndan seçilirse oraya gitmiyor 1 ay yaklaşıyor sadece.
-      // TODO: agenda viewdan week viewa geçince yanlış aralığı gösteriyor
-      const today = dayjs();
-      const start = dayjs(startDate);
-      const end = dayjs(endDate);
-
-      let targetMonth: dayjs.Dayjs;
-
-      if (today.isBetween(start, end, "day", "[]")) {
-        targetMonth = today.startOf("month"); // today clicked
-      } else if (start.isBefore(dayjs(date), "month")) {
-        targetMonth = dayjs(date).subtract(1, "month").startOf("month"); // prev clicked
-      } else if (start.isAfter(dayjs(date), "month")) {
-        targetMonth = dayjs(date).add(1, "month").startOf("month"); // next clicked
+      if (monthsDiff >= 2) {
+        middleDate = dayjs(startDate).startOf("month").toDate();
       } else {
-        targetMonth = dayjs(date).startOf("month"); // fallback
-      }
+        /* 3) AGENDA view için mevcut “özel” hesaplama */
+        const today = dayjs();
+        const start = dayjs(startDate);
+        const end = dayjs(endDate);
 
-      middleDate = targetMonth.date(1).startOf("day").toDate();
+        let targetMonth: dayjs.Dayjs;
+
+        if (today.isBetween(start, end, "day", "[]")) {
+          targetMonth = today.startOf("month"); // bugün görünüyorsa
+        } else if (start.isBefore(dayjs(date), "month")) {
+          targetMonth = dayjs(date).subtract(1, "month").startOf("month"); // «Prev» tıklandı
+        } else if (start.isAfter(dayjs(date), "month")) {
+          targetMonth = dayjs(date).add(1, "month").startOf("month"); // «Next» tıklandı
+        } else {
+          targetMonth = dayjs(date).startOf("month"); // güvenlik
+        }
+
+        middleDate = targetMonth.date(1).startOf("day").toDate();
+      }
     } else {
+      /* 4) Diğer view’ler: mevcut ortalama mantık */
       middleDate = new Date(
         (new Date(startDate).getTime() + new Date(endDate).getTime()) / 2
       );
     }
 
+    /* -- state ve URL güncellemeleri aynen korunur -- */
     setDate(middleDate);
     messages.noEventsInRange = "";
     setSessions([]);
     localStorage.setItem("savedCalendarDate", middleDate.toISOString());
 
     const newParams = new URLSearchParams(searchParams.toString());
-
-    let urlDate;
-    if (currentView === "day") {
-      urlDate = dayjs(middleDate).format("YYYY-MM-DD");
-    } else {
-      urlDate = dayjs(middleDate).format("YYYY-MM");
-    }
+    const urlDate =
+      currentView === "day"
+        ? dayjs(middleDate).format("YYYY-MM-DD")
+        : dayjs(middleDate).format("YYYY-MM");
 
     navigate({
       pathname: `/sessions/${urlDate}`,

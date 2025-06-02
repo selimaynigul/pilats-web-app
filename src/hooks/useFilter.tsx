@@ -59,25 +59,20 @@ export default function useFilter() {
 
   /* ---------- 3)  STATE → URL senk. ----------------------- */
   useEffect(() => {
-    const params: Record<string, string> = {};
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
 
-    const companyId = company.companyId ?? company.id ?? undefined;
-    if (companyId) params.company = companyId;
+      /* company */
+      if (company.companyParam) next.set("company", company.companyParam);
+      else next.delete("company");
 
-    const branchId =
-      company.branchParam ??
-      (company.branchName ? (company.id ?? undefined) : undefined);
-    if (branchId) params.branch = branchId;
+      /* branch */
+      if (company.branchParam) next.set("branch", company.branchParam);
+      else next.delete("branch");
 
-    // {} verilirse query string silinir
-    setSearchParams(params);
-  }, [
-    company.id,
-    company.companyId,
-    company.branchParam,
-    company.branchName,
-    setSearchParams,
-  ]);
+      return next;
+    });
+  }, [company.companyParam, company.branchParam, setSearchParams]);
 
   /* ---------- 4)  ID → İsim Fetch ------------------------ */
   useEffect(() => {
