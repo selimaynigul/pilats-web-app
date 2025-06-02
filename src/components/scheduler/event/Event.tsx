@@ -8,6 +8,7 @@ import { StyledModal } from "../SchedulerStyles";
 import { useLocation, useNavigate } from "react-router-dom";
 import EventPopover from "./EventPopover";
 import EventDrawer from "./EventDrawer";
+import { capitalize } from "utils/permissionUtils";
 
 const Container = styled.div`
   background: #5d46e5;
@@ -134,7 +135,7 @@ const CustomEvent: React.FC<{
           onMouseMove={handleMouseMove}
           onDoubleClick={handleDoubleClick}
         >
-          <strong>{(event as any)?.name}</strong>
+          <strong>{capitalize((event as any)?.name)}</strong>
           {!isMobile && showTime && (
             <small
               style={{

@@ -6,6 +6,7 @@ import { companyPackageService, trainerService } from "services";
 import { Link } from "react-router-dom";
 import PackageCard from "./packages-list-card";
 import { getCompanyId, hasRole } from "utils/permissionUtils";
+import { ListContainer } from "components";
 
 const LoadMoreContainer = styled.div`
   text-align: center;
@@ -53,7 +54,7 @@ const PackageList: React.FC<PackageListProps> = ({
   }, [packages, onTrainerCountChange]);
 
   return (
-    <>
+    <ListContainer>
       <Row gutter={[16, 16]}>
         {packages.map((item: any, index: number) => (
           <Col xs={24} sm={12} md={12} lg={6} key={index}>
@@ -94,7 +95,7 @@ const PackageList: React.FC<PackageListProps> = ({
       )}
 
       {!hasMore && !loading && <></>}
-    </>
+    </ListContainer>
   );
 };
 

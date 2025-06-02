@@ -130,6 +130,13 @@ const RoleManagementToolbar: React.FC<{
     }
   };
 
+  const tabs = (
+    <TabButton disabled={!hasRole(["ADMIN"])} onClick={changeTabs}>
+      {isBranchMode ? t.branch : t.company}
+      <AiOutlineSwap />
+    </TabButton>
+  );
+
   const [form] = Form.useForm();
 
   return (
@@ -144,16 +151,17 @@ const RoleManagementToolbar: React.FC<{
             onSelect={(company) => setSelectedCompany(company)}
           />
         )}
-        <Tooltip
-          title={
-            isBranchMode ? "Switch to Company Mode" : "Switch to Branch Mode"
-          }
-        >
-          <TabButton onClick={changeTabs}>
-            {isBranchMode ? t.branch : t.company}
-            <AiOutlineSwap />
-          </TabButton>
-        </Tooltip>
+        {hasRole(["ADMIN"]) ? (
+          <Tooltip
+            title={
+              isBranchMode ? "Switch to Company Mode" : "Switch to Branch Mode"
+            }
+          >
+            {tabs}
+          </Tooltip>
+        ) : (
+          tabs
+        )}
         <AddButton onClick={() => setIsModalVisible(true)} />
       </ActionContainer>
       <AddAdminModal

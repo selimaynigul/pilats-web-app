@@ -66,13 +66,13 @@ const GlobalStyle = createGlobalStyle`
 }
 
 .ant-popover-inner {
-  background-color: rgba(255, 255, 255, 0.5) !important;
+  background-color: rgba(255, 255, 255, 0.7) !important;
   backdrop-filter: blur(8px) !important;
   border: 1px solid white;
   border-radius: 15px !important;
 }
 
-  .ant-alert-icon {
+  .ant-alert-info  .ant-alert-icon {
     color: ${({ theme }) => theme.primary} !important;
   }
 

@@ -21,6 +21,7 @@
   "description": "Açıklama",
   "trainer": "Eğitmen",
   "attendees": "Katılımcılar",
+  "attendee": "katılımcı",
   "all": "Tümü",
   "searchCompany": "Şirket Ara",
   "searchBranch": "Şube Ara",
@@ -38,7 +39,13 @@
     "week": "Hafta",
     "day": "Gün",
     "agenda": "Ajanda",
-    "listView": "Liste Görünümü"
+    "listView": "Liste Görünümü",
+    "daily": "Günlük",
+    "weekly": "Haftalık",
+    "monthly": "Aylık",
+    "custom": "Özel",
+    "repeat": "Tekrarla",
+    "quota": "Kontenjan"
   },
   "more": "daha",
   "login": "Giriş Yap",
@@ -49,5 +56,29 @@
   "startsIn": "içinde başlayacak.",
   "startsSoon": "Az sonra başlıyor",
   "ongoing": "Etkinlik şu anda devam ediyor.",
-  "ended": "Etkinlik sona erdi."
+  "ended": "Etkinlik sona erdi.",
+  "msg": {
+    "ERR_NETWORK": "Network error, please try again later.",
+    "STS_SUCCESS": "Operation completed successfully."
+  },
+  "loading": "Yükleniyor...",
+  "noAttendees": "Katılımcı bulunamadı.",
+  "noSessions": "Ders bulunamadı.",
+  "noTrainers": "Eğitmen bulunamadı.",
+  "noBranches": "Şube bulunamadı.",
+  "noCompanies": "Şirket bulunamadı.",
+  "noUsers": "Kullanıcı bulunamadı.",
+  "noPackages": "Paket bulunamadı.",
+  "addAttendee": "Katılımcı ekle",
+  "noDescription": "Açıklama yok.",
+  "noAttendeesYet": "Henüz katılımcı yok",
+  "addDescription": "Açıklama ekle",
+  "create": "Oluştur",
+  "enterClassName": "Ders adını girin",
+  "enterDescription": "Açıklamayı girin",
+  "selectDate": "Tarih seçin",
+  "startTime": "Başlangıç saati",
+  "endTime": "Bitiş saati",
+  "selectTrainer": "Eğitmen seçin",
+  "selectEndTime": "Bitiş saatini seçin"
 }

@@ -25,6 +25,7 @@ import {
 } from "@ant-design/icons";
 import { branchService, trainerService } from "services";
 import { getBranchId, getCompanyId, hasRole } from "utils/permissionUtils";
+import { useLanguage } from "hooks";
 
 const StyleOverrides = styled.div`
   .trainer-select {
@@ -112,6 +113,7 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
   const [branchOptions, setBranchOptions] = useState<any[]>([]);
   const [selectedBranch, setSelectedBranch] = useState<any>(null);
   const [selectedDate, setSelectedDate] = useState<dayjs.Dayjs | null>(null);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const isSingleDay = selectedRange
@@ -279,7 +281,7 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
       >
         <Form.Item name="className" rules={formItems.className.rules}>
           <NameInputStyles>
-            <StyledNameInput ref={nameRef} placeholder="Enter class name" />
+            <StyledNameInput ref={nameRef} placeholder={t.enterClassName} />
           </NameInputStyles>
         </Form.Item>
 
@@ -291,7 +293,7 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
             }}
             style={{ marginBottom: "16px", padding: 0, marginLeft: 24 }}
           >
-            + Add Description
+            + {t.addDescription}
           </Button>
         )}
 
@@ -484,7 +486,7 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
                 ]}
                 style={{ width: "100%" }}
               >
-                <InputNumber placeholder="Quota" min={1} step={1} />
+                <InputNumber placeholder={t.calendar.quota} min={1} step={1} />
               </Form.Item>
             </div>
           </div>
@@ -506,7 +508,7 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
               }
             }}
           >
-            Repeat
+            {t.calendar.repeat}
           </Checkbox>
         </Form.Item>
 
@@ -517,10 +519,10 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
                 value={repeatFrequency}
                 onChange={(e) => setRepeatFrequency(e.target.value)}
               >
-                <Radio value="daily">Daily</Radio>
-                <Radio value="weekly">Weekly</Radio>
-                <Radio value="monthly">Monthly</Radio>
-                <Radio value="custom">Custom</Radio>
+                <Radio value="daily">{t.calendar.daily}</Radio>
+                <Radio value="weekly">{t.calendar.weekly}</Radio>
+                <Radio value="monthly">{t.calendar.monthly}</Radio>
+                <Radio value="custom">{t.calendar.custom}</Radio>
               </Radio.Group>
             </Form.Item>
 
@@ -578,7 +580,7 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
             shape="round"
             icon={<PlusOutlined />}
           >
-            Create
+            {t.create}
           </CreateButton>
         </Form.Item>
       </Form>

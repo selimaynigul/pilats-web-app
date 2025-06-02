@@ -354,7 +354,7 @@ const Scheduler: React.FC<{
 
     const payload = {
       name: values.className,
-      description: values.description || "No description provided.",
+      description: values.description || null,
       startDate: dayjs(values.startDate)
         .hour(dayjs(startTime).hour())
         .minute(dayjs(startTime).minute())

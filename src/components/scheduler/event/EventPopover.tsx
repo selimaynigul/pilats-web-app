@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Avatar, Tooltip, Button, Popover } from "antd";
 import {
   AntDesignOutlined,
@@ -12,9 +12,10 @@ import {
 import styled from "styled-components";
 import dayjs from "dayjs";
 import { Link } from "react-router-dom";
-import { hasRole } from "utils/permissionUtils";
+import { capitalize, hasRole } from "utils/permissionUtils";
 import { useLanguage } from "hooks";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import { sessionService } from "services";
 dayjs.extend(isSameOrAfter);
 
 const TrainerInfo = styled.div`
@@ -146,10 +147,43 @@ const EventPopover: React.FC<EventPopoverProps> = ({
 }) => {
   const { t } = useLanguage();
 
+  // Katılımcı state'i
+  const [attendees, setAttendees] = useState<any[]>([]);
+  const [loadingAttendees, setLoadingAttendees] = useState(false);
+
+  useEffect(() => {
+    if (visible && event?.id) {
+      setLoadingAttendees(true);
+      sessionService
+        .getSessionCustomers({
+          searchByPageDto: {
+            sort: "DESC",
+            pageNo: 0,
+            pageSize: 100,
+          },
+          sessionId: event.id,
+          sessionCustomerEventsList: ["JOINED", "ATTENDED"],
+        })
+        .then((res: any) => {
+          setAttendees(res?.data || []);
+        })
+        .catch(() => setAttendees([]))
+        .finally(() => setLoadingAttendees(false));
+    }
+  }, [visible, event?.id]);
+
+  const avatarColorPairs = [
+    { bg: "#ffe7ba", color: "#873800" },
+    { bg: "#b5f5ec", color: "#00474f" },
+    { bg: "#ffccc7", color: "#820014" },
+    { bg: "#bae0ff", color: "#002c8c" },
+    { bg: "#d9f7be", color: "#135200" },
+  ];
+
   const content = (
     <div style={{ position: "relative", maxWidth: 300 }}>
       <div style={{ marginBottom: 20 }}>
-        <strong>{event.name}</strong>
+        <strong>{capitalize(event.name)}</strong>
         {hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN"]) && (
           <ActionButtons>
             {/* Edit sadece bugünkü ve sonraki etkinliklerde gösterilsin */}
@@ -186,7 +220,7 @@ const EventPopover: React.FC<EventPopoverProps> = ({
       <strong style={{ display: "block", marginTop: 15 }}>
         {t.description}
       </strong>
-      <small>{event.description}</small>
+      <small>{event.description ? event.description : t.noDescription}</small>
 
       <strong style={{ display: "block", marginTop: 15 }}>{t.trainer}</strong>
       <div style={{ marginTop: 0 }}>
@@ -199,7 +233,7 @@ const EventPopover: React.FC<EventPopoverProps> = ({
               <strong>
                 {event.trainerName} {event.trainerSurname}{" "}
               </strong>
-              <small> Expert Yoga Trainer</small>
+              <small>Trainer</small>
             </TrainerName>
             <TrainerDetailButton>
               <ArrowRightOutlined />
@@ -210,28 +244,52 @@ const EventPopover: React.FC<EventPopoverProps> = ({
           {t.attendees}
         </strong>
         <AttendeeInfo>
-          <Avatar.Group
-            style={{ marginTop: 7 }}
-            max={{
-              count: 3,
-              style: { color: "#f56a00", backgroundColor: "#fde3cf" },
-            }}
-          >
-            <Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=2" />
-            <Avatar style={{ backgroundColor: "#f56a00" }}>K</Avatar>
-            <Tooltip title="Ant User" placement="top">
-              <Avatar
-                style={{ backgroundColor: "#87d068" }}
-                icon={<UserOutlined />}
-              />
-            </Tooltip>
-            <Avatar
-              style={{ backgroundColor: "#1677ff" }}
-              icon={<AntDesignOutlined />}
-            />
-          </Avatar.Group>
+          {loadingAttendees ? (
+            <span>{t.loading}</span>
+          ) : attendees.length === 0 ? (
+            <span>{t.noAttendeesYet}</span>
+          ) : (
+            <Avatar.Group
+              style={{ marginTop: 7 }}
+              max={{
+                count: 3,
+                style: { color: "#f56a00", backgroundColor: "#fde3cf" },
+              }}
+            >
+              {attendees.map((a, idx) => {
+                const pair = avatarColorPairs[idx % avatarColorPairs.length];
+                return (
+                  <Link key={a.id} to={`/users/${a.id}`}>
+                    <Tooltip
+                      title={
+                        `${a.ucGetResponse.name} ${a.ucGetResponse.surname}` ||
+                        a.name
+                      }
+                      placement="top"
+                    >
+                      <Avatar
+                        src={a.imageUrl}
+                        style={{
+                          backgroundColor: a.imageUrl ? undefined : pair.bg,
+                          color: a.imageUrl ? undefined : pair.color,
+                        }}
+                      >
+                        {!a.imageUrl &&
+                          `${(a.ucGetResponse.name || "?")[0] || ""}${(a.ucGetResponse.surname || "?")[0] || ""}`}
+                      </Avatar>
+                    </Tooltip>
+                  </Link>
+                );
+              })}
+            </Avatar.Group>
+          )}
 
-          <strong>12/15</strong>
+          <strong>
+            {typeof event.totalCapacity === "number" &&
+            typeof event.remainingCapacity === "number"
+              ? `${event.totalCapacity - event.remainingCapacity}/${event.totalCapacity}`
+              : ""}
+          </strong>
         </AttendeeInfo>
       </div>
     </div>

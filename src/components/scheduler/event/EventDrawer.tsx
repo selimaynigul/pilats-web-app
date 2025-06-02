@@ -7,6 +7,7 @@ import {
   Progress,
   message,
   Tooltip,
+  Spin,
 } from "antd";
 import {
   CalendarOutlined,
@@ -29,6 +30,7 @@ import { sessionService, userService } from "services";
 import { useSearchParams } from "react-router-dom";
 import "dayjs/locale/tr";
 import EventStatusAlert from "./EventStatusAlert";
+import { Dropdown, Menu } from "antd";
 const { Panel } = Collapse;
 dayjs.locale("tr");
 dayjs.extend(isSameOrAfter);
@@ -43,12 +45,17 @@ const EventDrawer: React.FC<{
   const sessionId = parseInt(searchParams.get("id") || "0", 10);
   const [attendees, setAttendees] = useState<any[]>([]);
   const [loadingAttendees, setLoadingAttendees] = useState(true);
+  const [joining, setJoining] = useState(false);
   const hasFetched = useRef(false);
   const navigate = useNavigate();
 
   const [event, setEvent] = useState<any | null>(null);
 
   const { t } = useLanguage();
+
+  const canAdd = event
+    ? dayjs(event.start).isSameOrAfter(dayjs(), "minute")
+    : false;
 
   const [showSearch, setShowSearch] = useState(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -118,6 +125,82 @@ const EventDrawer: React.FC<{
     hasFetched.current = true;
   }, []);
 
+  useEffect(() => {
+    if (!showSearch || !event) return;
+    performSearch(""); // ⬅️ aşağıda utils fonksiyonu
+  }, [showSearch, event]);
+
+  const performSearch = async (name: string) => {
+    if (!event) return; // güvenlik
+
+    /* 1) Boşsa null gönder → tüm kullanıcılar gelsin */
+    const queryName = name.trim() ? name.trim() : null;
+
+    try {
+      const res = await userService.search({
+        ucSearchRequest: { name: queryName }, // null ⇒ tümü
+        companyId: event.company.id, // sadece ilgili şirket
+        branchId: event.branch.id, // ve şube
+      });
+      setSearchResults(res.data);
+    } catch (err) {
+      console.error("Kullanıcı arama hatası:", err);
+    }
+  };
+
+  /* 3) Seçilince katılımcıya ekleyen yardımcı */
+  const handleSelect = async ({ key }: { key: string }) => {
+    const user = searchResults.find((u) => String(u.id) === key);
+    if (!user) return;
+
+    try {
+      setJoining(true);
+      await sessionService.join({ sessionId, customerId: user.id });
+
+      setAttendees((prev) => [
+        ...prev,
+        {
+          id: user.id,
+          firstName: user.ucGetResponse.name,
+          lastName: user.ucGetResponse.surname,
+          avatar: null,
+          present: false,
+        },
+      ]);
+
+      /* Arama kutusunu temizle ve kapat */
+      setSearchValue("");
+      setSearchResults([]);
+      setShowSearch(false);
+    } catch (err: any) {
+      const errorCode = err?.response?.data?.errorCode;
+      if (err.response?.status === 500) {
+        message.error("Kullanıcıya tanımlı bir paket bulunamadı.");
+      } else if (errorCode === 2003) {
+        message.error("Bu kullanıcı zaten bu etkinliğe kayıtlı.");
+      } else if (errorCode === 1902) {
+        message.error("Kullanıcının kredisi yok.");
+      } else {
+        console.error("Kayıt hatası:", err);
+        message.error("Bir hata oluştu. Lütfen tekrar deneyin.");
+      }
+    } finally {
+      setJoining(false);
+    }
+  };
+
+  const menuItems = searchResults.map((u) => ({
+    key: String(u.id), // key zorunlu ⇒ string
+    label: (
+      <>
+        <Avatar size={24}>{u.ucGetResponse.name?.[0]}</Avatar>{" "}
+        <span style={{ marginLeft: 8 }}>
+          {u.ucGetResponse.name} {u.ucGetResponse.surname}
+        </span>
+      </>
+    ),
+  }));
+
   return (
     <StyledDrawer
       title={event?.name}
@@ -142,7 +225,9 @@ const EventDrawer: React.FC<{
           <EventStatusAlert startDate={event.start} endDate={event.end} />
         )}
 
-        <Paragraph>{event?.description}</Paragraph>
+        <Paragraph style={{ marginTop: 10 }}>
+          {event?.description ? event.description : t.noDescription}
+        </Paragraph>
 
         <InfoBar>
           <DateTimeBox>
@@ -180,13 +265,14 @@ const EventDrawer: React.FC<{
               <strong>
                 {event?.trainerName} {event?.trainerSurname}
               </strong>
-              <small>Expert Yoga Trainer</small>
+              <small>Trainer</small>
             </TrainerInfo>
             <ArrowRightOutlined style={{ color: "gray", marginLeft: "auto" }} />
           </TrainerBox>
         </Link>
 
         <Collapse
+          defaultActiveKey={["attendees"]}
           ghost
           expandIconPosition="end"
           style={{ background: "transparent" }}
@@ -210,111 +296,57 @@ const EventDrawer: React.FC<{
                       <strong>
                         {attendees.length}/{event?.capacity}
                       </strong>{" "}
-                      attendees
+                      {t.attendee}
                     </CenteredText>
                   </ProgressWrapper>
-                  <Tooltip title="Katılımcı ekle">
+                  <Tooltip title={t.addAttendee}>
                     <FullWidthButton
                       icon={<MdPersonAddAlt1 />}
-                      disabled={attendees.length >= event?.capacity}
+                      disabled={!canAdd || attendees.length >= event?.capacity}
                       onClick={() => setShowSearch(true)}
                     />
                   </Tooltip>
                 </AttendeeHeader>
               ) : (
                 <div style={{ marginBottom: 12 }}>
-                  <Input
-                    autoFocus
-                    placeholder="Kullanıcı ara..."
-                    allowClear
-                    value={searchValue}
-                    onChange={async (e) => {
-                      const value = e.target.value;
-                      setSearchValue(value);
-
-                      if (!value.trim()) {
-                        setSearchResults([]);
-                        return;
-                      }
-
-                      try {
-                        const res = await userService.search({
-                          ucSearchRequest: { name: value },
-                        });
-                        setSearchResults(res.data);
-                        console.log("Kullanıcı arama sonuçları:", res.data);
-                      } catch (err) {
-                        console.error("Kullanıcı arama hatası:", err);
-                      }
-                    }}
-                  />
-                  <SearchResults>
-                    {searchResults.map((user) => (
-                      <SearchResultItem
-                        key={user.id}
-                        onClick={async () => {
-                          console.log(
-                            "Selected user:",
-                            user.ucGetResponse.name
-                          );
-                          try {
-                            await sessionService.join({
-                              sessionId,
-                              customerId: user.id,
-                            });
-
-                            const newUser = {
-                              id: user.id,
-                              firstName: user.ucGetResponse.name,
-                              lastName: user.ucGetResponse.surname,
-                              avatar: null,
-                              present: false,
-                            };
-
-                            setAttendees((prev) => [...prev, newUser]);
-                            setSearchValue("");
-                            setSearchResults([]);
-                            setShowSearch(false);
-                          } catch (err: any) {
-                            const errorCode = err?.response?.data?.errorCode;
-                            if (err.response?.status === 500) {
-                              message.error(
-                                "Kullanıcıya tanımlı bir paket bulunamadı."
-                              );
-                            } else if (errorCode === 2003) {
-                              message.error(
-                                "Bu kullanıcı zaten bu etkinliğe kayıtlı."
-                              );
-                            } else if (errorCode === 1902) {
-                              message.error("Kullanıcının kredisi yok.");
-                            } else {
-                              console.error("Kayıt hatası:", err);
-                              message.error(
-                                "Bir hata oluştu. Lütfen tekrar deneyin."
-                              );
-                            }
-                          }
+                  {showSearch && (
+                    <Dropdown
+                      open={showSearch}
+                      placement="bottomLeft"
+                      trigger={["click"]}
+                      onOpenChange={(v) => setShowSearch(v)}
+                      menu={{
+                        items: menuItems,
+                        onClick: ({ key }) => handleSelect({ key }),
+                      }}
+                    >
+                      <Input
+                        variant="filled"
+                        autoFocus
+                        allowClear
+                        placeholder={t.searchUser}
+                        value={searchValue}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setSearchValue(val);
+                          performSearch(val.trim());
                         }}
-                      >
-                        <Avatar size={32}>{user.name?.[0]}</Avatar>
-                        <div>
-                          <strong>
-                            {user.ucGetResponse.name}{" "}
-                            {user.ucGetResponse.surname}
-                          </strong>
-                        </div>
-                      </SearchResultItem>
-                    ))}
-                  </SearchResults>
+                      />
+                    </Dropdown>
+                  )}
                 </div>
               )}
             </StickyAttendeeHeader>
 
             <AttendeeList>
-              {loadingAttendees ? (
-                <p>Katılımcılar yükleniyor...</p>
+              {loadingAttendees || joining /* 👈 iki yükleme durumu */ ? (
+                <div style={{ textAlign: "center" }}>
+                  <Spin />
+                </div>
               ) : attendees.length === 0 ? (
-                <p>Henüz katılımcı yok.</p>
+                <p style={{ textAlign: "center", color: "gray" }}>
+                  {t.noAttendeesYet}
+                </p>
               ) : (
                 attendees.map((user: any) => (
                   <AttendeeRow
@@ -336,22 +368,24 @@ const EventDrawer: React.FC<{
                         )}
                       </div>
                     </AttendeeInfo>
-                    <DeleteButton
-                      onClick={async (e) => {
-                        e.stopPropagation();
-                        try {
-                          await sessionService.unjoin({
-                            sessionId,
-                            customerId: user.id,
-                          });
-                          setAttendees((prev) =>
-                            prev.filter((att: any) => att.id !== user.id)
-                          );
-                        } catch (err) {
-                          console.error("Unjoin hatası:", err);
-                        }
-                      }}
-                    />
+                    {canAdd && (
+                      <DeleteButton
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          try {
+                            await sessionService.unjoin({
+                              sessionId,
+                              customerId: user.id,
+                            });
+                            setAttendees((prev) =>
+                              prev.filter((att: any) => att.id !== user.id)
+                            );
+                          } catch (err) {
+                            console.error("Unjoin hatası:", err);
+                          }
+                        }}
+                      />
+                    )}
                   </AttendeeRow>
                 ))
               )}
@@ -366,12 +400,6 @@ const EventDrawer: React.FC<{
 export default EventDrawer;
 
 const StyledDrawer = styled(Drawer)``;
-
-const EventStatus = styled.div`
-  background: blue;
-  height: 10px;
-  width: 100%;
-`;
 
 const RoundedProgress = styled(Progress)`
   .ant-progress-bg {
@@ -407,6 +435,11 @@ const StickyAttendeeHeader = styled.div`
   padding-bottom: 8px;
   margin-bottom: 8px;
   padding-top: 10px;
+
+  .ant-input-affix-wrapper {
+    height: 40px;
+    border-radius: 15px;
+  }
 `;
 
 const InfoBar = styled.div`

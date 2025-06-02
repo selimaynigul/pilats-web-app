@@ -21,6 +21,7 @@
   "description": "Description",
   "trainer": "Trainer",
   "attendees": "Attendees",
+  "attendee": "attendee",
   "all": "All",
   "searchCompany": "Search Company",
   "searchBranch": "Search Branch",
@@ -38,7 +39,13 @@
     "week": "Week",
     "day": "Day",
     "agenda": "Agenda",
-    "listView": "List View"
+    "listView": "List View",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "custom": "Custom",
+    "repeat": "Repeat",
+    "quota": "Quota"
   },
   "more": "more",
   "login": "Login",
@@ -49,5 +56,29 @@
   "startsIn": "Starts in",
   "startsSoon": "Starts soon",
   "ongoing": "The event is currently ongoing.",
-  "ended": "The event has ended."
+  "ended": "The event has ended.",
+  "msg": {
+    "ERR_NETWORK": "Network error, please try again later.",
+    "STS_SUCCESS": "Operation completed successfully."
+  },
+  "loading": "Loading...",
+  "noAttendees": "No attendees found.",
+  "noSessions": "No sessions found.",
+  "noTrainers": "No trainers found.",
+  "noBranches": "No branches found.",
+  "noCompanies": "No companies found.",
+  "noUsers": "No users found.",
+  "noPackages": "No packages found.",
+  "addAttendee": "Add attendee",
+  "noDescription": "No description provided.",
+  "noAttendeesYet": "No attendees yet",
+  "addDescription": "Add description",
+  "create": "Create",
+  "enterClassName": "Enter class name",
+  "enterDescription": "Enter description",
+  "selectDate": "Select date",
+  "startTime": "Start time",
+  "endTime": "End time",
+  "selectTrainer": "Select trainer",
+  "selectEndTime": "Select end time"
 }
