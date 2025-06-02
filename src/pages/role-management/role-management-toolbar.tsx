@@ -70,13 +70,13 @@ const CountNumber = styled.span`
 `;
 
 const RoleManagementToolbar: React.FC<{
-  trainerCount: number;
+  adminCount: number;
   selectedCompany: any;
   setSelectedCompany: any;
   isBranchMode: boolean;
   setIsBranchMode: any;
 }> = ({
-  trainerCount,
+  adminCount,
   selectedCompany,
   setSelectedCompany,
   isBranchMode,
@@ -135,7 +135,7 @@ const RoleManagementToolbar: React.FC<{
   return (
     <ToolbarContainer>
       <CountContainer>
-        <CountNumber>{trainerCount}</CountNumber> {t.adminsListed}
+        <CountNumber>{adminCount}</CountNumber> {t.adminsListed}
       </CountContainer>
       <ActionContainer>
         {hasRole(["ADMIN", "COMPANY_ADMIN"]) && (

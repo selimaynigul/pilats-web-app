@@ -80,7 +80,7 @@ const StyledReload = styled(AiOutlineReload)`
 
 interface CompanyDropdownProps {
   selectedItem: any;
-  onSelect: (company: string) => void;
+  onSelect: (company: string | null) => void;
 }
 
 const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
@@ -98,12 +98,13 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
   const { t } = useLanguage();
 
   useEffect(() => {
-    // Prop doluysa ve henüz local state boşsa veya id’ler farklıysa güncelle
-    if (selectedItem && selectedItem.id !== selectedCompany?.id) {
-      setSelectedCompany(selectedItem);
+    if (selectedItem && selectedItem.id) {
+      //  sadece ID doluysa
+      if (selectedItem.id !== selectedCompany?.id) {
+        setSelectedCompany(selectedItem);
+      }
     }
   }, [selectedItem]);
-
   useEffect(() => {
     if (buttonRef.current) {
       const buttonWidth = buttonRef.current.offsetWidth;
@@ -147,7 +148,11 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
       const fetchService = hasRole(["COMPANY_ADMIN"])
         ? (query: string) => fetchBranches(query)
         : selectedCompany
-          ? (query: string) => fetchBranches(query, selectedCompany.id)
+          ? (query: any) =>
+              fetchBranches(
+                query,
+                selectedCompany.companyId || selectedCompany.id // önce companyId varsa onu, yoksa id
+              )
           : fetchCompanies;
       fetchData(searchQuery, fetchService);
     } else {
@@ -169,7 +174,7 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
   const handleRefreshClick = () => {
     setSelectedCompany(null);
     setSearchQuery("");
-    onSelect(t.selectCompany);
+    onSelect(null);
     handleSearchMode(false);
     fetchData("", fetchCompanies);
   };

@@ -6,6 +6,7 @@ import { usePagination } from "hooks";
 import { userService } from "services";
 import { ListItem } from "components";
 import { mapToItemData } from "utils/utils";
+import { getCompanyId, hasRole } from "utils/permissionUtils";
 
 const LoadMoreContainer = styled.div`
   text-align: center;
@@ -21,14 +22,23 @@ const UserList: React.FC<TrainerListProps> = ({
   onUserCountChange,
   company,
 }) => {
-  const params = useMemo(
-    () => ({
+  const params = useMemo(() => {
+    const isAdmin = hasRole(["ADMIN"]);
+    return {
       pageSize: 8,
       sort: "DESC",
-      companyId: company?.id,
-    }),
-    [company?.id]
-  );
+      companyId: isAdmin
+        ? company?.branchName
+          ? company?.companyId
+          : company?.id
+        : getCompanyId(),
+      branchId: company.companyParam
+        ? company.branchParam || (company.branchName ? company.id : null)
+        : company.branchName
+          ? company.id
+          : null,
+    };
+  }, [company?.id, company?.companyId]);
 
   const {
     items: users,

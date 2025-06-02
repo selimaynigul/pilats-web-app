@@ -2,16 +2,13 @@ import React, { useState } from "react";
 import UserList from "./user-list/user-list";
 import { Card } from "components";
 import UsersToolbar from "./users-toolbar";
-import { useLanguage } from "hooks";
+import { useFilter, useLanguage } from "hooks";
 import { Helmet } from "react-helmet";
 
 const UsersPage: React.FC = () => {
   const { t } = useLanguage();
   const [userCount, setUserCount] = useState(0);
-  const [company, setCompany] = useState({
-    companyName: t.all,
-    id: null,
-  });
+  const { company, setCompany } = useFilter();
 
   const updateUserCount = (count: number) => {
     setUserCount(count);

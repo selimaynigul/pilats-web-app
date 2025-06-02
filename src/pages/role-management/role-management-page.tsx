@@ -3,12 +3,12 @@ import { Card } from "components";
 import RoleManagementToolbar from "./role-management-toolbar";
 import AdminList from "./admin-list/admin-list";
 import { hasRole } from "utils/permissionUtils";
-import { useLanguage } from "hooks";
+import { useFilter, useLanguage } from "hooks";
 import { Helmet } from "react-helmet";
 
 const RoleManagementPage: React.FC = () => {
   const { t } = useLanguage();
-  const [trainerCount, setTrainerCount] = useState(0);
+  const [adminCount, setAdminCount] = useState(0);
   const [isBranchMode, setIsBranchMode] = useState<boolean>(() => {
     if (hasRole(["COMPANY_ADMIN"])) return true;
     const storedValue = localStorage.getItem("isBranchMode");
@@ -19,13 +19,10 @@ const RoleManagementPage: React.FC = () => {
     localStorage.setItem("isBranchMode", JSON.stringify(isBranchMode));
   }, [isBranchMode]);
 
-  const [company, setCompany] = useState({
-    companyName: t.all,
-    id: null,
-  });
+  const { company, setCompany } = useFilter();
 
-  const updateTrainerCount = (count: number) => {
-    setTrainerCount(count);
+  const updateAdminCount = (count: number) => {
+    setAdminCount(count);
   };
 
   return (
@@ -36,7 +33,7 @@ const RoleManagementPage: React.FC = () => {
       <Card
         toolbar={
           <RoleManagementToolbar
-            trainerCount={trainerCount}
+            adminCount={adminCount}
             selectedCompany={company}
             setSelectedCompany={setCompany}
             isBranchMode={isBranchMode}
@@ -46,7 +43,7 @@ const RoleManagementPage: React.FC = () => {
       >
         <AdminList
           isBranchMode={isBranchMode}
-          onAdminCountChange={updateTrainerCount}
+          onAdminCountChange={updateAdminCount}
           company={company}
         />
         <div></div>

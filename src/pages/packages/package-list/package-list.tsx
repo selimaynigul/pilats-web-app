@@ -5,6 +5,7 @@ import { usePagination } from "hooks";
 import { companyPackageService, trainerService } from "services";
 import { Link } from "react-router-dom";
 import PackageCard from "./packages-list-card";
+import { getCompanyId, hasRole } from "utils/permissionUtils";
 
 const LoadMoreContainer = styled.div`
   text-align: center;
@@ -20,15 +21,23 @@ const PackageList: React.FC<PackageListProps> = ({
   onTrainerCountChange,
   company,
 }) => {
-  const params = useMemo(
-    () => ({
+  const params = useMemo(() => {
+    const isAdmin = hasRole(["ADMIN"]);
+    return {
       pageSize: 8,
       sort: "DESC",
-      companyId: company?.id,
-    }),
-    [company?.id]
-  );
-
+      companyId: isAdmin
+        ? company?.branchName
+          ? company?.companyId
+          : company?.id
+        : getCompanyId(),
+      branchId: company.companyParam
+        ? company.branchParam || (company.branchName ? company.id : null)
+        : company.branchName
+          ? company.id
+          : null,
+    };
+  }, [company?.id, company?.companyId]);
   const {
     items: packages,
     loading,
