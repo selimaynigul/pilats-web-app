@@ -5,7 +5,7 @@ import TrainerCard from "./trainer-list-card";
 import { usePagination } from "hooks";
 import { trainerService } from "services";
 import { getCompanyId, hasRole } from "utils/permissionUtils";
-import { ListItem } from "components";
+import { ListContainer, ListItem } from "components";
 import { mapToItemData } from "utils/utils";
 
 const LoadMoreContainer = styled.div`
@@ -54,7 +54,7 @@ const TrainerList: React.FC<TrainerListProps> = ({
   }, [trainers, onTrainerCountChange]);
 
   return (
-    <>
+    <ListContainer>
       <Row gutter={[16, 16]}>
         {trainers.map((trainer: any, index: number) => (
           <Col xs={24} sm={12} md={8} lg={6} key={index}>
@@ -77,7 +77,7 @@ const TrainerList: React.FC<TrainerListProps> = ({
       )}
 
       {!hasMore && !loading && <></>}
-    </>
+    </ListContainer>
   );
 };
 

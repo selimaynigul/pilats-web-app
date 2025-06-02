@@ -62,7 +62,7 @@ const ListItem: React.FC<ListItemProps> = ({ data, type = "default" }) => {
                 gap: 12,
               }}
             >
-              {!isActive && <InactiveIcon title="Inactive" />}
+              {/*       {!isActive && <InactiveIcon title="Inactive" />} */}
               <Avatar
                 size={60}
                 src={imageUrl ?? undefined}
@@ -83,7 +83,7 @@ const ListItem: React.FC<ListItemProps> = ({ data, type = "default" }) => {
               gap: 12,
             }}
           >
-            {!isActive && <InactiveIcon title="Inactive" />}{" "}
+            {/*  {!isActive && <InactiveIcon title="Inactive" />}{" "} */}
             {/* TODO: isActive düzeltilecek ters şu an*/}
             <Avatar
               size={60}

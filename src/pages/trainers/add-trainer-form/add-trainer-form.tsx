@@ -132,7 +132,7 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
 
         if (hasRole(["BRANCH_ADMIN"])) {
           const branchId = getBranchId();
-          modifiedValues = { ...values, branch: branchId };
+          modifiedValues = { ...values, branch: branchId, passive: false };
         }
 
         onSubmit(modifiedValues);
@@ -157,6 +157,12 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
         <Form.Item {...addTrainerFormItems.surname} name="surname">
           <Input placeholder="Enter trainer's surname" />
         </Form.Item>
+        <Form.Item {...addTrainerFormItems.email} name="email">
+          <Input placeholder="Enter email address" />
+        </Form.Item>
+        <Form.Item {...addTrainerFormItems.phoneNumber} name="phoneNumber">
+          <Input placeholder="Enter phone number" />
+        </Form.Item>
         {!hasRole(["COMPANY_ADMIN", "BRANCH_ADMIN"]) && (
           <Form.Item {...addTrainerFormItems.company} name="company">
             <Select
@@ -180,7 +186,7 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
             <Select
               placeholder="Select branch"
               loading={branchLoading}
-              /*      disabled={!branches.length} */
+              disabled={!branches.length}
             >
               {branches.map((branch: any) => (
                 <Select.Option key={branch.id} value={branch.id}>
@@ -195,15 +201,9 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
         </Form.Item>
         <Form.Item {...addTrainerFormItems.gender} name="gender">
           <Select placeholder="Select gender">
-            <Select.Option value="male">MALE</Select.Option>
-            <Select.Option value="female">FEMALE</Select.Option>
+            <Select.Option value="male">Male</Select.Option>
+            <Select.Option value="female">Female</Select.Option>
           </Select>
-        </Form.Item>
-        <Form.Item {...addTrainerFormItems.email} name="email">
-          <Input placeholder="Enter email address" />
-        </Form.Item>
-        <Form.Item {...addTrainerFormItems.phoneNumber} name="phoneNumber">
-          <Input placeholder="Enter phone number" />
         </Form.Item>
         <Form.Item
           name="jobId"
@@ -275,7 +275,7 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
           label="Location"
           rules={[{ required: false, message: "Please enter the location" }]}
         >
-          <Input />
+          <Input placeholder="Location" />
         </Form.Item>
 
         <Form.Item>

@@ -50,10 +50,16 @@ const SessionsContainer: React.FC = () => {
         <Spin />
       ) : sessions.length === 0 ? (
         <Alert
-          message="Bu kullanıcıya herhangi bir ders atanmamış."
+          message="Herhangi bir ders atanmamış"
           type="info"
           showIcon
-          style={{ borderRadius: 8 }}
+          closable
+          style={{
+            width: "100%",
+            borderRadius: "15px",
+            border: "1px solid #e6e3ff",
+            background: "#e6e3ff",
+          }}
         />
       ) : (
         <Row gutter={[16, 16]}>

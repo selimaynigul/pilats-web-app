@@ -8,10 +8,10 @@ export const StyledCard = styled(Card)`
   }
   cursor: pointer;
   transition: 0.3s;
-  
+
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0px 8px 42px -5px rgba(93, 70, 229, 0.2);
+    /* box-shadow: 0px 8px 42px -5px rgba(93, 70, 229, 0.2); */
   }
 
   /* .ant-card-body {

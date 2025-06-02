@@ -4,7 +4,7 @@ import { Row, Col, Spin, Button } from "antd";
 import UserCard from "./user-list-card";
 import { usePagination } from "hooks";
 import { userService } from "services";
-import { ListItem } from "components";
+import { ListContainer, ListItem } from "components";
 import { mapToItemData } from "utils/utils";
 import { getCompanyId, hasRole } from "utils/permissionUtils";
 
@@ -55,7 +55,7 @@ const UserList: React.FC<TrainerListProps> = ({
   }, [users, onUserCountChange]);
 
   return (
-    <>
+    <ListContainer>
       <Row gutter={[16, 16]}>
         {users.map((user: any, index: number) => (
           <Col xs={24} sm={12} md={8} lg={6} key={index}>
@@ -63,7 +63,7 @@ const UserList: React.FC<TrainerListProps> = ({
               data={mapToItemData({
                 ...user,
                 detailUrl: "/users",
-                passive: true, // TODO: Change this to real data
+                passive: false, // TODO: Change this to real data
               })}
             />
           </Col>
@@ -77,7 +77,7 @@ const UserList: React.FC<TrainerListProps> = ({
           <Button onClick={loadMore}>Load More</Button>
         </LoadMoreContainer>
       )}
-    </>
+    </ListContainer>
   );
 };
 

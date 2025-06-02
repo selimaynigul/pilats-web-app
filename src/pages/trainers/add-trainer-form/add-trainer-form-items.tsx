@@ -21,11 +21,9 @@ export const addTrainerFormItems = {
   },
   birthdate: {
     label: "Birth Date",
-    rules: [{ required: true, message: "Please select the birth date" }],
   },
   gender: {
     label: "Gender",
-    rules: [{ required: true, message: "Please select the gender" }],
   },
   email: {
     label: "Email",

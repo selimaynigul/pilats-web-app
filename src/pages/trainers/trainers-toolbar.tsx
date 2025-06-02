@@ -75,12 +75,13 @@ const TrainersToolbar: React.FC<{
         birthdate: values.birthdate
           ? moment(values.birthdate).format("YYYY-MM-DD")
           : null,
-        gender: values.gender.toUpperCase(),
+        gender: values.gender ? values.gender.toUpperCase() : null,
         telNo1: values.phoneNumber,
       },
       branchId: parseInt(values.branch, 10),
       jobId: values.jobId,
       location: values.location,
+      isModalVisible: true,
     };
 
     setLoading(true);
@@ -124,8 +125,8 @@ const TrainersToolbar: React.FC<{
         loading={loading}
         visible={isModalVisible}
         onClose={() => {
-          form.resetFields();
           setIsModalVisible(false);
+          form.resetFields();
         }}
         onSubmit={handleAddTrainer}
         company={selectedCompany}

@@ -59,20 +59,34 @@ export default function useFilter() {
 
   /* ---------- 3)  STATE → URL senk. ----------------------- */
   useEffect(() => {
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
+    /* 1) Güncel company / branch değerlerini hazırla */
+    const companyId = company.companyParam ?? company.companyId ?? undefined; // şirket ID
+    const branchId =
+      company.branchParam ??
+      (company.branchName ? (company.id ?? undefined) : undefined); // şube ID
 
-      /* company */
-      if (company.companyParam) next.set("company", company.companyParam);
+    /* 2) Query-string’i güncelle  */
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev); // ⬅️ mevcut parametreleri koru
+
+      // company
+      if (companyId) next.set("company", companyId);
       else next.delete("company");
 
-      /* branch */
-      if (company.branchParam) next.set("branch", company.branchParam);
+      // branch
+      if (branchId) next.set("branch", branchId);
       else next.delete("branch");
 
-      return next;
+      return next; // diğer anahtarlar (v, id, vs.) olduğu gibi kalır
     });
-  }, [company.companyParam, company.branchParam, setSearchParams]);
+  }, [
+    company.companyParam,
+    company.companyId,
+    company.branchParam,
+    company.branchName,
+    company.id,
+    setSearchParams,
+  ]);
 
   /* ---------- 4)  ID → İsim Fetch ------------------------ */
   useEffect(() => {

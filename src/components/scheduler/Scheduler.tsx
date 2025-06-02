@@ -237,6 +237,7 @@ const Scheduler: React.FC<{
     /* 1) Mevcut tarih (state) ile yeni aralığın ilk günü arasındaki AY farkı */
     const monthsDiff = Math.abs(dayjs(startDate).diff(dayjs(date), "month"));
 
+    // TODO: week görünümünde gösterilen ve yazan tarihte hata var
     /* 2) Eğer fark ≥ 2 ay ise: direkt o ayın 1’ine git */
     if (currentView === "agenda") {
       if (monthsDiff >= 2) {

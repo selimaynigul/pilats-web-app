@@ -28,6 +28,10 @@ import moment from "moment";
 import { PlusOutlined } from "@ant-design/icons";
 import { Divider } from "antd";
 import { capitalize } from "utils/permissionUtils";
+import dayjs, { Dayjs } from "dayjs";
+
+const safeFormat = (d?: Dayjs | null) =>
+  d && dayjs.isDayjs(d) && d.isValid() ? d.format("YYYY-MM-DD") : null;
 
 const countryCodes = [
   { code: "+90", country: "TR" },
@@ -288,7 +292,7 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
   loading,
 }) => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [isActive, setIsActive] = useState(trainer?.active);
+  const [isActive, setIsActive] = useState(!trainer?.passive); // ✅ tek kaynak
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -316,6 +320,21 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
     }
   };
 
+  // ----------  trainer değiştiğinde ----------
+  useEffect(() => {
+    if (!trainer) return;
+    setIsActive(!trainer.passive); // ✅ doğru yön
+    // telefon vs. aynı kaldı
+    form.setFieldsValue({
+      ...trainer.ucGetResponse,
+      birthdate: dayjs(trainer.ucGetResponse.birthdate),
+      isActive: !trainer.passive, // ✅ form alanı
+      endDate: trainer.passive ? dayjs(trainer.passiveEndDate) : null,
+      jobId: trainer.jobName,
+      location: trainer.location,
+    });
+  }, [trainer]);
+
   const handleAddNewJob = async () => {
     try {
       if (!newJobName) return message.error("Please enter a job name");
@@ -334,12 +353,13 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
     }
   };
 
+  // ----------  edit butonuna basıldığında ----------
   const handleEdit = () => {
     form.setFieldsValue({
       ...trainer.ucGetResponse,
-      birthdate: moment(trainer.ucGetResponse.birthdate),
-      active: trainer.active,
-      endDate: trainer.passiveEndDate,
+      birthdate: dayjs(trainer.ucGetResponse.birthdate),
+      isActive: !trainer.passive, // ✅
+      endDate: trainer.passive ? dayjs(trainer.passiveEndDate) : null,
       jobId: trainer.jobName,
       location: trainer.location,
     });
@@ -351,20 +371,16 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
 
     const payload = {
       id: trainer.id,
-      passive: values.active, // Checkbox state for active status
-      /*  temporarilyPassive: !values.active && values.endDate ? true : false, */ // Set to true only if inactive and endDate exists */
-      /* passiveEndDate: values.active
-        ? null
-        : values.endDate?.format("YYYY-MM-DD"), // Null if active; otherwise, endDate */
-      passiveEndDate: null,
+      passive: !values.isActive, // ✅ tek satır
+      passiveEndDate: values.isActive ? null : safeFormat(values.endDate),
       ucUpdateRequest: {
         name: values.name,
         surname: values.surname,
-        birthdate: values.birthdate.format("YYYY-MM-DD"), // Birthdate in "YYYY-MM-DD" format
+        birthdate: safeFormat(values.birthdate),
         telNo1: formattedPhone,
       },
-      jobId: jobs.find((job) => job.jobName === values.jobId)?.id,
-      gender: values.gender.toUpperCase(),
+      jobId: jobs.find((j) => j.jobName === values.jobId)?.id,
+      gender: values.gender?.toUpperCase() ?? null,
       location: values.location,
     };
 
@@ -372,9 +388,8 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
       .update(payload)
       .then(() => {
         message.success("Trainer updated successfully");
-        window.location.reload();
         setIsEditModalVisible(false);
-        form.resetFields();
+        window.location.reload();
       })
       .catch((error) => {
         console.error("Error updating trainer:", error);
@@ -494,7 +509,7 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
 
         <ProfileSection>
           <AvatarContainer onClick={handleAvatarClick}>
-            {!trainer.passive && <InactiveIcon title="Not working" />}
+            {trainer.passive && <InactiveIcon title="Not working" />}
             <AvatarWrapper>
               <Avatar
                 size={150}
@@ -585,7 +600,7 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
             form.validateFields().then(handleEditSubmit).catch(console.error);
           }}
         >
-          <Form form={form} layout="vertical">
+          <Form form={form} layout="vertical" variant="filled">
             <Form.Item
               name="name"
               label="Name"
@@ -627,10 +642,6 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
                     {
                       required: true,
                       message: "Please input your phone number!",
-                    },
-                    {
-                      pattern: /^\d{10}$/,
-                      message: "Please enter a valid 10-digit phone number!",
                     },
                   ]}
                 >
@@ -714,27 +725,23 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
                 </Select>
               )}
             </Form.Item>
-            <Form.Item
-              name="gender"
-              label="Gender"
-              rules={[{ required: true, message: "Please select the gender" }]}
-            >
-              <Select>
+            <Form.Item name="gender" label="Gender">
+              <Select placeholder="Select gender" allowClear>
                 <Select.Option value="MALE">Male</Select.Option>
                 <Select.Option value="FEMALE">Female</Select.Option>
               </Select>
             </Form.Item>
-            <Form.Item
-              name="location"
-              label="Location"
-              rules={[
-                { required: false, message: "Please enter the location" },
-              ]}
-            >
-              <Input />
+            <Form.Item name="location" label="Location">
+              <Input placeholder="Enter location" />
             </Form.Item>
-            <Form.Item name="active" label="Is Active" valuePropName="checked">
-              <Checkbox onChange={handleCheckboxChange}>Is Active</Checkbox>
+            <Form.Item
+              name="isActive"
+              label="Is Active"
+              valuePropName="checked"
+            >
+              <Checkbox onChange={(e) => setIsActive(e.target.checked)}>
+                Is Active
+              </Checkbox>
             </Form.Item>
             {!isActive && (
               <Form.Item name="endDate" label="End Date">

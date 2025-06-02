@@ -10,7 +10,7 @@ import {
 } from "services";
 import { Link } from "react-router-dom";
 import { hasRole } from "utils/permissionUtils";
-import { ListItem } from "components";
+import { ListContainer, ListItem } from "components";
 import { mapToItemData } from "utils/utils";
 import { DeleteOutlined } from "@ant-design/icons";
 
@@ -90,7 +90,7 @@ const AdminList: React.FC<TrainerListProps> = ({
   );
 
   return (
-    <>
+    <ListContainer>
       <Row gutter={[16, 16]}>
         {admins.map((admin: any, index: number) => (
           <Col xs={24} sm={12} md={8} lg={6} key={index}>
@@ -117,7 +117,7 @@ const AdminList: React.FC<TrainerListProps> = ({
       )}
 
       {!hasMore && !loading && <></>}
-    </>
+    </ListContainer>
   );
 };
 

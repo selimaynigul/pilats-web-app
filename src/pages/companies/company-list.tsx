@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo } from "react";
 import styled from "styled-components";
-import { Row, Col, Spin, Button } from "antd";
+import { Row, Col, Spin, Button, List } from "antd";
 import CompanyCard from "./company-list-card";
 import { usePagination } from "hooks";
 import { companyService, trainerService } from "services";
 import { Link } from "react-router-dom";
+import { ListContainer } from "components";
 
 const LoadMoreContainer = styled.div`
   text-align: center;
@@ -44,7 +45,7 @@ const CompanyList: React.FC<TrainerListProps> = ({
   }, [trainers, onTrainerCountChange]);
 
   return (
-    <>
+    <ListContainer>
       <Row gutter={[16, 16]}>
         {trainers.map((company: any, index: number) => (
           <Col xs={24} sm={12} md={8} lg={6} key={index}>
@@ -62,7 +63,7 @@ const CompanyList: React.FC<TrainerListProps> = ({
       )}
 
       {!hasMore && !loading && <></>}
-    </>
+    </ListContainer>
   );
 };
 

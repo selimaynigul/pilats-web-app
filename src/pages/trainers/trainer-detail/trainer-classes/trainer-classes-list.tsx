@@ -16,10 +16,6 @@ const Container = styled.div`
     color: ${({ theme }) => theme.primary};
     margin-bottom: 24px;
   }
-
-  .ant-alert-icon {
-    color: ${({ theme }) => theme.primary};
-  }
 `;
 
 const Sessions = styled.div`
@@ -90,7 +86,7 @@ const TrainerClassesList: React.FC<{ trainer: any }> = ({ trainer }) => {
       <Header>
         <h2>{t.sessions}</h2>
       </Header>
-      {trainer && !trainer?.passive && (
+      {trainer?.passive && (
         <Alert
           message="Deactive trainers cannot have classes!"
           type="info"
@@ -107,27 +103,29 @@ const TrainerClassesList: React.FC<{ trainer: any }> = ({ trainer }) => {
       {loading ? (
         <Spin />
       ) : (
-        <Sessions>
-          {trainer && (
-            <Row gutter={[16, 16]}>
-              {sessions.map((session: any, index) => {
-                const { date, start, end } = formatDateTime(
-                  session.startDate,
-                  session.endDate
-                );
+        !trainer?.passive && (
+          <Sessions>
+            {trainer && (
+              <Row gutter={[16, 16]}>
+                {sessions.map((session: any, index) => {
+                  const { date, start, end } = formatDateTime(
+                    session.startDate,
+                    session.endDate
+                  );
 
-                return (
-                  <Col xs={24} sm={12} key={index}>
-                    <SessionCard
-                      session={session}
-                      onClick={handleSessionClick}
-                    />
-                  </Col>
-                );
-              })}
-            </Row>
-          )}
-        </Sessions>
+                  return (
+                    <Col xs={24} sm={12} key={index}>
+                      <SessionCard
+                        session={session}
+                        onClick={handleSessionClick}
+                      />
+                    </Col>
+                  );
+                })}
+              </Row>
+            )}
+          </Sessions>
+        )
       )}
     </Container>
   );

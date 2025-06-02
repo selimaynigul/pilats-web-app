@@ -17,7 +17,8 @@ const StyledCard = styled(Card)`
   transition: 0.3s;
 
   &:hover {
-    box-shadow: 0px 8px 42px -5px rgba(93, 70, 229, 0.2);
+    transform: translateY(-2px);
+    /*   box-shadow: 0px 8px 42px -5px rgba(93, 70, 229, 0.2); */
   }
 
   .ant-card-body {
@@ -44,7 +45,10 @@ const CompanyListCard: React.FC<{ company: any }> = ({ company }) => {
           >
             <Avatar
               size={60}
-              src = {"https://prod-grad.onrender.com/api/v1/images" + company.imageUrl}
+              src={
+                "https://prod-grad.onrender.com/api/v1/images" +
+                company.imageUrl
+              }
               style={{
                 background: "lightgrey",
                 fontSize: 24,

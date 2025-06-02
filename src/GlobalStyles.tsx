@@ -72,6 +72,11 @@ const GlobalStyle = createGlobalStyle`
   border-radius: 15px !important;
 }
 
+  .ant-alert-icon {
+    color: ${({ theme }) => theme.primary} !important;
+  }
+
+
 
    
  @keyframes expandWidth {
