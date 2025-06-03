@@ -14,10 +14,6 @@ export const StyledCard = styled(Card)`
     /* box-shadow: 0px 8px 42px -5px rgba(93, 70, 229, 0.2); */
   }
 
-  /* .ant-card-body {
-    display: none;
-  } */
-
   .ant-card-meta-title {
     margin-bottom: 0 !important;
   }
@@ -37,6 +33,7 @@ export const ContactInfo = styled.div`
   justify-content: space-between;
   align-items: center;
   margin: 0 32px;
+  margin-top: 12px;
 `;
 export const ContactButton = styled.div`
   height: 36px;
@@ -53,70 +50,6 @@ export const ContactButton = styled.div`
   }
 
   font-size: 14px;
-`;
-
-export const CompanyInfo = styled.div`
-  border: 1px solid white;
-  /*   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 12px;
- */
-  width: 100%;
-  border-radius: 10px;
-  margin: 7px 0 15px 0;
-  padding: 5px;
-  box-sizing: border-box;
-  display: flex;
-  background: #e6e3ff;
-  background: white;
-
-  align-items: center;
-  transition: all 0.1s ease;
-
-  gap: 10px;
-  cursor: pointer;
-  transition: 0.2s;
-
-  &:hover {
-    div:nth-of-type(3) {
-      opacity: 1;
-    }
-
-    box-shadow: 0px 8px 42px -5px rgba(93, 70, 229, 0.2);
-  }
-`;
-
-export const CompanyLogo = styled.div`
-  background: #e6e3ff;
-  height: 40px;
-  width: 40px;
-  border-radius: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-`;
-export const CompanyName = styled.div`
-  display: flex;
-  flex-direction: column;
-
-  strong {
-    color: black;
-  }
-  small {
-    color: gray;
-  }
-`;
-export const CompanyDetailButton = styled.div`
-  background: transparent;
-  height: 30px;
-  width: 30px;
-  border-radius: 10px;
-  opacity: 0;
-  display: flex;
-  margin-left: auto;
-  justify-content: center;
-  align-items: center;
-  /* color: #5d46e5; */
-  color: gray;
 `;
 
 export const InactiveIcon = styled.div`

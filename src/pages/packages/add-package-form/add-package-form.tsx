@@ -6,14 +6,15 @@ interface AddPackageFormProps {
   visible: boolean;
   onClose: () => void;
   onSubmit: (values: any) => void;
+  form: any;
 }
 
 const AddPackageForm: React.FC<AddPackageFormProps> = ({
   visible,
   onClose,
   onSubmit,
+  form,
 }) => {
-  const [form] = Form.useForm();
   const [companies, setCompanies] = useState([]);
   const [branches, setBranches] = useState([]);
   const [companySearchLoading, setCompanySearchLoading] = useState(false);
@@ -47,11 +48,10 @@ const AddPackageForm: React.FC<AddPackageFormProps> = ({
   const handleSubmit = () => {
     form
       .validateFields()
-      .then((values) => {
+      .then((values: any) => {
         onSubmit(values);
-        form.resetFields();
       })
-      .catch((info) => {
+      .catch((info: any) => {
         console.error("Validation Failed:", info);
       });
   };
@@ -94,6 +94,18 @@ const AddPackageForm: React.FC<AddPackageFormProps> = ({
         </Form.Item>
 
         <Form.Item
+          label="Credit Count"
+          name="creditCount"
+          rules={[{ required: true, message: "Please enter the credit count" }]}
+        >
+          <InputNumber
+            style={{ width: "100%" }}
+            min={0}
+            placeholder="Enter credit count"
+          />
+        </Form.Item>
+
+        <Form.Item
           label="Discount"
           name="discount"
           rules={[{ required: true, message: "Please enter the discount" }]}
@@ -128,18 +140,6 @@ const AddPackageForm: React.FC<AddPackageFormProps> = ({
             style={{ width: "100%" }}
             min={0}
             placeholder="Enter change count"
-          />
-        </Form.Item>
-
-        <Form.Item
-          label="Credit Count"
-          name="creditCount"
-          rules={[{ required: true, message: "Please enter the credit count" }]}
-        >
-          <InputNumber
-            style={{ width: "100%" }}
-            min={0}
-            placeholder="Enter credit count"
           />
         </Form.Item>
 

@@ -39,6 +39,23 @@ export const Heading = styled.div<{ isMobile: boolean }>`
   justify-content: space-between;
   padding: ${({ isMobile }) => (isMobile ? "0 10px" : "0 36px")};
   margin-top: ${({ isMobile }) => (isMobile ? "0" : "16px")};
+
+  z-index: 0;
+
+  &.search-active {
+    animation: slideDownHeading 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes slideDownHeading {
+    from {
+      transform: translateY(-40px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
 `;
 
 export const Title = styled.h2`
@@ -57,6 +74,10 @@ export const SearchContainer = styled.div<{
   width: 500px;
   margin: ${({ isMobile }) => (isMobile ? "16px 0" : "0")};
   display: ${({ searchActive }) => (searchActive ? "flex" : "none")};
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 export const Search = styled(Input)<{ focused: boolean }>`

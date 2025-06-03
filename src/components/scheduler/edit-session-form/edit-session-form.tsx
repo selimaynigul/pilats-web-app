@@ -193,15 +193,28 @@ const EditSessionForm: React.FC<EditSessionFormProps> = ({
         </Form.Item>
 
         {/* Description */}
-        <Form.Item name="description">
+        <Form.Item /* dış Item yalnızca düzen amaçlı */>
           <div
             className="custom-input"
             style={{ display: "flex", alignItems: "start" }}
           >
-            <CustomIcon>
-              <AlignLeftOutlined style={{ marginTop: 5 }} />
+            <CustomIcon style={{ marginTop: 5 }}>
+              <AlignLeftOutlined />
             </CustomIcon>
-            <Input.TextArea rows={3} placeholder="Enter description" />
+
+            {/* asıl kontrollü alan */}
+            <Form.Item
+              name="description"
+              noStyle /* UI’yi etkilemez                */
+              rules={[{ required: false, message: "Enter description" }]}
+            >
+              <Input.TextArea
+                rows={3}
+                placeholder="Enter description"
+                maxLength={200}
+                showCount
+              />
+            </Form.Item>
           </div>
         </Form.Item>
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { Row, Col, Spin, Button } from "antd";
-import { usePagination } from "hooks";
+import { useLanguage, usePagination } from "hooks";
 import { companyPackageService, trainerService } from "services";
 import { Link } from "react-router-dom";
 import PackageCard from "./packages-list-card";
@@ -22,6 +22,8 @@ const PackageList: React.FC<PackageListProps> = ({
   onTrainerCountChange,
   company,
 }) => {
+  const { t } = useLanguage();
+
   const params = useMemo(() => {
     const isAdmin = hasRole(["ADMIN"]);
     return {
@@ -65,9 +67,9 @@ const PackageList: React.FC<PackageListProps> = ({
                 price: item.price,
                 description: item.description,
                 features: [
-                  { value: item.creditCount, label: "katılım hakkı" },
-                  { value: item.changeCount, label: "iptal hakkı" },
-                  { value: item.bonusCount, label: "bonus hakkı" },
+                  { value: item.creditCount, label: t.credit },
+                  { value: item.changeCount, label: t.cancelRight },
+                  { value: item.bonusCount, label: t.bonusRight },
                 ],
                 bonusCount: item.bonusCount,
                 remainingBonusCount: item.remainingBonusCount,
@@ -76,6 +78,8 @@ const PackageList: React.FC<PackageListProps> = ({
                 creditCount: item.creditCount,
                 remainingCreditCount: item.remainingCreditCount,
                 companyId: item.companyId,
+                companyName: item.companyName,
+                branchName: item.branchName,
               }}
               mode="admin"
               onDelete={() => {

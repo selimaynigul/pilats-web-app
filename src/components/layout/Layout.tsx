@@ -130,7 +130,10 @@ const AppLayout: React.FC = () => {
             setSearchActive={setSearchActive}
           />
         )}
-        <Heading isMobile={isMobile}>
+        <Heading
+          isMobile={isMobile}
+          className={searchActive && isMobile ? "search-active" : ""}
+        >
           <Title>{pageTitle}</Title>
           <SearchBar
             isMobile={isMobile}

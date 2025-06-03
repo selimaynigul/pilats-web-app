@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Avatar, Tooltip, Button, Popover } from "antd";
+import { Avatar, Tooltip, Button, Popover, Modal } from "antd";
 import {
   AntDesignOutlined,
   ArrowRightOutlined,
@@ -9,14 +9,23 @@ import {
   EditFilled,
   UserOutlined,
 } from "@ant-design/icons";
+import { FiMoreVertical } from "react-icons/fi";
 import styled from "styled-components";
 import dayjs from "dayjs";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { capitalize, hasRole } from "utils/permissionUtils";
 import { useLanguage } from "hooks";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import { sessionService } from "services";
 dayjs.extend(isSameOrAfter);
+
+const Header = styled.div`
+  height: 30px;
+  margin-bottom: 15px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border-radius: 10px;
+`;
 
 const TrainerInfo = styled.div`
   border: 1px solid white;
@@ -89,7 +98,7 @@ const ActionButtons = styled.div`
   display: flex;
   gap: 5px;
   top: 0px;
-  right: 5px;
+  right: 0px;
 `;
 
 const EditButton = styled(Button)`
@@ -121,7 +130,24 @@ const DeleteButton = styled(Button)`
     box-shadow: rgba(255, 50, 94, 0.2) 0px 8px 12px;
   }
 `;
+const DetailButton = styled(Button)`
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 4px;
+  min-width: 24px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: grey;
 
+  &:hover {
+    background: transparent !important;
+    box-shadow: none !important;
+    color: grey !important;
+  }
+`;
 const AttendeeInfo = styled.div`
   display: flex;
   justify-content: space-between;
@@ -146,6 +172,7 @@ const EventPopover: React.FC<EventPopoverProps> = ({
   setVisible,
 }) => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
 
   // Katılımcı state'i
   const [attendees, setAttendees] = useState<any[]>([]);
@@ -180,26 +207,74 @@ const EventPopover: React.FC<EventPopoverProps> = ({
     { bg: "#d9f7be", color: "#135200" },
   ];
 
+  const handleDeleteWithConfirm = () => {
+    Modal.confirm({
+      title: t.confirmDelete || "Emin misiniz?",
+      content:
+        t.confirmDeleteText || "Bu dersi silmek istediğinize emin misiniz?",
+      okText: t.delete || "Sil",
+      okType: "danger",
+      cancelText: t.cancel || "Vazgeç",
+      onOk: handleDelete,
+    });
+  };
+
+  const goToSession = () => {
+    navigate(`/sessions/?id=${event.id}`);
+  };
+
   const content = (
     <div style={{ position: "relative", maxWidth: 300 }}>
-      <div style={{ marginBottom: 20 }}>
-        <strong>{capitalize(event.name)}</strong>
+      <Header onClick={goToSession}>
+        <strong
+          style={{
+            display: "block",
+            maxWidth: 150,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            paddingTop: 3,
+          }}
+          title={capitalize(event.name)}
+        >
+          {capitalize(event.name)}
+        </strong>
         {hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN"]) && (
           <ActionButtons>
             {/* Edit sadece bugünkü ve sonraki etkinliklerde gösterilsin */}
             {dayjs(event.start).isSameOrAfter(dayjs(), "day") && (
-              <EditButton type="primary" onClick={handleEditClick}>
+              <EditButton
+                type="primary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleEditClick();
+                }}
+              >
                 <EditFilled />
               </EditButton>
             )}
 
             {/* Delete her zaman gösterilsin */}
-            <DeleteButton onClick={handleDelete} type="primary">
+            <DeleteButton
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDeleteWithConfirm();
+              }}
+              type="primary"
+            >
               <DeleteOutlined />
             </DeleteButton>
+            <Tooltip
+              title={t.detail || "Dersi görüntüle"}
+              mouseEnterDelay={0.5}
+            >
+              <DetailButton onClick={goToSession} type="primary">
+                <FiMoreVertical />
+              </DetailButton>
+            </Tooltip>
           </ActionButtons>
         )}
-      </div>
+      </Header>
       <div style={{ display: "flex", gap: 5 }}>
         <DateInfo>
           <CalendarOutlined style={{ color: "grey  " }} />
@@ -220,9 +295,11 @@ const EventPopover: React.FC<EventPopoverProps> = ({
       <strong style={{ display: "block", marginTop: 15 }}>
         {t.description}
       </strong>
-      <small>{event.description ? event.description : t.noDescription}</small>
+      <small style={{ color: "grey" }}>
+        {event.description ? event.description : t.noDescription}
+      </small>
 
-      <strong style={{ display: "block", marginTop: 15 }}>{t.trainer}</strong>
+      <strong style={{ display: "block", marginTop: 10 }}>{t.trainer}</strong>
       <div style={{ marginTop: 0 }}>
         <Link to={`/trainers/${event.trainerId}`}>
           <TrainerInfo>
@@ -233,7 +310,7 @@ const EventPopover: React.FC<EventPopoverProps> = ({
               <strong>
                 {event.trainerName} {event.trainerSurname}{" "}
               </strong>
-              <small>Trainer</small>
+              <small style={{ color: "grey" }}>Trainer</small>
             </TrainerName>
             <TrainerDetailButton>
               <ArrowRightOutlined />
@@ -247,7 +324,7 @@ const EventPopover: React.FC<EventPopoverProps> = ({
           {loadingAttendees ? (
             <span>{t.loading}</span>
           ) : attendees.length === 0 ? (
-            <span>{t.noAttendeesYet}</span>
+            <small style={{ color: "grey" }}>{t.noAttendeesYet}</small>
           ) : (
             <Avatar.Group
               style={{ marginTop: 7 }}

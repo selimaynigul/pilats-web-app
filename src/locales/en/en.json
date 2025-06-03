@@ -80,5 +80,14 @@
   "startTime": "Start time",
   "endTime": "End time",
   "selectTrainer": "Select trainer",
-  "selectEndTime": "Select end time"
+  "selectEndTime": "Select end time",
+  "assignToCustomer": "Assign to customer",
+  "delete": "Delete",
+  "edit": "Edit",
+  "features": "Features",
+  "remainingUsages": "Remaining usages",
+  "measurements": "Measurements",
+  "credit": "credits",
+  "cancelRight": "cancel right",
+  "bonusRight": "bonus right"
 }

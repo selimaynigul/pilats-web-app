@@ -50,6 +50,11 @@ const StyleOverrides = styled.div`
   .ant-input-number-filled {
     width: 100%;
   }
+
+  .ant-input-data-count {
+    font-size: 11px !important;
+    color: #888;
+  }
 `;
 
 const CustomIcon = styled.span`
@@ -313,6 +318,8 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
                 rows={3}
                 placeholder="Enter description"
                 ref={descRef}
+                maxLength={200}
+                showCount
               />
             </div>
           </Form.Item>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Dropdown, Spin, InputRef, Avatar } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
@@ -85,6 +85,12 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
       inputRef.current?.focus();
     }
   }, [selectedCategory]);
+
+  useEffect(() => {
+    if (isMobile && searchActive && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isMobile, searchActive]);
 
   const handleSearchIconClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();

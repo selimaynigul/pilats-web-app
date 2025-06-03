@@ -9,10 +9,6 @@ import {
   StyledCard,
   InactiveIcon,
   Container,
-  CompanyInfo,
-  CompanyLogo,
-  CompanyName,
-  CompanyDetailButton,
   ContactButton,
   ContactInfo,
 } from "./ListItemStyles";
@@ -21,6 +17,7 @@ import { BsEnvelopeFill, BsWhatsapp } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import { ItemData, ListItemType } from "types/types";
 import { capitalize } from "utils/permissionUtils";
+import CardInfo from "components/CardInfo";
 
 interface ListItemProps {
   data: ItemData;
@@ -100,20 +97,12 @@ const ListItem: React.FC<ListItemProps> = ({ data, type = "default" }) => {
       {showContainer && (
         <Container>
           {showCompanyInfo && company?.id && (
-            <Link to={`/companies/${company.id}`}>
-              <CompanyInfo>
-                <CompanyLogo>
-                  <UserOutlined style={{ fontSize: 20 }} />
-                </CompanyLogo>
-                <CompanyName>
-                  <strong>{company.name ?? "Unnamed Company"}</strong>
-                  {company.branch && <small>{company.branch}</small>}
-                </CompanyName>
-                <CompanyDetailButton>
-                  <ArrowRightOutlined />
-                </CompanyDetailButton>
-              </CompanyInfo>
-            </Link>
+            <CardInfo
+              id={company.id}
+              title={company.name}
+              detail={company.branch}
+              to={`/companies/${company.id}`}
+            />
           )}
 
           {(contact?.email || contact?.phone || contact?.whatsapp) && (

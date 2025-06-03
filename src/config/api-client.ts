@@ -4,8 +4,6 @@ const baseURL = window.location.hostname.includes("localhost")
   ? "http://localhost:8000/api/v1"
   : "https://uat-platesapi-latest.onrender.com/api/v1";
 
-/* const baseURL = "https://uat-platesapi-latest.onrender.com"; */
-
 const apiClient = axios.create({
   baseURL,
   headers: {

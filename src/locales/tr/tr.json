@@ -80,5 +80,14 @@
   "startTime": "Başlangıç saati",
   "endTime": "Bitiş saati",
   "selectTrainer": "Eğitmen seçin",
-  "selectEndTime": "Bitiş saatini seçin"
+  "selectEndTime": "Bitiş saatini seçin",
+  "assignToCustomer": "Müşteriye ata",
+  "delete": "Sil",
+  "edit": "Düzenle",
+  "features": "Özellikler",
+  "remainingUsages": "Kalan kullanımlar",
+  "measurements": "Ölçümler",
+  "credit": "katılım hakkı",
+  "cancelRight": "iptal hakkı",
+  "bonusRight": "bonus hakkı"
 }

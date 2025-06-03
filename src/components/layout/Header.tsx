@@ -24,6 +24,7 @@ const StyledHeader = styled(Header)`
   backdrop-filter: blur(8px) !important;
   display: flex;
   align-items: center;
+  z-index: 2;
 `;
 
 const MenuButton = styled.button`
@@ -48,19 +49,75 @@ const ProfilePhoto = styled.div`
   cursor: pointer;
   margin-left: 8px;
 `;
-
-const SearchIcon = styled.div`
+const SearchIcon = styled.div<{ $visible?: boolean }>`
+  position: relative;
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background-color: white;
+  background: #fff;
   border: 1px solid #5d46e5;
-  color: #5d46e5;
-  display: flex;
+  display: ${({ $visible }) => ($visible === false ? "none" : "flex")};
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  color: #5d46e5;
   margin-right: 8px;
+
+  .magic-icon-search {
+    display: inline-block;
+    position: fixed;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    color: ${({ theme }) => theme.primary};
+    border-color: ${({ theme }) => theme.primary};
+  }
+  .magic-icon-search::before {
+    color: ${({ theme }) => theme.primary};
+    border-color: ${({ theme }) => theme.primary};
+    content: "";
+    display: inline-block;
+    width: 10%;
+    height: 40%;
+    background: ${({ theme }) => theme.primary};
+    position: absolute;
+    left: 75%;
+    top: 75%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    transition: all 0.3s;
+  }
+  .magic-icon-search::after {
+    content: "";
+    display: inline-block;
+    position: absolute;
+    width: 50%;
+    height: 50%;
+    border: 2px solid ${({ theme }) => theme.primary};
+    border-radius: 50%;
+    top: 40%;
+    left: 40%;
+    transform: translate(-50%, -50%) rotate(0deg);
+    transition: all 0.3s;
+  }
+  .magic-icon-search.close::before {
+    background: ${({ theme }) => theme.primary};
+    height: 80%;
+    left: 50%;
+    top: 50%;
+  }
+  .magic-icon-search.close::after {
+    border-width: 1px;
+    border-radius: 0;
+    background: ${({ theme }) => theme.primary};
+    width: 0;
+    height: 70%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+    transition:
+      all 0.3s,
+      background 0s 0.3s;
+  }
 `;
 
 export const Title = styled.h2`
@@ -133,7 +190,11 @@ const AppHeader: React.FC<HeaderProps> = ({
       {isMobile && (
         <div style={{ display: "flex", alignItems: "center" }}>
           <SearchIcon onClick={toggleSearch}>
-            {searchActive ? <CloseOutlined /> : <SearchOutlined />}
+            {/*             {searchActive ? <CloseOutlined /> : <SearchOutlined />}
+             */}{" "}
+            <span
+              className={`magic-icon-search${searchActive ? " close" : ""}`}
+            ></span>
           </SearchIcon>
           <Dropdown
             overlay={profileMenu}

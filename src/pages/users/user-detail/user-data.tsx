@@ -4,6 +4,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import MeasurementsContainer from "./user-data/measurements-tab/measurement-info-container";
 import SessionsContainer from "./user-data/sessions-tab/SessionsContainer";
 import PackagesContainer from "./user-data/packages-tab/PackagesContainer";
+import { useLanguage } from "hooks";
 
 const Container = styled.div`
   border-radius: 20px;
@@ -19,6 +20,9 @@ const Header = styled.div`
   align-items: center;
   color: ${({ theme }) => theme.primary};
   font-weight: bold;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
 
   .tab {
     padding: 8px 16px;
@@ -28,8 +32,23 @@ const Header = styled.div`
     font-size: 1.1em;
 
     &.active {
-      background: ${({ theme }) => theme.primary};
+      background: ${({ theme }) => theme.primary} !important;
       color: #fff;
+    }
+
+    &:hover {
+      background: ${({ theme }) => theme.primary}15;
+    }
+  }
+
+  @media (max-width: 600px) {
+    gap: 5px;
+    font-size: 0.9em;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+
+    .tab {
+      padding: 6px 12px;
     }
   }
 `;
@@ -46,7 +65,7 @@ const TABS = {
 
 const UserData: React.FC<{ user: any }> = ({ user }) => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const tabParam = searchParams.get("tab") || "sessions";
   const [activeTab, setActiveTab] = useState(
@@ -86,19 +105,19 @@ const UserData: React.FC<{ user: any }> = ({ user }) => {
           className={`tab ${activeTab === "classes" ? "active" : ""}`}
           onClick={() => handleTabClick("sessions")}
         >
-          Classes
+          {t.sessions}
         </div>
         <div
           className={`tab ${activeTab === "packages" ? "active" : ""}`}
           onClick={() => handleTabClick("packages")}
         >
-          Packages
+          {t.packages}
         </div>
         <div
           className={`tab ${activeTab === "measurements" ? "active" : ""}`}
           onClick={() => handleTabClick("measurements")}
         >
-          Measurements
+          {t.measurements}
         </div>
       </Header>
 

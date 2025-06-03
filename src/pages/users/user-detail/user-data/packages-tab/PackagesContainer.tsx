@@ -4,6 +4,7 @@ import styled from "styled-components";
 import PackageCard from "pages/packages/package-list/packages-list-card";
 import customerPackageService from "services/customer-package-service";
 import { useParams } from "react-router-dom";
+import { useLanguage } from "hooks";
 
 const Container = styled.div`
   max-height: 71vh;
@@ -19,8 +20,9 @@ const Container = styled.div`
 const PackagesContainer: React.FC = () => {
   const [packages, setPackages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const { id } = useParams<{ id: string }>(); // URL'den id'yi al
-  const customerId = parseInt(id || "0", 10); // Sayıya çevir, default 0
+  const { id } = useParams<{ id: string }>();
+  const customerId = parseInt(id || "0", 10);
+  const { t } = useLanguage();
 
   const fetchCustomerPackages = async () => {
     try {
@@ -70,9 +72,9 @@ const PackagesContainer: React.FC = () => {
                   price: pkg.price,
                   description: pkg.description,
                   features: [
-                    { value: pkg.creditCount, label: "katılım hakkı" },
-                    { value: pkg.changeCount, label: "iptal hakkı" },
-                    { value: pkg.bonusCount, label: "bonus hakkı" },
+                    { value: pkg.creditCount, label: t.credit },
+                    { value: pkg.changeCount, label: t.cancelRight },
+                    { value: pkg.bonusCount, label: t.bonusRight },
                   ],
                   bonusCount: pkg.bonusCount,
                   remainingBonusCount: pkg.remainingBonusCount,

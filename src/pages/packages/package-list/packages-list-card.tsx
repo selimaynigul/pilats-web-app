@@ -6,11 +6,13 @@ import {
   RightOutlined,
   LeftOutlined,
 } from "@ant-design/icons";
-import { Dropdown, Input, Menu, Modal, message } from "antd";
+import { Card, Dropdown, Input, Menu, Modal, Tooltip, message } from "antd";
 import { companyPackageService, userService } from "services";
-import { capitalize } from "utils/permissionUtils";
+import { capitalize, hasRole } from "utils/permissionUtils";
 import ProgressBar from "components/ProgressBar";
 import customerPackageService from "services/customer-package-service";
+import CardInfo from "components/CardInfo";
+import { useLanguage } from "hooks";
 
 interface Package {
   id: string | number;
@@ -22,9 +24,11 @@ interface Package {
   remainingBonusCount: number;
   changeCount: number;
   remainingChangeCount: number;
+  companyId: number;
   creditCount: number;
   remainingCreditCount: number;
-  companyId: number;
+  companyName?: string;
+  branchName?: string;
 }
 
 interface CardProps {
@@ -44,6 +48,15 @@ const CardContainer = styled.div<{ mode?: "customer" | "admin" }>`
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0px 8px 42px -5px rgba(93, 70, 229, 0.2);
+  }
+`;
+
+const CardInfoContainer = styled.div`
+  padding: 0 15px;
+  margin-top: 10px;
+
+  strong {
+    margin-bottom: 3px;
   }
 `;
 
@@ -72,11 +85,20 @@ const Price = styled.p`
   margin: 0;
   color: #6a5bff;
 `;
-
 const Description = styled.p`
   font-size: 0.9rem;
-  color: #7c7c7c;
-  margin: 15px 15px 0;
+  color: rgb(182, 172, 198);
+  margin: 10px 10px 0;
+  margin-bottom: 15px;
+  line-height: 1.4;
+  font-size: 0.9em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  word-break: break-word;
 `;
 
 const FeatureList = styled.div`
@@ -171,8 +193,12 @@ const PackageCard: React.FC<CardProps> = ({
     remainingChangeCount,
     creditCount,
     remainingCreditCount,
+    companyId,
+    companyName,
+    branchName,
   } = pkg;
 
+  const { t } = useLanguage();
   const [showProgress, setShowProgress] = useState(false);
   const [assignModalVisible, setAssignModalVisible] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -184,7 +210,7 @@ const PackageCard: React.FC<CardProps> = ({
     try {
       const res = await userService.search({
         ucSearchRequest: { name: value },
-        companyId: pkg.companyId,
+        companyId: companyId,
       });
       setSearchResults(res?.data || []);
     } catch (error) {
@@ -246,7 +272,7 @@ const PackageCard: React.FC<CardProps> = ({
           icon={<MoreOutlined />}
           onClick={() => setAssignModalVisible(true)}
         >
-          Kullanıcıya Ata
+          {t.assignToCustomer}
         </Menu.Item>
       )}
       <Menu.Item
@@ -254,7 +280,7 @@ const PackageCard: React.FC<CardProps> = ({
         icon={<DeleteOutlined style={{ color: "red" }} />}
         onClick={handleDelete}
       >
-        Sil
+        {t.delete}
       </Menu.Item>
     </Menu>
   );
@@ -267,8 +293,21 @@ const PackageCard: React.FC<CardProps> = ({
           <Price>₺{price}</Price>
         </CardHeader>
       </Dropdown>
+      {hasRole(["COMPANY_ADMIN", "ADMIN"]) && mode === "admin" && (
+        <CardInfoContainer>
+          <CardInfo
+            title={companyName || null}
+            detail={branchName || null}
+            to={`/companies/${companyId}`}
+          />
+        </CardInfoContainer>
+      )}
       <InfoContainer>
-        <Description>{description}</Description>
+        {description && (
+          <Tooltip title={description} mouseEnterDelay={0.5}>
+            <Description>{description}</Description>
+          </Tooltip>
+        )}{" "}
         <FeatureList>
           <div
             style={{
@@ -283,7 +322,7 @@ const PackageCard: React.FC<CardProps> = ({
             }}
           >
             <strong style={{ color: "#4f46e5" }}>
-              {showProgress ? "Kalan Kullanımlar" : "Özellikler"}
+              {showProgress ? t.remainingUsages : t.features}
             </strong>
             {mode !== "admin" && (
               <span

@@ -8,7 +8,7 @@ import {
   trainerService,
 } from "services";
 import { handleError } from "utils/apiHelpers";
-import { message } from "antd";
+import { Form, message } from "antd";
 import { CompanyDropdown } from "components";
 import moment from "moment";
 import { hasRole } from "utils/permissionUtils";
@@ -63,6 +63,7 @@ const PackagesToolbar: React.FC<{
 }> = ({ packageCount, selectedCompany, setSelectedCompany }) => {
   const [isModalVisible, setIsModalVisible] = React.useState(false);
   const { t } = useLanguage();
+  const [form] = Form.useForm();
 
   const handleAddPackage = (values: any) => {
     const payload = {
@@ -81,8 +82,8 @@ const PackagesToolbar: React.FC<{
     companyPackageService
       .add(payload)
       .then(() => {
-        message.success("Package is added");
         setIsModalVisible(false);
+        message.success("Package is added");
         window.location.reload();
       })
       .catch((err) => {
@@ -106,8 +107,12 @@ const PackagesToolbar: React.FC<{
         <AddButton onClick={() => setIsModalVisible(true)} />
       </ActionContainer>
       <AddPackageForm
+        form={form}
         visible={isModalVisible}
-        onClose={() => setIsModalVisible(false)}
+        onClose={() => {
+          form.resetFields();
+          setIsModalVisible(false);
+        }}
         onSubmit={handleAddPackage}
       />
     </ToolbarContainer>
