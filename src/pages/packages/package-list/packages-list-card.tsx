@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import {
   MoreOutlined,
@@ -7,6 +7,7 @@ import {
   LeftOutlined,
 } from "@ant-design/icons";
 import { Card, Dropdown, Input, Menu, Modal, Tooltip, message } from "antd";
+import type { InputRef } from "antd/es/input";
 import { companyPackageService, userService } from "services";
 import { capitalize, hasRole } from "utils/permissionUtils";
 import ProgressBar from "components/ProgressBar";
@@ -25,6 +26,7 @@ interface Package {
   changeCount: number;
   remainingChangeCount: number;
   companyId: number;
+  branchId?: number | null;
   creditCount: number;
   remainingCreditCount: number;
   companyName?: string;
@@ -194,6 +196,7 @@ const PackageCard: React.FC<CardProps> = ({
     creditCount,
     remainingCreditCount,
     companyId,
+    branchId,
     companyName,
     branchName,
   } = pkg;
@@ -204,6 +207,16 @@ const PackageCard: React.FC<CardProps> = ({
   const [searchValue, setSearchValue] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
+  const inputRef = useRef<InputRef>(null);
+
+  // Modal açıldığında inputa focus ver
+  useEffect(() => {
+    if (assignModalVisible) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+    }
+  }, [assignModalVisible]);
 
   const handleUserSearch = async (value: string) => {
     setSearchLoading(true);
@@ -385,11 +398,20 @@ const PackageCard: React.FC<CardProps> = ({
     </CardContainer>
   );
 
+  // Sonuçları filtrele
+  const filteredResults = searchResults.filter((user) => {
+    const userCompanyId = user.companyId ?? user.ucGetResponse?.companyId;
+    const userBranchId = user.branchId ?? user.ucGetResponse?.branchId;
+    const sameCompany = userCompanyId === companyId;
+    const sameBranch = pkg.branchId == null || userBranchId === pkg.branchId;
+    return sameCompany && sameBranch;
+  });
+
   return (
     <>
       {renderCardContent()}
       <Modal
-        title="Paketi müşteriye ata"
+        title={t.assignToCustomer}
         open={assignModalVisible}
         onCancel={() => {
           setAssignModalVisible(false);
@@ -400,6 +422,7 @@ const PackageCard: React.FC<CardProps> = ({
         closable={false}
       >
         <Input
+          ref={inputRef}
           type="text"
           value={searchValue}
           onFocus={() => {
@@ -423,11 +446,11 @@ const PackageCard: React.FC<CardProps> = ({
 
         {searchLoading ? (
           <p>Yükleniyor...</p>
-        ) : searchResults.length === 0 && searchValue.trim() ? (
+        ) : filteredResults.length === 0 && searchValue.trim() ? (
           <p>Kullanıcı bulunamadı</p>
         ) : (
           <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-            {searchResults.map((user) => (
+            {filteredResults.map((user) => (
               <li
                 key={user.id}
                 onClick={async () => {
@@ -455,7 +478,14 @@ const PackageCard: React.FC<CardProps> = ({
                   padding: "8px",
                   cursor: "pointer",
                   borderBottom: "1px solid #eee",
+                  transition: "background 0.2s",
                 }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.background = "#f5f5f5")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.background = "transparent")
+                }
               >
                 <img
                   src={
