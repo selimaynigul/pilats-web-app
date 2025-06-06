@@ -17,6 +17,8 @@ import { capitalize, hasRole } from "utils/permissionUtils";
 import { useLanguage } from "hooks";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import { sessionService } from "services";
+import { ExclamationCircleFilled } from "@ant-design/icons";
+
 dayjs.extend(isSameOrAfter);
 
 const Header = styled.div`
@@ -152,6 +154,13 @@ const AttendeeInfo = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-top: 7px;
+`;
+
+const StyledAvatar = styled(Avatar)`
+  &:hover {
+    z-index: 9;
+  }
 `;
 
 interface EventPopoverProps {
@@ -239,10 +248,9 @@ const EventPopover: React.FC<EventPopoverProps> = ({
         >
           {capitalize(event.name)}
         </strong>
-        {hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN"]) && (
-          <ActionButtons>
-            {/* Edit sadece bugünkü ve sonraki etkinliklerde gösterilsin */}
-            {dayjs(event.start).isSameOrAfter(dayjs(), "day") && (
+        <ActionButtons>
+          {dayjs(event.start).isSameOrAfter(dayjs(), "day") &&
+            hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN"]) && (
               <EditButton
                 type="primary"
                 onClick={(e) => {
@@ -254,7 +262,8 @@ const EventPopover: React.FC<EventPopoverProps> = ({
               </EditButton>
             )}
 
-            {/* Delete her zaman gösterilsin */}
+          {/* Delete her zaman gösterilsin */}
+          {hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN"]) && (
             <DeleteButton
               onClick={(e) => {
                 e.stopPropagation();
@@ -264,16 +273,13 @@ const EventPopover: React.FC<EventPopoverProps> = ({
             >
               <DeleteOutlined />
             </DeleteButton>
-            <Tooltip
-              title={t.detail || "Dersi görüntüle"}
-              mouseEnterDelay={0.5}
-            >
-              <DetailButton onClick={goToSession} type="primary">
-                <FiMoreVertical />
-              </DetailButton>
-            </Tooltip>
-          </ActionButtons>
-        )}
+          )}
+          <Tooltip title={t.detail || "Dersi görüntüle"} mouseEnterDelay={0.5}>
+            <DetailButton onClick={goToSession} type="primary">
+              <FiMoreVertical />
+            </DetailButton>
+          </Tooltip>
+        </ActionButtons>
       </Header>
       <div style={{ display: "flex", gap: 5 }}>
         <DateInfo>
@@ -327,7 +333,6 @@ const EventPopover: React.FC<EventPopoverProps> = ({
             <small style={{ color: "grey" }}>{t.noAttendeesYet}</small>
           ) : (
             <Avatar.Group
-              style={{ marginTop: 7 }}
               max={{
                 count: 3,
                 style: { color: "#f56a00", backgroundColor: "#fde3cf" },
@@ -343,8 +348,9 @@ const EventPopover: React.FC<EventPopoverProps> = ({
                         a.name
                       }
                       placement="top"
+                      mouseEnterDelay={0.4}
                     >
-                      <Avatar
+                      <StyledAvatar
                         src={a.imageUrl}
                         style={{
                           backgroundColor: a.imageUrl ? undefined : pair.bg,
@@ -353,7 +359,7 @@ const EventPopover: React.FC<EventPopoverProps> = ({
                       >
                         {!a.imageUrl &&
                           `${(a.ucGetResponse.name || "?")[0] || ""}${(a.ucGetResponse.surname || "?")[0] || ""}`}
-                      </Avatar>
+                      </StyledAvatar>
                     </Tooltip>
                   </Link>
                 );
@@ -361,12 +367,51 @@ const EventPopover: React.FC<EventPopoverProps> = ({
             </Avatar.Group>
           )}
 
-          <strong>
-            {typeof event.totalCapacity === "number" &&
-            typeof event.remainingCapacity === "number"
-              ? `${event.totalCapacity - event.remainingCapacity}/${event.totalCapacity}`
-              : ""}
-          </strong>
+          {typeof event.totalCapacity === "number" &&
+          typeof event.remainingCapacity === "number" ? (
+            event.remainingCapacity === 0 ? (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  background: "#ff6b82",
+                  borderRadius: 50,
+                  padding: "2px 3px",
+                  fontWeight: 500,
+                  fontSize: 14,
+                  color: "#fff",
+                  minWidth: 90,
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    width: 22,
+                    height: 22,
+                    borderRadius: "50%",
+                    background: "#ffabb8",
+                    color: "#fff",
+                  }}
+                >
+                  <ExclamationCircleFilled style={{ fontSize: 16 }} />
+                </div>
+                <span style={{ fontWeight: 700 }}>Full</span>
+                <span style={{ color: "#fff", fontWeight: 400 }}>
+                  {event.totalCapacity}/{event.totalCapacity}
+                </span>
+              </div>
+            ) : (
+              <strong>
+                {event.totalCapacity - event.remainingCapacity}/
+                {event.totalCapacity}
+              </strong>
+            )
+          ) : (
+            ""
+          )}
         </AttendeeInfo>
       </div>
     </div>

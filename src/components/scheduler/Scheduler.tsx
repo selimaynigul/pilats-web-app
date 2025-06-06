@@ -341,7 +341,7 @@ const Scheduler: React.FC<{
       return;
     }
 
-    if (hasRole(["BRANCH_ADMIN"])) {
+    if (hasRole(["COMPANY_ADMIN", "BRANCH_ADMIN"])) {
       setSelectedRange(slotInfo);
       setIsModalVisible(true);
     }

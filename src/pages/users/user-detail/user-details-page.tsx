@@ -35,11 +35,11 @@ const UserDetailsPage: React.FC = () => {
         <Spin />
       ) : (
         <Row gutter={[16, 16]} style={{ height: "100%" }}>
-          <Col xs={24} sm={24} md={8}>
+          <Col xs={24} sm={24} md={24} lg={8}>
             <UserInfo user={user} loading={loading} />
           </Col>
 
-          <Col xs={24} sm={24} md={16}>
+          <Col xs={24} sm={24} md={24} lg={16}>
             <UserData user={user} />
           </Col>
         </Row>

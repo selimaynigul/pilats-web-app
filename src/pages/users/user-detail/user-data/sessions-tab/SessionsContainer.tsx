@@ -1,5 +1,5 @@
-import React, { useMemo } from "react";
-import { Alert, Col, Row, Spin } from "antd";
+import React, { useMemo, useState } from "react";
+import { Alert, Col, Row, Spin, Checkbox } from "antd";
 import styled from "styled-components";
 import SessionCard from "components/SessionCard";
 import { sessionService } from "services";
@@ -16,18 +16,60 @@ const Sessions = styled.div`
   }
 `;
 
+const FilterContainer = styled.div`
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  margin-left: 8px;
+  span {
+    color: grey !important;
+  }
+  overflow-x: auto; /* Yatay scroll için */
+  white-space: nowrap; /* Satır atlamayı önler */
+  -webkit-overflow-scrolling: touch; /* Mobilde daha iyi scroll deneyimi */
+`;
+
 const SessionsContainer: React.FC = () => {
   const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>(); // URL'den :id al
+  const { id } = useParams<{ id: string }>();
+
+  const [selectedFilters, setSelectedFilters] = useState<string[]>(["ALL"]);
+
+  const handleFilterChange = (checked: boolean, filter: string) => {
+    if (filter === "ALL") {
+      setSelectedFilters(checked ? ["ALL"] : []);
+    } else {
+      setSelectedFilters((prev) => {
+        const updatedFilters = checked
+          ? [...prev.filter((f) => f !== "ALL"), filter] // "Tümü" seçeneğini kaldır
+          : prev.filter((f) => f !== filter);
+
+        // Eğer diğer 4 checkbox seçili değilse "Tümü" seçili olsun
+        if (
+          !updatedFilters.includes("JOINED") &&
+          !updatedFilters.includes("ATTENDED") &&
+          !updatedFilters.includes("POSTPONED") &&
+          !updatedFilters.includes("CANCELLED")
+        ) {
+          return ["ALL"];
+        }
+
+        return updatedFilters;
+      });
+    }
+  };
 
   const params = useMemo(() => {
+    console.log(selectedFilters);
     return {
       sessionCustomerLastEventSearchRequest: {
-        sessionCustomerEventsList: ["JOINED", "ATTENDED"],
-        customerId: parseInt(id || "0", 10), // customerId olarak kullan
+        sessionCustomerEventsList: selectedFilters.includes("ALL")
+          ? ["JOINED", "ATTENDED", "POSTPONED", "CANCELLED"]
+          : selectedFilters,
+        customerId: parseInt(id || "0", 10),
       },
     };
-  }, [id]);
+  }, [id, selectedFilters]);
 
   const {
     items: sessions,
@@ -44,33 +86,81 @@ const SessionsContainer: React.FC = () => {
     navigate(`/sessions/${sessionDate}?id=${session.id}`);
   };
 
+  const isJoinedButNotAttended = (session: any) => {
+    return (
+      session.customerLastEvent === "JOINED" &&
+      new Date(session.endDate) < new Date()
+    );
+  };
+
   return (
-    <Sessions onScroll={loadMore}>
-      {loading ? (
-        <Spin />
-      ) : sessions.length === 0 ? (
-        <Alert
-          message="Herhangi bir ders atanmamış"
-          type="info"
-          showIcon
-          closable
-          style={{
-            width: "100%",
-            borderRadius: "15px",
-            border: "1px solid #e6e3ff",
-            background: "#e6e3ff",
-          }}
-        />
-      ) : (
-        <Row gutter={[16, 16]}>
-          {sessions.map((session: any) => (
-            <Col xs={24} sm={12} key={session.id}>
-              <SessionCard session={session} onClick={handleSessionClick} />
-            </Col>
-          ))}
-        </Row>
-      )}
-    </Sessions>
+    <>
+      {/* Checkbox Filter */}
+      <FilterContainer>
+        <Checkbox
+          checked={selectedFilters.includes("ALL")}
+          onChange={(e) => handleFilterChange(e.target.checked, "ALL")}
+        >
+          Tümü
+        </Checkbox>
+        <Checkbox
+          checked={selectedFilters.includes("JOINED")}
+          onChange={(e) => handleFilterChange(e.target.checked, "JOINED")}
+        >
+          Katılmadı
+        </Checkbox>
+        <Checkbox
+          checked={selectedFilters.includes("ATTENDED")}
+          onChange={(e) => handleFilterChange(e.target.checked, "ATTENDED")}
+        >
+          Katıldı
+        </Checkbox>
+        <Checkbox
+          checked={selectedFilters.includes("POSTPONED")}
+          onChange={(e) => handleFilterChange(e.target.checked, "POSTPONED")}
+        >
+          Ertelendi
+        </Checkbox>
+        <Checkbox
+          checked={selectedFilters.includes("CANCELLED")}
+          onChange={(e) => handleFilterChange(e.target.checked, "CANCELLED")}
+        >
+          İptal Edildi
+        </Checkbox>
+      </FilterContainer>
+
+      {/* Session Cards */}
+      <Sessions onScroll={loadMore}>
+        {loading ? (
+          <Spin />
+        ) : sessions.length === 0 ? (
+          <Alert
+            message="Herhangi bir ders bulunamadı."
+            type="info"
+            showIcon
+            closable
+            style={{
+              width: "100%",
+              borderRadius: "15px",
+              border: "1px solid #e6e3ff",
+              background: "#e6e3ff",
+            }}
+          />
+        ) : (
+          <Row gutter={[16, 16]}>
+            {sessions.map((session: any) => (
+              <Col sm={24} md={12} key={session.id}>
+                <SessionCard
+                  session={session}
+                  onClick={handleSessionClick}
+                  isJoinedButNotAttended={isJoinedButNotAttended(session)}
+                />
+              </Col>
+            ))}
+          </Row>
+        )}
+      </Sessions>
+    </>
   );
 };
 

@@ -8,11 +8,11 @@ import { StyledModal } from "../SchedulerStyles";
 import { useLocation, useNavigate } from "react-router-dom";
 import EventPopover from "./EventPopover";
 import EventDrawer from "./EventDrawer";
-import { capitalize } from "utils/permissionUtils";
+import { capitalize, hasRole } from "utils/permissionUtils";
 
-const Container = styled.div`
-  background: #5d46e5;
-  border-bottom: 4px solid #4d3abd;
+const Container = styled.div<{ bgColor: string; darkColor: string }>`
+  background: ${(props) => props.bgColor};
+  border-bottom: 4px solid ${(props) => props.darkColor};
   color: white;
   padding: 2px 10px;
   border-radius: 12px;
@@ -24,7 +24,7 @@ const Container = styled.div`
   height: 100%;
 
   &:hover {
-    background: #4d3abd;
+    background: ${(props) => props.darkColor};
   }
 
   @media (max-width: 1024px) {
@@ -121,6 +121,72 @@ const CustomEvent: React.FC<{
     }
   };
 
+  const colorPalette = [
+    "#5d46e5", // PRIMARY COLOR
+    "#0097e6", // canlı mavi
+    "#2980b9", // lacivert ton
+    "#ff835d", // turuncu
+    "#007db7", // mavi
+    "#7f8c8d", // nötr gri
+    "#00a981", // yeşile yakın turkuaz
+    "#b4a3d8", // lila
+    "#67baa7", // açık yeşilimsi
+    "#a681ff", // pastel mor
+    "#4e8074", // koyu yeşil
+    "#1abc9c", // açık turkuaz
+    "#afa8ba", // grimsi
+    "#8263ff", // açık mor
+    "#16a085", // mavi-yeşil
+    "#9ab5bc", // mavi-gri
+    "#0b879d", // koyu camgöbeği
+    "#bea6a1", // gri-bej
+    "#9e8dc1", // mor-gri arası
+    "#00a2b7", // su yeşili
+  ];
+
+  function getColorForCompany(companyName: any, companyId: any) {
+    let index;
+    if (hasRole(["ADMIN", "COMPANY_ADMIN"])) {
+      const input = `${companyName}_${companyId}`;
+      let hash = 0;
+      for (let i = 0; i < input.length; i++) {
+        hash = input.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      index = Math.abs(hash) % colorPalette.length;
+    } else {
+      index = 0;
+    }
+    console.log(event.name, colorPalette[index]);
+    return colorPalette[index];
+  }
+
+  function darkenColor(hex: string, percent: number): string {
+    const num = parseInt(hex.replace("#", ""), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = (num >> 16) - amt;
+    const G = ((num >> 8) & 0x00ff) - amt;
+    const B = (num & 0x0000ff) - amt;
+
+    return (
+      "#" +
+      (
+        0x1000000 +
+        (Math.max(0, R) << 16) +
+        (Math.max(0, G) << 8) +
+        Math.max(0, B)
+      )
+        .toString(16)
+        .slice(1)
+    );
+  }
+
+  const hashName = hasRole(["COMPANY_ADMIN"])
+    ? event.branchName
+    : event.companyName;
+  const hashId = hasRole(["COMPANY_ADMIN"]) ? event.branchId : event.companyId;
+  const bgColor = getColorForCompany(hashName, hashId);
+  const darkColor = darkenColor(bgColor, 10);
+
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
       <EventPopover
@@ -134,6 +200,8 @@ const CustomEvent: React.FC<{
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onDoubleClick={handleDoubleClick}
+          bgColor={bgColor}
+          darkColor={darkColor}
         >
           <strong>{capitalize((event as any)?.name)}</strong>
           {!isMobile && showTime && (

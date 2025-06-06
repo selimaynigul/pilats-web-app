@@ -238,7 +238,7 @@ const Toolbar: React.FC<
                   {viewOptions.find((v) => v.key === view)?.label}
                 </ToggleViewButton>
               </Dropdown>
-              {hasRole(["BRANCH_ADMIN"]) && (
+              {hasRole(["COMPANY_ADMIN", "BRANCH_ADMIN"]) && (
                 <AddButton onClick={() => handleModalToggle(true)} />
               )}
             </NavButtons>

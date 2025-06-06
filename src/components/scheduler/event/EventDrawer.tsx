@@ -9,6 +9,8 @@ import {
   Tooltip,
   Spin,
 } from "antd";
+import { FaCheck } from "react-icons/fa";
+
 import {
   CalendarOutlined,
   ClockCircleOutlined,
@@ -17,6 +19,9 @@ import {
   ArrowRightOutlined,
   UserOutlined,
   AntDesignOutlined,
+  CheckOutlined,
+  CloseOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
@@ -62,7 +67,7 @@ const EventDrawer: React.FC<{
 
   const [searchValue, setSearchValue] = useState("");
 
-  const showAttendance = dayjs().isAfter(dayjs(event?.start), "day");
+  const showAttendance = dayjs().isAfter(dayjs(event?.start), "minute");
 
   useEffect(() => {
     if (!open || hasFetched.current) return;
@@ -361,14 +366,50 @@ const EventDrawer: React.FC<{
                         <AttendeeName>
                           {user.firstName} {user.lastName}
                         </AttendeeName>
-                        {showAttendance && (
-                          <AttendanceStatus $present={user.present}>
-                            {user.present ? "Katıldı" : "Katılmadı"}
-                          </AttendanceStatus>
-                        )}
                       </div>
                     </AttendeeInfo>
-                    {canAdd && (
+
+                    {!canAdd ? (
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                        }}
+                      >
+                        <Tooltip title={user.present ? "Katıldı" : "Katılmadı"}>
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              width: 18,
+                              height: 18,
+                              borderRadius: "50%",
+                              background: user.present ? "#52c41a" : "#ff4d4f",
+                              color: "#fff",
+                            }}
+                          >
+                            {user.present ? (
+                              <FaCheck style={{ fontSize: 10 }} />
+                            ) : (
+                              <CloseOutlined style={{ fontSize: 10 }} />
+                            )}
+                          </div>
+                        </Tooltip>
+                        <MoreOutlined
+                          style={{
+                            fontSize: 16,
+                            color: "gray",
+                            cursor: "pointer",
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // Handle more options click
+                          }}
+                        />
+                      </div>
+                    ) : (
                       <DeleteButton
                         onClick={async (e) => {
                           e.stopPropagation();
