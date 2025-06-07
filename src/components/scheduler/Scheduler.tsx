@@ -7,7 +7,7 @@ import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import CustomEvent from "./event/Event";
-import { Form, message, Spin } from "antd";
+import { Form, message, Modal, Spin } from "antd";
 import AddClassForm from "components/scheduler/add-class-form/AddClassForm";
 import CustomToolbar from "components/scheduler/toolbar/scheduler-toolbar";
 import {
@@ -25,6 +25,10 @@ import { View } from "react-big-calendar";
 import isBetween from "dayjs/plugin/isBetween";
 import Draggable from "react-draggable";
 import type { DraggableEvent, DraggableData } from "react-draggable";
+import EditSessionForm from "./edit-session-form/edit-session-form";
+import EventDrawer from "./event/EventDrawer";
+import EventPopover from "./event/event-popover/EventPopover";
+import { usePopover } from "contexts/PopoverProvider";
 dayjs.extend(isBetween);
 
 const validViews: View[] = ["month", "week", "day", "agenda"];
@@ -61,6 +65,10 @@ const Scheduler: React.FC<{
   const [loading, setLoading] = useState(false);
   const [sessions, setSessions] = useState<any[]>([]);
   const { t, userLanguage } = useLanguage();
+
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedSession, setSelectedSession] = useState<any | null>(null);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRange, setSelectedRange] = useState<{
@@ -226,6 +234,23 @@ const Scheduler: React.FC<{
       fetchSessions(visibleRange.start, visibleRange.end, true);
     }
   }, [visibleRange, params]);
+
+  // Scheduler.tsx
+  useEffect(() => {
+    const id = searchParams.get("id");
+    if (id && !drawerVisible) {
+      /* 1) ID takvimdeki veriler içindeyse hemen aç */
+      const found = sessions.find((s) => String(s.id) === id);
+      if (found) {
+        setSelectedSession(found);
+        setDrawerVisible(true);
+      } else {
+        /* 2) Henüz gelmediyse, Drawer’ı boş aç → Drawer fetch eder */
+        setSelectedSession(null);
+        setDrawerVisible(true);
+      }
+    }
+  }, [searchParams, sessions, drawerVisible]);
 
   // Güncellenmiş, kopyala-yapıştır hazır `updateVisibleDate`
   const updateVisibleDate = (range: { start: Date; end: Date } | Date[]) => {
@@ -580,6 +605,50 @@ const Scheduler: React.FC<{
       });
   };
 
+  // --------------- ortak fonksiyonlar ---------------
+  const openDrawer = (ev: any) => {
+    setSelectedSession(ev);
+    setDrawerVisible(true);
+  };
+
+  const openEditModal = (ev: any) => {
+    setSelectedSession(ev);
+    setEditModalOpen(true);
+  };
+
+  const handleDelete = (ev: any) => {
+    if (!ev) return; // güvenlik
+
+    Modal.confirm({
+      title: t.confirmDelete || "Emin misiniz?",
+      content:
+        t.confirmDeleteText || "Bu dersi silmek istediğinize emin misiniz?",
+      okText: t.delete || "Sil",
+      cancelText: t.cancel || "Vazgeç",
+      okType: "danger",
+      onOk: async () => {
+        try {
+          await sessionService.delete(ev.id);
+          message.success(t.deleted || "Silindi");
+          /* listeyi yenile */
+          if (visibleRange)
+            fetchSessions(visibleRange.start, visibleRange.end, false);
+
+          setDrawerVisible(false);
+          setSelectedSession(null);
+        } catch {
+          message.error(t.deleteFailed || "Silinemedi");
+        }
+      },
+    });
+  };
+
+  const fetch = () => {
+    if (visibleRange) {
+      return fetchSessions(visibleRange.start, visibleRange.end, true);
+    }
+  };
+
   return (
     <CalendarWrapper>
       {loading && (
@@ -628,20 +697,19 @@ const Scheduler: React.FC<{
             const showTime = dayEvents.length <= 1;
 
             return (
-              <CustomEvent
+              <EventPopover
                 event={event}
-                dayEvents={dayEvents}
-                showTime={showTime}
-                fetch={() => {
-                  if (visibleRange) {
-                    return fetchSessions(
-                      visibleRange.start,
-                      visibleRange.end,
-                      true
-                    );
-                  }
-                }}
-              />
+                handleEditClick={openEditModal}
+                handleDelete={handleDelete}
+              >
+                <CustomEvent
+                  event={event}
+                  dayEvents={dayEvents}
+                  showTime={showTime}
+                  onOpenDrawer={openDrawer}
+                  refresh={fetch}
+                />
+              </EventPopover>
             );
           },
         }}
@@ -681,6 +749,32 @@ const Scheduler: React.FC<{
           selectedRange={selectedRange}
           nameRef={nameInputRef}
           currentView={currentView}
+        />
+      </StyledModal>
+
+      {/* Takvimin hemen altına ekleyin */}
+      <EventDrawer
+        open={drawerVisible}
+        onClose={() => {
+          setDrawerVisible(false);
+          setSelectedSession(null);
+          searchParams.delete("id");
+          navigate({ search: searchParams.toString() }, { replace: true });
+        }}
+        onEdit={() => openEditModal(selectedSession)}
+        onDelete={() => handleDelete(selectedSession)}
+      />
+
+      {/* Edit Session Modal */}
+      <StyledModal
+        visible={editModalOpen}
+        onCancel={() => setEditModalOpen(false)}
+        footer={null}
+      >
+        <EditSessionForm
+          session={selectedSession}
+          onClose={() => setEditModalOpen(false)}
+          onUpdated={fetch}
         />
       </StyledModal>
     </CalendarWrapper>

@@ -54,7 +54,8 @@ const EventDrawer: React.FC<{
   const hasFetched = useRef(false);
   const navigate = useNavigate();
 
-  const [event, setEvent] = useState<any | null>(null);
+  const [event, setEvent] = useState<any | null>(null); // session prop varsa
+  const [prevId, setPrevId] = useState<number | undefined>();
 
   const { t } = useLanguage();
 
@@ -70,69 +71,64 @@ const EventDrawer: React.FC<{
   const showAttendance = dayjs().isAfter(dayjs(event?.start), "minute");
 
   useEffect(() => {
-    if (!open || hasFetched.current) return;
+    if (!open || !sessionId) return;
+
+    // ID değiştiyse veriyi sıfırla ve yeniden çek
+    if (prevId !== sessionId) {
+      setPrevId(sessionId);
+      setEvent(null);
+      setAttendees([]);
+      setLoadingAttendees(true);
+    }
+
+    if (event) return; // ayni id için ikinci kez çağırma
 
     const fetchData = async () => {
-      if (!sessionId) return;
-
       try {
-        // 1. Etkinlik detayını çek
-        const sessionRes: any = await sessionService.search({ id: sessionId });
-        console.log("fetching session", sessionRes);
-        const sessionData = sessionRes.data[0];
+        /* --- 1. Etkinlik --- */
+        const res = await sessionService.search({ id: sessionId });
+        const s = res.data[0];
         setEvent({
-          name: sessionData.name,
-          description: sessionData?.description,
-          trainerId: sessionData.trainerId,
-          trainerName: sessionData.trainerName,
-          trainerSurname: sessionData.trainerSurname,
-          start: sessionData.startDate,
-          end: sessionData.endDate,
-          capacity: sessionData.totalCapacity,
-          company: {
-            id: sessionData.companyId,
-            name: sessionData.companyName,
-          },
-          branch: {
-            id: sessionData.branchId,
-            name: sessionData.branchName,
-          },
+          name: s.name,
+          description: s.description,
+          trainerId: s.trainerId,
+          trainerName: s.trainerName,
+          trainerSurname: s.trainerSurname,
+          start: s.startDate,
+          end: s.endDate,
+          capacity: s.totalCapacity,
+          company: { id: s.companyId, name: s.companyName },
+          branch: { id: s.branchId, name: s.branchName },
         });
 
-        // 2. Katılımcıları çek
-        const customerRes = await sessionService.getSessionCustomers({
-          searchByPageDto: {
-            sort: "DESC",
-            pageNo: 0,
-            pageSize: 100,
-          },
+        /* --- 2. Katılımcılar --- */
+        const cust = await sessionService.getSessionCustomers({
+          searchByPageDto: { sort: "DESC", pageNo: 0, pageSize: 100 },
           sessionId,
           sessionCustomerEventsList: ["JOINED", "ATTENDED"],
         });
-
-        const attendees = customerRes.data.map((item: any) => ({
-          id: item.customerId,
-          firstName: item.ucGetResponse?.name,
-          lastName: item.ucGetResponse?.surname,
-          avatar: null,
-          present: item.customerLastEvent === "ATTENDED",
-        }));
-
-        setAttendees(attendees);
-      } catch (error) {
-        console.error("Etkinlik veya katılımcı bilgisi alınamadı:", error);
+        setAttendees(
+          cust.data.map((c: any) => ({
+            id: c.customerId,
+            firstName: c.ucGetResponse?.name,
+            lastName: c.ucGetResponse?.surname,
+            avatar: null,
+            present: c.customerLastEvent === "ATTENDED",
+          }))
+        );
+      } catch (err) {
+        console.error("Fetch error", err);
       } finally {
         setLoadingAttendees(false);
       }
     };
 
     fetchData();
-    hasFetched.current = true;
-  }, []);
+  }, [open, sessionId, prevId, event]);
 
   useEffect(() => {
     if (!showSearch || !event) return;
-    performSearch(""); // ⬅️ aşağıda utils fonksiyonu
+    performSearch("");
   }, [showSearch, event]);
 
   const performSearch = async (name: string) => {

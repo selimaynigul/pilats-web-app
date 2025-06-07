@@ -2,6 +2,7 @@ import React from "react";
 import Scheduler from "../../components/scheduler/Scheduler";
 import { Helmet } from "react-helmet";
 import { useLanguage, useFilter } from "hooks";
+import { PopoverProvider } from "contexts";
 
 const ClassesPage: React.FC = () => {
   const { t } = useLanguage();
@@ -12,7 +13,9 @@ const ClassesPage: React.FC = () => {
       <Helmet>
         <title>Pilats - {t.sessions}</title>
       </Helmet>
-      <Scheduler selectedCompany={company} setSelectedCompany={setCompany} />
+      <PopoverProvider>
+        <Scheduler selectedCompany={company} setSelectedCompany={setCompany} />
+      </PopoverProvider>
     </>
   );
 };

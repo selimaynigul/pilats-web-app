@@ -18,6 +18,7 @@ import { useLanguage } from "hooks";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import { sessionService } from "services";
 import { ExclamationCircleFilled } from "@ant-design/icons";
+import { usePopover } from "contexts/PopoverProvider";
 
 dayjs.extend(isSameOrAfter);
 
@@ -165,11 +166,9 @@ const StyledAvatar = styled(Avatar)`
 
 interface EventPopoverProps {
   event: any;
-  handleEditClick: () => void;
-  handleDelete: () => void;
+  handleEditClick: (ev: any) => void;
+  handleDelete: (ev: any) => void;
   children: any;
-  visible: boolean;
-  setVisible: any;
 }
 
 const EventPopover: React.FC<EventPopoverProps> = ({
@@ -177,8 +176,7 @@ const EventPopover: React.FC<EventPopoverProps> = ({
   handleEditClick,
   handleDelete,
   children,
-  visible,
-  setVisible,
+  ...rest
 }) => {
   const { t } = useLanguage();
   const navigate = useNavigate();
@@ -186,9 +184,11 @@ const EventPopover: React.FC<EventPopoverProps> = ({
   // Katılımcı state'i
   const [attendees, setAttendees] = useState<any[]>([]);
   const [loadingAttendees, setLoadingAttendees] = useState(false);
+  const { openId, setOpenId } = usePopover();
 
   useEffect(() => {
-    if (visible && event?.id) {
+    const isOpen = openId === event.id;
+    if (isOpen && event?.id) {
       setLoadingAttendees(true);
       sessionService
         .getSessionCustomers({
@@ -206,7 +206,7 @@ const EventPopover: React.FC<EventPopoverProps> = ({
         .catch(() => setAttendees([]))
         .finally(() => setLoadingAttendees(false));
     }
-  }, [visible, event?.id]);
+  }, [openId, event?.id]);
 
   const avatarColorPairs = [
     { bg: "#ffe7ba", color: "#873800" },
@@ -216,19 +216,8 @@ const EventPopover: React.FC<EventPopoverProps> = ({
     { bg: "#d9f7be", color: "#135200" },
   ];
 
-  const handleDeleteWithConfirm = () => {
-    Modal.confirm({
-      title: t.confirmDelete || "Emin misiniz?",
-      content:
-        t.confirmDeleteText || "Bu dersi silmek istediğinize emin misiniz?",
-      okText: t.delete || "Sil",
-      okType: "danger",
-      cancelText: t.cancel || "Vazgeç",
-      onOk: handleDelete,
-    });
-  };
-
   const goToSession = () => {
+    setOpenId(null);
     navigate(`/sessions/?id=${event.id}`);
   };
 
@@ -255,7 +244,8 @@ const EventPopover: React.FC<EventPopoverProps> = ({
                 type="primary"
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleEditClick();
+                  setOpenId(null);
+                  handleEditClick(event);
                 }}
               >
                 <EditFilled />
@@ -267,7 +257,8 @@ const EventPopover: React.FC<EventPopoverProps> = ({
             <DeleteButton
               onClick={(e) => {
                 e.stopPropagation();
-                handleDeleteWithConfirm();
+                setOpenId(null);
+                handleDelete(event);
               }}
               type="primary"
             >
@@ -367,50 +358,45 @@ const EventPopover: React.FC<EventPopoverProps> = ({
             </Avatar.Group>
           )}
 
-          {typeof event.totalCapacity === "number" &&
-          typeof event.remainingCapacity === "number" ? (
-            event.remainingCapacity === 0 ? (
+          {event.remainingCapacity === 0 ? (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                background: "#ff6b82",
+                borderRadius: 50,
+                padding: "2px 3px",
+                fontWeight: 500,
+                fontSize: 14,
+                color: "#fff",
+                minWidth: 90,
+              }}
+            >
               <div
                 style={{
                   display: "flex",
+                  justifyContent: "center",
                   alignItems: "center",
-                  gap: 8,
-                  background: "#ff6b82",
-                  borderRadius: 50,
-                  padding: "2px 3px",
-                  fontWeight: 500,
-                  fontSize: 14,
+                  width: 22,
+                  height: 22,
+                  borderRadius: "50%",
+                  background: "#ffabb8",
                   color: "#fff",
-                  minWidth: 90,
                 }}
               >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    width: 22,
-                    height: 22,
-                    borderRadius: "50%",
-                    background: "#ffabb8",
-                    color: "#fff",
-                  }}
-                >
-                  <ExclamationCircleFilled style={{ fontSize: 16 }} />
-                </div>
-                <span style={{ fontWeight: 700 }}>Full</span>
-                <span style={{ color: "#fff", fontWeight: 400 }}>
-                  {event.totalCapacity}/{event.totalCapacity}
-                </span>
+                <ExclamationCircleFilled style={{ fontSize: 16 }} />
               </div>
-            ) : (
-              <strong>
-                {event.totalCapacity - event.remainingCapacity}/
-                {event.totalCapacity}
-              </strong>
-            )
+              <span style={{ fontWeight: 700 }}>Full</span>
+              <span style={{ color: "#fff", fontWeight: 400 }}>
+                {event.totalCapacity}/{event.totalCapacity}
+              </span>
+            </div>
           ) : (
-            ""
+            <strong>
+              {event.totalCapacity - event.remainingCapacity}/
+              {event.totalCapacity}
+            </strong>
           )}
         </AttendeeInfo>
       </div>
@@ -419,13 +405,25 @@ const EventPopover: React.FC<EventPopoverProps> = ({
 
   return (
     <Popover
-      open={visible}
-      onOpenChange={setVisible}
-      trigger="click"
       content={content}
+      open={openId === event.id}
+      onOpenChange={(v) => setOpenId(v ? event.id : null)}
+      trigger="click"
       arrow={false}
+      getPopupContainer={() =>
+        (document.querySelector(".rbc-overlay") as HTMLElement) || document.body
+      }
+      {...rest}
     >
-      {children}
+      <div
+        style={{ height: "100%" }}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (openId !== event.id) setOpenId(event.id);
+        }}
+      >
+        {children}
+      </div>
     </Popover>
   );
 };
