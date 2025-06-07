@@ -121,32 +121,51 @@ const CustomEvent: React.FC<{
     }
   };
 
+  // 32 different colors
   const colorPalette = [
-    "#5d46e5", // PRIMARY COLOR
-    "#0097e6", // canlı mavi
-    "#2980b9", // lacivert ton
-    "#ff835d", // turuncu
-    "#007db7", // mavi
-    "#7f8c8d", // nötr gri
-    "#00a981", // yeşile yakın turkuaz
-    "#b4a3d8", // lila
-    "#67baa7", // açık yeşilimsi
-    "#a681ff", // pastel mor
-    "#4e8074", // koyu yeşil
-    "#1abc9c", // açık turkuaz
-    "#afa8ba", // grimsi
-    "#8263ff", // açık mor
-    "#16a085", // mavi-yeşil
-    "#9ab5bc", // mavi-gri
-    "#0b879d", // koyu camgöbeği
-    "#bea6a1", // gri-bej
-    "#9e8dc1", // mor-gri arası
-    "#00a2b7", // su yeşili
+    "#5d46e5",
+    "#2980b9",
+    "#619c86",
+    "#5bbdd4",
+    "#6f7597",
+    "#afa8ba",
+    "#67baa7",
+    "#A9B49D",
+    "#f56882",
+    "#74b2df",
+    "#8263ff",
+    "#567b97",
+    "#1abc9c",
+    "#00a2b7",
+    "#b4a3d8",
+    "#007db7",
+    "#96bbfc",
+    "#a4ae9e",
+    "#b2a8b8",
+    "#789CA2",
+    "#5079b5",
+    "#00a981",
+    "#567690",
+    "#9ab5bc",
+    "#9e8dc1",
+    "#0097e6",
+    "#ff835d",
+    "#0b879d",
+    "#a681ff",
+    "#209585",
+    "#7FA7C5",
   ];
 
-  function getColorForCompany(companyName: any, companyId: any) {
+  function getColorForCompany(
+    companyName: any,
+    companyId: any,
+    testMode = false
+  ) {
     let index;
-    if (hasRole(["ADMIN", "COMPANY_ADMIN"])) {
+
+    if (testMode) {
+      index = Math.floor(Math.random() * colorPalette.length);
+    } else if (hasRole(["ADMIN", "COMPANY_ADMIN"])) {
       const input = `${companyName}_${companyId}`;
       let hash = 0;
       for (let i = 0; i < input.length; i++) {
@@ -156,7 +175,7 @@ const CustomEvent: React.FC<{
     } else {
       index = 0;
     }
-    console.log(event.name, colorPalette[index]);
+
     return colorPalette[index];
   }
 
@@ -202,6 +221,7 @@ const CustomEvent: React.FC<{
           onDoubleClick={handleDoubleClick}
           bgColor={bgColor}
           darkColor={darkColor}
+          title={bgColor}
         >
           <strong>{capitalize((event as any)?.name)}</strong>
           {!isMobile && showTime && (

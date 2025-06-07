@@ -77,8 +77,15 @@ const TrainerClassesList: React.FC<{ trainer: any }> = ({ trainer }) => {
   };
 
   const handleSessionClick = (session: any) => {
-    const sessionDate = new Date(session.startDate).toISOString().slice(0, 7); // Extract "YYYY-MM"
-    navigate(`/sessions/${sessionDate}?id=${session.id}`);
+    const calendarView = localStorage.getItem("savedCalendarView");
+    const sessionDate = new Date(session.startDate);
+
+    const formattedDate =
+      calendarView === "day" || calendarView === "week"
+        ? sessionDate.toISOString().slice(0, 10) // YYYY-MM-DD
+        : sessionDate.toISOString().slice(0, 7); // YYYY-MM
+
+    navigate(`/sessions/${formattedDate}?id=${session.id}`);
   };
 
   return (
