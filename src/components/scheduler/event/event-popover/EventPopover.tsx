@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Avatar, Tooltip, Button, Popover, Modal } from "antd";
 import {
   AntDesignOutlined,
@@ -184,10 +184,13 @@ const EventPopover: React.FC<EventPopoverProps> = ({
   // Katılımcı state'i
   const [attendees, setAttendees] = useState<any[]>([]);
   const [loadingAttendees, setLoadingAttendees] = useState(false);
-  const { openId, setOpenId } = usePopover();
+  const { openId, setOpenId, triggerRef } = usePopover();
+
+  const selfRef = useRef<HTMLDivElement | null>(null);
+
+  const isOpen = openId === event.id && triggerRef.current === selfRef.current;
 
   useEffect(() => {
-    const isOpen = openId === event.id;
     if (isOpen && event?.id) {
       setLoadingAttendees(true);
       sessionService
@@ -406,8 +409,10 @@ const EventPopover: React.FC<EventPopoverProps> = ({
   return (
     <Popover
       content={content}
-      open={openId === event.id}
-      onOpenChange={(v) => setOpenId(v ? event.id : null)}
+      open={isOpen}
+      onOpenChange={(v) => {
+        if (!v && isOpen) setOpenId(null);
+      }}
       trigger="click"
       arrow={false}
       getPopupContainer={() =>
@@ -416,10 +421,14 @@ const EventPopover: React.FC<EventPopoverProps> = ({
       {...rest}
     >
       <div
+        ref={selfRef}
         style={{ height: "100%" }}
         onClick={(e) => {
           e.stopPropagation();
-          if (openId !== event.id) setOpenId(event.id);
+          if (!isOpen) {
+            triggerRef.current = selfRef.current;
+            setOpenId(event.id);
+          }
         }}
       >
         {children}
