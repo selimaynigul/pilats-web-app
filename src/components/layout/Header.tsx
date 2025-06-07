@@ -20,7 +20,7 @@ const StyledHeader = styled(Header)`
   padding: 5px 10px;
   justify-content: space-between;
   border-bottom: 1px solid #e6e3ff;
-  background-color: rgba(255, 255, 255, 0.5) !important;
+  background-color: rgba(255, 255, 255, 0.7) !important;
   backdrop-filter: blur(8px) !important;
   display: flex;
   align-items: center;

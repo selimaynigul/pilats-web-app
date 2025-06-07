@@ -7,7 +7,7 @@ import { handleError } from "utils/apiHelpers";
 import { message } from "antd";
 import { CompanyDropdown } from "components";
 import moment from "moment";
-import { hasRole } from "utils/permissionUtils";
+import { getBranchId, hasRole } from "utils/permissionUtils";
 import { useLanguage } from "hooks";
 
 const ToolbarContainer = styled.div`
@@ -75,7 +75,9 @@ const UsersToolbar: React.FC<{
         gender: values.gender.toUpperCase(),
         telNo1: values.phoneNumber,
       },
-      branchId: parseInt(values.branch, 10),
+      branchId: hasRole(["BRANCH_ADMIN"])
+        ? getBranchId()
+        : parseInt(values.branch, 10),
       jobId: values.jobId,
       location: values.location,
     };

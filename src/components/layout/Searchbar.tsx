@@ -9,6 +9,7 @@ import {
   TransparentMenu,
   CategoryItem,
   ResultItem,
+  ResultContainer,
 } from "./layoutStyles";
 import { SearchOutlined } from "@ant-design/icons";
 import {
@@ -35,7 +36,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const inputRef = useRef<InputRef>(null);
-  const { t } = useLanguage();
+  const { t, userLanguage } = useLanguage();
+  const locale = userLanguage === "tr" ? "tr-TR" : "en-US";
 
   useEffect(() => {
     if (location.pathname.includes("users")) {
@@ -106,10 +108,15 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
     if (selectedCategory === "sessions") {
       const selectedSession = results.find((session) => session.id === id);
       if (selectedSession && selectedSession.startDate) {
-        const sessionDate = new Date(selectedSession.startDate)
-          .toISOString()
-          .slice(0, 7);
-        navigate(`/sessions/${sessionDate}?id=${id}`);
+        const savedCalendarView = localStorage.getItem("savedCalendarView");
+        const sessionDate = new Date(selectedSession.startDate);
+
+        const formattedDate =
+          savedCalendarView === "day" || savedCalendarView === "week"
+            ? sessionDate.toISOString().slice(0, 10) // YYYY-MM-DD
+            : sessionDate.toISOString().slice(0, 7); // YYYY-MM
+
+        navigate(`/sessions/${formattedDate}?id=${id}`);
       }
     } else {
       navigate(`/${selectedCategory}/${id}`);
@@ -157,9 +164,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
               {trainer.ucGetResponse?.name} {trainer.ucGetResponse?.surname}
             </strong>
             <br />
-            <span>
+            <small style={{ color: "#888" }}>
               {trainer.companyName} - {trainer.branchName}
-            </span>
+            </small>
           </div>
         </ResultItem>
       ));
@@ -167,13 +174,39 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
       return results.map((user: any) => (
         <ResultItem key={user.id} onClick={() => handleResultClick(user.id)}>
           <Avatar>{user.ucGetResponse?.name[0].toUpperCase()}</Avatar>
-          <strong>
-            {user.ucGetResponse?.name} {user.ucGetResponse?.surname}
-          </strong>
+          <div>
+            <strong>
+              {user.ucGetResponse?.name} {user.ucGetResponse?.surname}
+              <br />
+            </strong>
+            <small style={{ color: "#888" }}>
+              {user.companyName} - {user.branchName}
+            </small>
+          </div>
         </ResultItem>
       ));
     } else if (selectedCategory === "sessions") {
       return results.map((session: any) => {
+        const sessionDate = new Date(session.startDate).toLocaleDateString(
+          locale,
+          {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          }
+        );
+        const startTime = new Date(session.startDate).toLocaleTimeString(
+          locale,
+          {
+            hour: "2-digit",
+            minute: "2-digit",
+          }
+        );
+        const endTime = new Date(session.endDate).toLocaleTimeString(locale, {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
         return (
           <ResultItem
             key={session.id}
@@ -182,9 +215,18 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
             <div>
               <strong>{session.name}</strong>
               <br />
-              <span>
+              <small style={{ color: "#888" }}>
                 {session.companyName} - {session.branchName}
-              </span>
+              </small>
+            </div>
+            <div
+              style={{ textAlign: "right", marginLeft: "auto", color: "#888" }}
+            >
+              <small style={{ color: "black" }}>{sessionDate}</small>
+              <br />
+              <small>
+                {startTime} - {endTime}
+              </small>
             </div>
           </ResultItem>
         );
@@ -222,7 +264,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
           {t.session}
         </CategoryItem>
       </TransparentMenu>
-      <div style={{ maxHeight: "300px", overflowY: "auto" }}>
+      <ResultContainer>
         {searchValue.length === 0 ? (
           /*  <div style={{ textAlign: "center", marginTop: 8 }}>
             Aramak yapmak için bir şeyler yazın
@@ -232,7 +274,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
         ) : (
           <div style={{ textAlign: "center", marginTop: 8 }}>Sonuç yok</div>
         )}
-      </div>
+      </ResultContainer>
     </DropdownOverlay>
   );
 
@@ -241,7 +283,13 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
       overlay={dropdownOverlay}
       trigger={["click"]}
       placement="bottomCenter"
-      onOpenChange={(visible) => setDropdownOpen(visible)}
+      onOpenChange={(visible) => {
+        setDropdownOpen(visible);
+        if (!visible) {
+          setSearchValue("");
+          setResults([]);
+        }
+      }}
       open={dropdownOpen}
     >
       <SearchContainer

@@ -9,7 +9,7 @@ export const theme = {
   backgroundColor: "#f0f2f5",
   borderColor: "#e6e3ff",
   hoverBackgroundColor: "#f6f5ff",
-  blurBackgroundColor: "rgba(255, 255, 255, 0.5)",
+  blurBackgroundColor: "rgba(255, 255, 255, 0.7)",
 };
 
 const { Content } = Layout;
@@ -114,6 +114,15 @@ export const SearchIcon = styled.div<{ visible: boolean }>`
   align-items: center;
   justify-content: center;
   cursor: pointer;
+`;
+
+export const ResultContainer = styled.div`
+  max-height: 300px;
+  overflow-y: auto;
+
+  @media (max-width: 768px) {
+    max-height: 70dvh;
+  }
 `;
 
 export const ProfileContainer = styled.div`
