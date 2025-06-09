@@ -24,8 +24,8 @@
      inkscape:deskcolor="#ffffff"
      inkscape:document-units="mm"
      inkscape:zoom="0.17304819"
-     inkscape:cx="-514.3076"
-     inkscape:cy="1557.3697"
+     inkscape:cx="-800.35508"
+     inkscape:cy="1048.8408"
      inkscape:window-width="1920"
      inkscape:window-height="981"
      inkscape:window-x="-9"
@@ -39,40 +39,66 @@
        inkscape:collect="always"
        style="color-interpolation-filters:sRGB"
        id="filter3"
-       x="-0.8789447"
-       y="-0.8789447"
-       width="2.7578894"
-       height="2.7578894">
+       x="-0.76447207"
+       y="-0.76447207"
+       width="2.5289441"
+       height="2.5289441">
       <feGaussianBlur
          inkscape:collect="always"
-         stdDeviation="62.287467"
+         stdDeviation="54.17523"
          id="feGaussianBlur3" />
     </filter>
     <filter
        inkscape:collect="always"
        style="color-interpolation-filters:sRGB"
        id="filter4"
-       x="-0.74470316"
-       y="-0.74470316"
-       width="2.4894063"
-       height="2.4894063">
+       x="-0.76816968"
+       y="-0.76816968"
+       width="2.5363394"
+       height="2.5363394">
       <feGaussianBlur
          inkscape:collect="always"
-         stdDeviation="52.774279"
+         stdDeviation="54.437263"
          id="feGaussianBlur4" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter1"
+       x="-0.90153245"
+       y="-0.90153245"
+       width="2.8030649"
+       height="2.8030649">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="63.888176"
+         id="feGaussianBlur1" />
     </filter>
     <clipPath
        clipPathUnits="userSpaceOnUse"
-       id="clipPath7">
+       id="clipPath1">
       <rect
-         style="fill:#5d46e5;fill-opacity:1;stroke-width:1.153;stroke-linecap:round;stroke-linejoin:round"
-         id="rect8"
-         width="267.56757"
-         height="267.56757"
-         x="-542.54211"
-         y="825.58038"
+         style="fill:#5d46e5;fill-opacity:1;stroke-width:2.20717;stroke-linecap:round;stroke-linejoin:round"
+         id="rect1"
+         width="512.20074"
+         height="512.20074"
+         x="-664.8587"
+         y="703.26373"
          ry="0" />
     </clipPath>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter5"
+       x="-0.03361915"
+       y="-0.034247597"
+       width="1.0672383"
+       height="1.0684952">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="2.137707"
+         id="feGaussianBlur5" />
+    </filter>
   </defs>
   <g
      inkscape:label="Layer 1"
@@ -80,36 +106,53 @@
      id="layer1"
      transform="translate(363.17279,-516.37215)">
     <g
-       id="g7"
-       clip-path="url(#clipPath7)"
-       transform="matrix(1.9142857,0,0,1.9142857,373.72191,-877.13296)"
-       inkscape:export-filename="logo.png"
+       id="g1"
+       clip-path="url(#clipPath1)"
+       inkscape:export-filename="elma.png"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96">
       <rect
-         style="fill:#5d46e5;fill-opacity:1;stroke-width:3.38924;stroke-linecap:round;stroke-linejoin:round"
+         style="fill:#5d46e5;fill-opacity:1;stroke-width:6.48797;stroke-linecap:round;stroke-linejoin:round"
          id="rect7"
-         width="786.51294"
-         height="786.51294"
-         x="-802.01483"
-         y="566.10767"
+         width="1505.6105"
+         height="1505.6105"
+         x="-1161.5636"
+         y="206.55885"
          ry="0" />
       <circle
-         style="mix-blend-mode:normal;fill:#638dea;fill-opacity:1;stroke-width:1.153;stroke-linecap:round;stroke-linejoin:round;filter:url(#filter4)"
+         style="mix-blend-mode:normal;fill:#412ebb;fill-opacity:1;stroke-width:1.153;stroke-linecap:round;stroke-linejoin:round;filter:url(#filter1)"
          id="path3"
-         cx="-363.17279"
-         cy="1083.6322"
+         transform="matrix(2.3529816,0,0,2.2561159,683.24573,-1139.1269)"
          r="85.039436"
-         transform="matrix(1.2291695,0,0,1.178568,113.17436,-225.9444)" />
+         cy="1083.6322"
+         cx="-363.17279" />
       <circle
          style="mix-blend-mode:normal;fill:#63c4ea;fill-opacity:1;stroke-width:1.153;stroke-linecap:round;stroke-linejoin:round;filter:url(#filter3)"
          id="circle3"
          cx="-509.04971"
          cy="853.08575"
          r="85.039436"
-         transform="matrix(1.2423164,0,0,1.1670495,89.858693,-139.90477)" />
+         transform="matrix(2.8473191,0,0,2.2340662,784.56827,-1162.0689)" />
+      <circle
+         style="mix-blend-mode:normal;fill:#638dea;fill-opacity:1;stroke-width:1.153;stroke-linecap:round;stroke-linejoin:round;filter:url(#filter4)"
+         id="circle1"
+         cx="-363.17279"
+         cy="1083.6322"
+         r="85.039436"
+         transform="matrix(2.3529816,0,0,2.2561159,226.32446,-1271.4312)" />
       <g
-         id="g8">
+         id="g4"
+         transform="matrix(1.9142857,0,0,1.9142857,374.78025,-876.07462)"
+         style="opacity:0.16305732;fill:#201281;fill-opacity:1;filter:url(#filter5)">
+        <path
+           id="path4"
+           style="fill:#201281;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:round"
+           d="m -397.65234,884.47431 c -23.43896,0.53653 -47.44054,17.56516 -61.08805,64.32625 43.34628,-101.41786 156.97957,2.67478 42.52961,15.46652 -21.0439,2.35203 -48.81258,2.76333 -68.85074,70.00012 27.76414,-57.9141 47.3364,-47.69908 99.47374,-51.97147 95.80933,-7.85104 43.4488,-99.09216 -12.06456,-97.82142 z m -7.0837,33.95503 c -19.32722,-0.33186 -22.97844,41.37243 3.52961,28.71481 5.33586,-2.54785 21.86048,-12.24421 10.40058,-22.21452 -5.23231,-4.55221 -9.91887,-6.43141 -13.93019,-6.50029 z"
+           sodipodi:nodetypes="scsccsscss" />
+      </g>
+      <g
+         id="g8"
+         transform="matrix(1.9142857,0,0,1.9142857,373.72191,-877.13296)">
         <path
            id="path2"
            style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:round"

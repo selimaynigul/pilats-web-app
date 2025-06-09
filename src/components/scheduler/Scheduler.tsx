@@ -204,15 +204,13 @@ const Scheduler: React.FC<{
 
       // Eğer day view'dayız ve urlDate YYYY-MM formatındaysa, ilk güne git
       if (currentView === "day" && dayjs(urlDate, "YYYY-MM", true).isValid()) {
-        const firstDay = dayjs(urlDate, "YYYY-MM")
-          .startOf("month")
-          .format("YYYY-MM-DD");
+        const firstDay = dayjs(urlDate, "YYYY-MM").startOf("month").toDate();
         const newParams = new URLSearchParams(searchParams.toString());
         navigate({
-          pathname: `/sessions/${firstDay}`,
+          pathname: `/sessions/${dayjs(firstDay).format("YYYY-MM-DD")}`,
           search: `?${newParams.toString()}`,
         });
-        setDate(dayjs(firstDay).toDate());
+        goToDate(firstDay);
         return;
       }
     }
@@ -252,64 +250,35 @@ const Scheduler: React.FC<{
     }
   }, [searchParams, sessions, drawerVisible]);
 
-  // Güncellenmiş, kopyala-yapıştır hazır `updateVisibleDate`
   const updateVisibleDate = (range: { start: Date; end: Date } | Date[]) => {
     const startDate = Array.isArray(range) ? range[0] : range.start;
     const endDate = Array.isArray(range) ? range[range.length - 1] : range.end;
 
     let middleDate: Date;
 
-    /* 1) Mevcut tarih (state) ile yeni aralığın ilk günü arasındaki AY farkı */
-    const monthsDiff = Math.abs(dayjs(startDate).diff(dayjs(date), "month"));
-
-    // TODO: week görünümünde gösterilen ve yazan tarihte hata var
-    /* 2) Eğer fark ≥ 2 ay ise: direkt o ayın 1’ine git */
     if (currentView === "agenda") {
+      const monthsDiff = Math.abs(dayjs(startDate).diff(dayjs(date), "month"));
       if (monthsDiff >= 2) {
         middleDate = dayjs(startDate).startOf("month").toDate();
       } else {
-        /* 3) AGENDA view için mevcut “özel” hesaplama */
         const today = dayjs();
         const start = dayjs(startDate);
         const end = dayjs(endDate);
 
-        let targetMonth: dayjs.Dayjs;
+        let targetMonth = today.isBetween(start, end, "day", "[]")
+          ? today.startOf("month")
+          : start.isBefore(dayjs(date), "month")
+            ? dayjs(date).subtract(1, "month").startOf("month")
+            : dayjs(date).add(1, "month").startOf("month");
 
-        if (today.isBetween(start, end, "day", "[]")) {
-          targetMonth = today.startOf("month"); // bugün görünüyorsa
-        } else if (start.isBefore(dayjs(date), "month")) {
-          targetMonth = dayjs(date).subtract(1, "month").startOf("month"); // «Prev» tıklandı
-        } else if (start.isAfter(dayjs(date), "month")) {
-          targetMonth = dayjs(date).add(1, "month").startOf("month"); // «Next» tıklandı
-        } else {
-          targetMonth = dayjs(date).startOf("month"); // güvenlik
-        }
-
-        middleDate = targetMonth.date(1).startOf("day").toDate();
+        middleDate = targetMonth.toDate();
       }
     } else {
-      /* 4) Diğer view’ler: mevcut ortalama mantık */
-      middleDate = new Date(
-        (new Date(startDate).getTime() + new Date(endDate).getTime()) / 2
-      );
+      middleDate = new Date((+new Date(startDate) + +new Date(endDate)) / 2);
     }
 
-    /* -- state ve URL güncellemeleri aynen korunur -- */
-    setDate(middleDate);
-    messages.noEventsInRange = "";
+    goToDate(middleDate);
     setSessions([]);
-    localStorage.setItem("savedCalendarDate", middleDate.toISOString());
-
-    const newParams = new URLSearchParams(searchParams.toString());
-    const urlDate =
-      currentView === "day"
-        ? dayjs(middleDate).format("YYYY-MM-DD")
-        : dayjs(middleDate).format("YYYY-MM");
-
-    navigate({
-      pathname: `/sessions/${urlDate}`,
-      search: `?${newParams.toString()}`,
-    });
   };
 
   const fetchSessions = (
@@ -649,13 +618,149 @@ const Scheduler: React.FC<{
     }
   };
 
+  const goToDate = (newDate: Date) => {
+    setDate(newDate);
+    const formatted =
+      currentView === "day"
+        ? dayjs(newDate).format("YYYY-MM-DD")
+        : dayjs(newDate).format("YYYY-MM");
+
+    const newParams = new URLSearchParams(searchParams.toString());
+    navigate(
+      {
+        pathname: `/sessions/${formatted}`,
+        search: `?${newParams.toString()}`,
+      },
+      { replace: true }
+    );
+    localStorage.setItem("savedCalendarDate", newDate.toISOString());
+  };
+
+  // Helper to map currentView to valid dayjs units
+  const getDayjsUnit = (view: View): "day" | "week" | "month" => {
+    if (view === "day") return "day";
+    if (view === "week") return "week";
+    return "month"; // fallback for "month", "agenda", etc.
+  };
+
+  const navigateNext = () => {
+    const unit = getDayjsUnit(currentView);
+    const newDate = dayjs(date).add(1, unit).toDate();
+    goToDate(newDate);
+  };
+
+  const navigateBack = () => {
+    const unit = getDayjsUnit(currentView);
+    const newDate = dayjs(date).subtract(1, unit).toDate();
+    goToDate(newDate);
+  };
+
+  useEffect(() => {
+    const el = document.querySelector(".rbc-calendar");
+    if (!el) return;
+
+    /* === TUNABLE SABİTLER =============================== */
+    const FIRST_THRESHOLD = 60; // ilk tetik için 2 px
+    const NEXT_THRESHOLD = 400; // aynı jestte 2. tetik için gerekli mesafe
+    const LOCK_AFTER_MS = 1000; // jest bitmeden sonraki bekleme
+    const ORIENT_RATIO = 1.2; // yatay > dikey * ORIENT_RATIO
+
+    /* === KAYDIRMA DURUMU ================================ */
+    let totalDX = 0; // bu jestte kümülatif deltaX
+    let gestureActive = false; // jest başladı mı?
+    let locked = false; // navigate kilidi
+    let lockTimer: number; // kilit süresi
+
+    /* ---------------------------------------------------- */
+    const resetGesture = () => {
+      totalDX = 0;
+      gestureActive = false;
+    };
+
+    const unlock = () => {
+      locked = false;
+      resetGesture();
+    };
+
+    /* ---------- TRACK-PAD / MOUSE WHEEL ----------------- */
+    const handleWheel = (e: Event) => {
+      const wheelEvent = e as WheelEvent; // Tip dönüşümü
+      const { deltaX, deltaY } = wheelEvent;
+
+      // dikey baskınsa görmezden gel
+      if (Math.abs(deltaX) < Math.abs(deltaY) * ORIENT_RATIO) return;
+
+      wheelEvent.preventDefault();
+      totalDX += deltaX;
+      gestureActive = true;
+
+      // *ilk* tetik
+      if (!locked && Math.abs(totalDX) > FIRST_THRESHOLD) {
+        deltaX > 0 ? navigateNext() : navigateBack();
+        locked = true; // ardışık çağrıları kilitle
+        totalDX = 0; // hareketi sıfırla
+
+        // jest sürerken 2. tetik için eşiği büyüt
+        clearTimeout(lockTimer);
+        lockTimer = window.setTimeout(unlock, LOCK_AFTER_MS);
+        return;
+      }
+
+      /* jest devam ederken – ikinci / üçüncü tetikler */
+      if (locked && Math.abs(totalDX) > NEXT_THRESHOLD) {
+        deltaX > 0 ? navigateNext() : navigateBack();
+        totalDX = 0; // sıfırla ve süreyi yeniden başlat
+        clearTimeout(lockTimer);
+        lockTimer = window.setTimeout(unlock, LOCK_AFTER_MS);
+      }
+    };
+
+    /* ---------- TOUCH (MOBİL) --------------------------- */
+    let startX = 0;
+    const handleTouchStart = (e: TouchEvent) => {
+      const t = e.touches[0];
+      startX = t.clientX;
+      resetGesture();
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (locked) return;
+      const dx = e.touches[0].clientX - startX;
+
+      if (Math.abs(dx) > FIRST_THRESHOLD) {
+        e.preventDefault();
+        dx < 0 ? navigateNext() : navigateBack();
+        locked = true;
+        lockTimer = window.setTimeout(unlock, LOCK_AFTER_MS);
+      }
+    };
+
+    /* ---------- EVENT LISTENERS ------------------------- */
+    el.addEventListener("wheel", handleWheel as EventListener, {
+      passive: false,
+    });
+    el.addEventListener("touchstart", handleTouchStart as EventListener, {
+      passive: true,
+    });
+    el.addEventListener("touchmove", handleTouchMove as EventListener, {
+      passive: false,
+    });
+
+    return () => {
+      el.removeEventListener("wheel", handleWheel as EventListener);
+      el.removeEventListener("touchstart", handleTouchStart as EventListener);
+      el.removeEventListener("touchmove", handleTouchMove as EventListener);
+      clearTimeout(lockTimer);
+    };
+  }, [currentView, date]);
+
   return (
     <CalendarWrapper>
-      {loading && (
+      {/*  {loading && (
         <LoadingOverlay>
           <Spin tip="Loading..." />
         </LoadingOverlay>
-      )}
+      )} */}
       <DragAndDropCalendar
         popup
         date={date}
