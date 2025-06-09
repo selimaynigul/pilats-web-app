@@ -62,6 +62,10 @@ const Scheduler: React.FC<{
     "month";
 
   const [currentView, setCurrentView] = useState<View>(initialView);
+  const [cachedSessions, setCachedSessions] = useState<Map<string, any[]>>(
+    new Map()
+  );
+
   const [loading, setLoading] = useState(false);
   const [sessions, setSessions] = useState<any[]>([]);
   const { t, userLanguage } = useLanguage();
@@ -100,6 +104,9 @@ const Scheduler: React.FC<{
     bottom: 0,
     right: 0,
   });
+
+  const getCacheKey = (start: Date, end: Date) =>
+    `${dayjs(start).format("YYYY-MM-DD")}_${dayjs(end).format("YYYY-MM-DD")}`;
 
   const params = useMemo(() => {
     const isAdmin = hasRole(["ADMIN"]);
@@ -277,15 +284,25 @@ const Scheduler: React.FC<{
       middleDate = new Date((+new Date(startDate) + +new Date(endDate)) / 2);
     }
 
+    if (!cachedSessions.has(getCacheKey(startDate, endDate))) {
+      setSessions([]); // sadece eğer yoksa temizle
+    }
     goToDate(middleDate);
-    setSessions([]);
   };
 
-  const fetchSessions = (
+  const fetchSessions = async (
     startDate: Date,
     endDate: Date,
     showLoading: boolean
   ) => {
+    const key = getCacheKey(startDate, endDate);
+
+    // Eğer cache’te varsa, anlık göster
+    if (cachedSessions.has(key)) {
+      setSessions(cachedSessions.get(key)!);
+      return;
+    }
+
     if (showLoading) setLoading(true);
 
     const finalParams = {
@@ -294,24 +311,34 @@ const Scheduler: React.FC<{
       endDate: dayjs(endDate).toISOString(),
     };
 
-    sessionService
-      .search(finalParams)
-      .then((response) => {
-        const formattedSessions = response.data.map((session: any) => ({
-          ...session,
-          start: new Date(session.startDate),
-          end: new Date(session.endDate),
-        }));
-        setSessions(formattedSessions);
-      })
-      .catch((error) => {
-        console.error("Error fetching events:", error);
-        message.error("Failed to load events.");
-      })
-      .finally(() => {
-        messages.noEventsInRange = t.noEventsInRange || "No events in range.";
-        if (showLoading) setLoading(false);
+    try {
+      const response = await sessionService.search(finalParams);
+      const formatted = response.data.map((session: any) => ({
+        ...session,
+        start: new Date(session.startDate),
+        end: new Date(session.endDate),
+      }));
+
+      setCachedSessions((prev) => {
+        const newMap = new Map(prev);
+        newMap.set(key, formatted);
+
+        if (newMap.size > 3) {
+          const oldestKey = newMap.keys().next().value;
+          if (oldestKey !== undefined) {
+            newMap.delete(oldestKey);
+          }
+        }
+
+        return newMap;
       });
+      setSessions(formatted);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+      message.error("Failed to load events.");
+    } finally {
+      if (showLoading) setLoading(false);
+    }
   };
 
   const selectSlot = (slotInfo: { start: Date; end: Date }) => {
@@ -662,7 +689,7 @@ const Scheduler: React.FC<{
     /* === TUNABLE SABİTLER =============================== */
     const FIRST_THRESHOLD = 60; // ilk tetik için 2 px
     const NEXT_THRESHOLD = 400; // aynı jestte 2. tetik için gerekli mesafe
-    const LOCK_AFTER_MS = 1000; // jest bitmeden sonraki bekleme
+    const LOCK_AFTER_MS = 0; // jest bitmeden sonraki bekleme
     const ORIENT_RATIO = 1.2; // yatay > dikey * ORIENT_RATIO
 
     /* === KAYDIRMA DURUMU ================================ */
@@ -756,11 +783,6 @@ const Scheduler: React.FC<{
 
   return (
     <CalendarWrapper>
-      {/*  {loading && (
-        <LoadingOverlay>
-          <Spin tip="Loading..." />
-        </LoadingOverlay>
-      )} */}
       <DragAndDropCalendar
         popup
         date={date}
@@ -781,7 +803,6 @@ const Scheduler: React.FC<{
           ["day", "week"].includes(currentView)
             ? (() => {
                 const now = new Date();
-                // scroll to 4 hours before the current time if the view is day or week
                 const scrollHour = Math.max(now.getHours() - 4, 0);
                 return new Date(1970, 1, 1, scrollHour, 0, 0);
               })()
