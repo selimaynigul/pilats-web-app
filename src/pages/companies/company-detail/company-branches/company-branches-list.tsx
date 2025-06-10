@@ -214,10 +214,9 @@ const CompanyBranchList: React.FC<{
         ))}
       </Row>
 
-      {/* Add Branch Modal */}
       <Modal
         title="Add Branch"
-        visible={isModalVisible}
+        open={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
         onOk={() => {
           form.validateFields().then(handleAddBranch).catch(console.error);
@@ -239,7 +238,7 @@ const CompanyBranchList: React.FC<{
       {/* Update Branch Modal */}
       <Modal
         title="Add Branch"
-        visible={isUpdateModalVisible}
+        open={isUpdateModalVisible}
         onCancel={() => setIsUpdateModalVisible(false)}
         onOk={() => {
           updateForm

@@ -58,12 +58,7 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
   };
 
   return (
-    <Modal
-      title="Add Trainer"
-      visible={visible}
-      onCancel={onClose}
-      footer={null}
-    >
+    <Modal title="Add Trainer" open={visible} onCancel={onClose} footer={null}>
       <Form form={form} layout="vertical" onFinish={handleSubmit}>
         <Form.Item {...addCompanyFormItems.name} name="name">
           <Input placeholder="Enter trainer's name" />

@@ -482,7 +482,7 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
 
         <Modal
           title="Edit User"
-          visible={isEditModalVisible}
+          open={isEditModalVisible}
           onCancel={() => setIsEditModalVisible(false)}
           onOk={() => {
             form.validateFields().then(handleEditSubmit).catch(console.error);

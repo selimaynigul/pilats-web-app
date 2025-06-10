@@ -13,14 +13,8 @@ import {
 } from "./layoutStyles";
 import { SettingOutlined, LogoutOutlined } from "@ant-design/icons";
 import { useAuth } from "contexts/AuthProvider";
-import SearchBar from "./Searchbar"; // Import the new SearchBar component
-import {
-  getCompanyName,
-  getUser,
-  getUserName,
-  hasRole,
-  updateUser,
-} from "utils/permissionUtils";
+import SearchBar from "./Searchbar";
+import { getCompanyName, getUserName, hasRole } from "utils/permissionUtils";
 import { useLanguage } from "hooks";
 
 const AppLayout: React.FC = () => {
@@ -77,16 +71,6 @@ const AppLayout: React.FC = () => {
     </Menu>
   );
 
-  const pathTitles: { [key: string]: string } = {
-    "/": "Dashboard",
-    "/companies": "Companies",
-    "/sessions": "Sessions",
-    "/trainers": "Trainers",
-    "/users": "Users",
-    "/packages": "Packages",
-    "/reports": "Reports",
-  };
-
   const getUserInfo = (info: string) => {
     if (info === "name") {
       return getUserName();
@@ -96,6 +80,25 @@ const AppLayout: React.FC = () => {
   const pathSegments = location.pathname.split("/").filter(Boolean);
   const basePath = `${pathSegments[0] || ""}`;
   const pageTitle = t[basePath || "dashboard"];
+
+  const profileMenuItems = [
+    ...(hasRole(["ADMIN", "COMPANY_ADMIN"])
+      ? [
+          {
+            key: "settings",
+            label: t.roleManagement,
+            icon: <SettingOutlined />,
+            onClick: () => navigate("/role-management"),
+          },
+        ]
+      : []),
+    {
+      key: "logout",
+      label: <span style={{ color: "red" }}>{t.logout}</span>,
+      icon: <LogoutOutlined style={{ color: "red" }} />,
+      onClick: handleLogout,
+    },
+  ];
 
   return (
     <Layout style={{ height: "100vh" }}>
@@ -148,7 +151,7 @@ const AppLayout: React.FC = () => {
                 <span>{getCompanyName()}</span>
               </ProfileInfo>
               <Dropdown
-                overlay={profileMenu}
+                menu={{ items: profileMenuItems }}
                 trigger={["click"]}
                 placement="bottomRight"
               >

@@ -57,12 +57,7 @@ const AddPackageForm: React.FC<AddPackageFormProps> = ({
   };
 
   return (
-    <Modal
-      title="Add Package"
-      visible={visible}
-      onCancel={onClose}
-      footer={null}
-    >
+    <Modal title="Add Package" open={visible} onCancel={onClose} footer={null}>
       <Form
         form={form}
         layout="vertical"

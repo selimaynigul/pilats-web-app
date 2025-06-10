@@ -5,14 +5,17 @@ export const ToolbarContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: ${({ theme }) => theme.bodyBg};
-  border-radius: 50px;
-  padding: 10px;
 `;
 
 export const NavButtons = styled.div`
   display: flex;
+  align-items: center;
   gap: 5px;
+  background: red;
+  padding: 10px;
+  height: 50px;
+  border-radius: 50px;
+  background: ${({ theme }) => theme.bodyBg};
 `;
 
 export const TitleButton = styled.button`

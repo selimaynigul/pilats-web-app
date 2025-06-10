@@ -22,7 +22,9 @@ import { useLanguage } from "hooks";
 const { Sider } = Layout;
 const { Option } = Select;
 
-const StyledSider = styled(Sider)<{ isMobile: boolean }>`
+const StyledSider = styled(Sider).withConfig({
+  shouldForwardProp: (prop) => prop !== "isMobile",
+})<{ isMobile: boolean }>`
   background: ${({ theme }) => theme.bodyBg};
   padding: ${({ isMobile }) => (isMobile ? "0" : "10px 0 0")};
   height: ${({ isMobile }) => (isMobile ? "100vh" : "auto")};
@@ -40,7 +42,9 @@ const StyledSider = styled(Sider)<{ isMobile: boolean }>`
   }
 `;
 
-const LogoContainer = styled.div<{ collapsed: boolean; isMobile: boolean }>`
+const LogoContainer = styled.div.withConfig({
+  shouldForwardProp: (prop) => !["collapsed", "isMobile"].includes(prop),
+})<{ collapsed: boolean; isMobile: boolean }>`
   display: flex;
   align-items: center;
   justify-content: ${({ collapsed }) => (collapsed ? "center" : "flex-start")};
@@ -62,7 +66,9 @@ const LogoContainer = styled.div<{ collapsed: boolean; isMobile: boolean }>`
     transition: opacity 0.3s ease;
   }
 `;
-const CustomTrigger = styled.div<{ collapsed: boolean }>`
+const CustomTrigger = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== "collapsed",
+})<{ collapsed: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;

@@ -74,7 +74,7 @@ const AddAdminModal: React.FC<AddAdminModalProps> = ({
   return (
     <Modal
       title={isBranchMode ? "Add Branch Admin" : "Add Company Admin"}
-      visible={visible}
+      open={visible}
       onCancel={onClose}
       footer={null}
     >

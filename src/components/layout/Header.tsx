@@ -155,27 +155,27 @@ const AppHeader: React.FC<HeaderProps> = ({
     logout(location);
   };
 
-  const profileMenu = (
-    <Menu>
-      {hasRole(["ADMIN", "COMPANY_ADMIN"]) && (
-        <Menu.Item
-          onClick={() => navigate("/role-management")}
-          key="settings"
-          icon={<SettingOutlined />}
-        >
-          {t.roleManagement}
-        </Menu.Item>
-      )}
-      <Menu.Item
-        onClick={handleLogout}
-        key="logout"
-        icon={<LogoutOutlined style={{ color: "red" }} />}
-        style={{ color: "red" }}
-      >
-        {t.logout}
-      </Menu.Item>
-    </Menu>
-  );
+  const handleMenuClick = ({ key }: { key: string }) => {
+    if (key === "settings") navigate("/role-management");
+    if (key === "logout") handleLogout();
+  };
+
+  const dropdownItems = [
+    ...(hasRole(["ADMIN", "COMPANY_ADMIN"])
+      ? [
+          {
+            key: "settings",
+            label: t.roleManagement,
+            icon: <SettingOutlined />,
+          },
+        ]
+      : []),
+    {
+      key: "logout",
+      label: <span style={{ color: "red" }}>{t.logout}</span>,
+      icon: <LogoutOutlined style={{ color: "red" }} />,
+    },
+  ];
 
   const toggleSearch = () => setSearchActive(!searchActive);
 
@@ -197,7 +197,7 @@ const AppHeader: React.FC<HeaderProps> = ({
             ></span>
           </SearchIcon>
           <Dropdown
-            overlay={profileMenu}
+            menu={{ items: dropdownItems, onClick: handleMenuClick }}
             trigger={["click"]}
             placement="bottomRight"
           >

@@ -14,7 +14,9 @@ export const theme = {
 
 const { Content } = Layout;
 
-export const StyledContent = styled(Content)<{
+export const StyledContent = styled(Content).withConfig({
+  shouldForwardProp: (prop) => !["isSessionsPage", "isMobile"].includes(prop),
+})<{
   isSessionsPage: boolean;
   isMobile: boolean;
 }>`
@@ -33,7 +35,9 @@ export const StyledContent = styled(Content)<{
   }
 `;
 
-export const Heading = styled.div<{ isMobile: boolean }>`
+export const Heading = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== "isMobile",
+})<{ isMobile: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -66,7 +70,9 @@ export const Title = styled.h2`
   }
 `;
 
-export const SearchContainer = styled.div<{
+export const SearchContainer = styled.div.withConfig({
+  shouldForwardProp: (prop) => !["isMobile", "searchActive"].includes(prop),
+})<{
   isMobile: boolean;
   searchActive: boolean;
 }>`
@@ -80,7 +86,9 @@ export const SearchContainer = styled.div<{
   }
 `;
 
-export const Search = styled(Input)<{ focused: boolean }>`
+export const Search = styled(Input).withConfig({
+  shouldForwardProp: (prop) => prop !== "focused",
+})<{ focused: boolean }>`
   border-radius: 50px;
   width: 100%;
   height: 48px;
@@ -100,7 +108,9 @@ export const Search = styled(Input)<{ focused: boolean }>`
   }
 `;
 
-export const SearchIcon = styled.div<{ visible: boolean }>`
+export const SearchIcon = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== "visible",
+})<{ visible: boolean }>`
   position: absolute;
   right: 10px;
   top: 50%;
@@ -188,7 +198,9 @@ export const TransparentMenu = styled.div`
   border-bottom: 1px solid #f0f0f0;
 `;
 
-export const CategoryItem = styled.div<{ isSelected: boolean }>`
+export const CategoryItem = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== "isSelected",
+})<{ isSelected: boolean }>`
   cursor: pointer;
   padding: 5px 10px;
   border-radius: 50px;

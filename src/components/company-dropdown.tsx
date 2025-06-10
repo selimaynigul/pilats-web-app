@@ -46,7 +46,9 @@ const IconWrapper = styled.div`
     transform: translateX(0);
   }
 `;
-const StyledInput = styled(Input)<{ inputWidth: string }>`
+const StyledInput = styled(Input).withConfig({
+  shouldForwardProp: (prop) => prop !== "inputWidth",
+})<{ inputWidth: string }>`
   &&.ant-input-affix-wrapper {
     &:hover {
       border-color: #4d3abd;
@@ -197,24 +199,24 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
     }
   };
 
-  const menu = (
-    <Menu
-      onMouseDown={(e) => {
-        e.preventDefault();
-      }}
-    >
-      {response.map((item: any) => (
-        <Menu.Item key={item.id} onClick={() => handleSelect(item)}>
-          {item.companyName} {item.branchName ? `- ${item.branchName}` : ""}
-        </Menu.Item>
-      ))}
-    </Menu>
-  );
+  const dropdownItems = response.map((item: any) => ({
+    key: item.id,
+    label: (
+      <div style={{ width: "100%" }} onClick={() => handleSelect(item)}>
+        {item.companyName}
+        {item.branchName ? ` - ${item.branchName}` : ""}
+      </div>
+    ),
+  }));
 
   return (
     <div style={{ position: "relative", width: "100%" }}>
       {searchMode ? (
-        <Dropdown overlay={menu} visible={searchMode} trigger={["click"]}>
+        <Dropdown
+          menu={{ items: dropdownItems }}
+          open={searchMode}
+          trigger={["click"]}
+        >
           <StyledInput
             ref={inputRef}
             className="styled-input"

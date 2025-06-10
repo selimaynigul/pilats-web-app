@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import dayjs from "dayjs";
-import EventPopover from "./event-popover/EventPopover";
 import { useSearchParams } from "react-router-dom";
 import { capitalize, hasRole } from "utils/permissionUtils";
 import { usePopover } from "contexts/PopoverProvider";
 
-const Container = styled.div<{ bgColor: string; darkColor: string }>`
+const Container = styled.div.withConfig({
+  shouldForwardProp: (prop) => !["bgColor", "darkColor"].includes(prop),
+})<{ bgColor: string; darkColor: string }>`
   background: ${(props) => props.bgColor};
   border-bottom: 4px solid ${(props) => props.darkColor};
   color: white;
@@ -97,7 +98,6 @@ const CustomEvent: React.FC<{
     "#b4a3d8",
     "#007db7",
     "#96bbfc",
-    "#a4ae9e",
     "#b2a8b8",
     "#789CA2",
     "#5079b5",
@@ -105,8 +105,6 @@ const CustomEvent: React.FC<{
     "#567690",
     "#9ab5bc",
     "#9e8dc1",
-    "#0097e6",
-    "#ff835d",
     "#0b879d",
     "#a681ff",
     "#209585",

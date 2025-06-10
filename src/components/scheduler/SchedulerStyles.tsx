@@ -16,7 +16,7 @@ export const CalendarWrapper = styled.div`
 
   @keyframes slideLeft {
     from {
-      transform: translateX(25px);
+      transform: translateX(20px);
       opacity: 0;
     }
     to {
@@ -27,7 +27,7 @@ export const CalendarWrapper = styled.div`
 
   @keyframes slideRight {
     from {
-      transform: translateX(-25px);
+      transform: translateX(-20px);
       opacity: 0;
     }
     to {

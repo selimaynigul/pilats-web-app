@@ -280,9 +280,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
 
   return (
     <Dropdown
-      overlay={dropdownOverlay}
+      dropdownRender={() => dropdownOverlay}
       trigger={["click"]}
-      placement="bottomCenter"
+      placement="bottom"
       onOpenChange={(visible) => {
         setDropdownOpen(visible);
         if (!visible) {

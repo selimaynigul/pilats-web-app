@@ -749,7 +749,9 @@ const Scheduler: React.FC<{
       <DragAndDropCalendar
         popup
         date={date}
+        onNavigate={(newDate) => setDate(newDate)}
         view={currentView}
+        onView={(view) => setCurrentView(view)}
         draggableAccessor={() => hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN"])}
         events={sessions}
         localizer={localizer}
@@ -818,7 +820,9 @@ const Scheduler: React.FC<{
             nameInputRef.current?.focus();
           }
         }}
-        maskStyle={{ background: "transparent" }}
+        styles={{
+          mask: { background: "transparent" },
+        }}
         modalRender={(modal) => (
           <Draggable
             handle=".ant-modal-content"
@@ -856,7 +860,7 @@ const Scheduler: React.FC<{
 
       {/* Edit Session Modal */}
       <StyledModal
-        visible={editModalOpen}
+        open={editModalOpen}
         onCancel={() => setEditModalOpen(false)}
         footer={null}
       >

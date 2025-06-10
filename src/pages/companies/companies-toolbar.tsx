@@ -75,7 +75,7 @@ const CompaniesToolbar: React.FC<{
       </ActionContainer>
       <Modal
         title="Update Company"
-        visible={isModalVisible}
+        open={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
         onOk={() => {
           form.validateFields().then(handleAddCompany).catch(console.error);

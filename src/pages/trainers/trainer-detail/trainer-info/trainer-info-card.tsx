@@ -594,7 +594,7 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
 
         <Modal
           title="Edit Trainer"
-          visible={isEditModalVisible}
+          open={isEditModalVisible}
           onCancel={() => setIsEditModalVisible(false)}
           onOk={() => {
             form.validateFields().then(handleEditSubmit).catch(console.error);

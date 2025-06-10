@@ -60,7 +60,6 @@ const SessionsContainer: React.FC = () => {
   };
 
   const params = useMemo(() => {
-    console.log(selectedFilters);
     return {
       sessionCustomerLastEventSearchRequest: {
         sessionCustomerEventsList: selectedFilters.includes("ALL")

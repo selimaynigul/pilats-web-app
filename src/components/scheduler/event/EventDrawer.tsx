@@ -209,7 +209,9 @@ const EventDrawer: React.FC<{
       onClose={onClose}
       open={open}
       width={400}
-      bodyStyle={{ padding: 20 }}
+      styles={{
+        body: { padding: 20 },
+      }}
       extra={
         hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN"]) && (
           <ActionButtonGroup>

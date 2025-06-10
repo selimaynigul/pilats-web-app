@@ -150,7 +150,9 @@ const StyledOuterSliders = styled.div`
   width: 100%;
 `;
 
-const StyledSliders = styled.div<{ offset: number; duration: number }>`
+const StyledSliders = styled.div.withConfig({
+  shouldForwardProp: (prop) => !["offset", "duration"].includes(prop),
+})<{ offset: number; duration: number }>`
   display: flex;
   flex-wrap: nowrap;
   width: 100%;
