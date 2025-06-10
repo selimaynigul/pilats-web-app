@@ -55,19 +55,32 @@ export default function useSwipe({
 
     const handleWheel = (e: Event) => {
       const wheelEvent = e as WheelEvent;
-      const { deltaX, deltaY } = wheelEvent;
+      const { deltaX, deltaY, shiftKey } = wheelEvent;
+      const customLockDuration = shiftKey ? 100 : lockDuration;
 
-      if (Math.abs(deltaX) < Math.abs(deltaY) * ORIENT_RATIO) return;
+      //  Shift + dikey scroll desteği → yatay kabul et
+      const effectiveDeltaX = shiftKey ? deltaY : deltaX;
+      const effectiveDeltaY = shiftKey ? 0 : deltaY;
+
+      // Yön filtresi (yatay hareket yeterli mi?)
+      if (
+        Math.abs(effectiveDeltaX) <
+        Math.abs(effectiveDeltaY) * ORIENT_RATIO
+      ) {
+        return;
+      }
 
       wheelEvent.preventDefault();
-      gestureState.current.totalDX += deltaX;
+      gestureState.current.totalDX += effectiveDeltaX;
       gestureState.current.gestureActive = true;
 
       if (
         !gestureState.current.locked &&
         Math.abs(gestureState.current.totalDX) > threshold
       ) {
-        deltaX > 0 ? onSwipeLeftRef.current() : onSwipeRightRef.current();
+        effectiveDeltaX > 0
+          ? onSwipeLeftRef.current()
+          : onSwipeRightRef.current();
 
         gestureState.current.locked = true;
         gestureState.current.totalDX = 0;
@@ -75,7 +88,7 @@ export default function useSwipe({
         clearTimeout(gestureState.current.lockTimer);
         gestureState.current.lockTimer = window.setTimeout(
           unlock,
-          lockDuration
+          customLockDuration
         );
       }
     };
