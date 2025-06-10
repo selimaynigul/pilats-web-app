@@ -12,7 +12,6 @@ import AddClassForm from "components/scheduler/add-class-form/AddClassForm";
 import CustomToolbar from "components/scheduler/toolbar/scheduler-toolbar";
 import {
   CalendarWrapper,
-  LoadingOverlay,
   StyledModal,
 } from "components/scheduler/SchedulerStyles";
 import { sessionService } from "services";
@@ -28,7 +27,7 @@ import type { DraggableEvent, DraggableData } from "react-draggable";
 import EditSessionForm from "./edit-session-form/edit-session-form";
 import EventDrawer from "./event/EventDrawer";
 import EventPopover from "./event/event-popover/EventPopover";
-import { usePopover } from "contexts/PopoverProvider";
+import { useSwipe } from "hooks";
 dayjs.extend(isBetween);
 
 const validViews: View[] = ["month", "week", "day", "agenda"];
@@ -69,6 +68,9 @@ const Scheduler: React.FC<{
   const [loading, setLoading] = useState(false);
   const [sessions, setSessions] = useState<any[]>([]);
   const { t, userLanguage } = useLanguage();
+  const [slideDirection, setSlideDirection] = useState<"left" | "right">(
+    "left"
+  );
 
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -105,8 +107,14 @@ const Scheduler: React.FC<{
     right: 0,
   });
 
-  const getCacheKey = (start: Date, end: Date) =>
-    `${dayjs(start).format("YYYY-MM-DD")}_${dayjs(end).format("YYYY-MM-DD")}`;
+  const getCacheKey = (start: Date, end: Date, params: any) => {
+    const baseKey = `${dayjs(start).format("YYYY-MM-DD")}_${dayjs(end).format("YYYY-MM-DD")}`;
+    const filterKey = JSON.stringify({
+      companyId: params.companyId,
+      branchId: params.branchId,
+    });
+    return `${baseKey}__${filterKey}`;
+  };
 
   const params = useMemo(() => {
     const isAdmin = hasRole(["ADMIN"]);
@@ -148,7 +156,7 @@ const Scheduler: React.FC<{
       time: t.time || "Time",
       event: t.event || "Event",
       allDay: t.allDay || "All Day",
-      noEventsInRange: t.noEventsInRange || "No events in range.",
+      noEventsInRange: t.noEventsInRange || "",
     }),
     [t]
   );
@@ -284,7 +292,7 @@ const Scheduler: React.FC<{
       middleDate = new Date((+new Date(startDate) + +new Date(endDate)) / 2);
     }
 
-    if (!cachedSessions.has(getCacheKey(startDate, endDate))) {
+    if (!cachedSessions.has(getCacheKey(startDate, endDate, params))) {
       setSessions([]); // sadece eğer yoksa temizle
     }
     goToDate(middleDate);
@@ -295,7 +303,7 @@ const Scheduler: React.FC<{
     endDate: Date,
     showLoading: boolean
   ) => {
-    const key = getCacheKey(startDate, endDate);
+    const key = getCacheKey(startDate, endDate, params);
 
     // Eğer cache’te varsa, anlık göster
     if (cachedSessions.has(key)) {
@@ -312,6 +320,7 @@ const Scheduler: React.FC<{
     };
 
     try {
+      messages.noEventsInRange = "";
       const response = await sessionService.search(finalParams);
       const formatted = response.data.map((session: any) => ({
         ...session,
@@ -332,6 +341,10 @@ const Scheduler: React.FC<{
 
         return newMap;
       });
+
+      messages.noEventsInRange =
+        formatted.length === 0 ? "No events in range." : "Loading...";
+
       setSessions(formatted);
     } catch (error) {
       console.error("Error fetching events:", error);
@@ -646,140 +659,90 @@ const Scheduler: React.FC<{
   };
 
   const goToDate = (newDate: Date) => {
+    const current = dateRef.current;
+
+    if (dayjs(newDate).isBefore(dayjs(current))) {
+      setSlideDirection("right");
+    } else if (dayjs(newDate).isAfter(dayjs(current))) {
+      setSlideDirection("left");
+    }
+
     setDate(newDate);
+
     const formatted =
       currentView === "day"
         ? dayjs(newDate).format("YYYY-MM-DD")
         : dayjs(newDate).format("YYYY-MM");
 
-    const newParams = new URLSearchParams(searchParams.toString());
-    navigate(
-      {
-        pathname: `/sessions/${formatted}`,
-        search: `?${newParams.toString()}`,
-      },
-      { replace: true }
-    );
+    const currentFormatted =
+      currentView === "day"
+        ? dayjs(current).format("YYYY-MM-DD")
+        : dayjs(current).format("YYYY-MM");
+
+    // ❗ Aynı tarihse navigate yapma
+    if (formatted !== currentFormatted) {
+      const newParams = new URLSearchParams(searchParams.toString());
+      navigate(
+        {
+          pathname: `/sessions/${formatted}`,
+          search: `?${newParams.toString()}`,
+        },
+        { replace: true }
+      );
+    }
+
     localStorage.setItem("savedCalendarDate", newDate.toISOString());
   };
 
-  // Helper to map currentView to valid dayjs units
   const getDayjsUnit = (view: View): "day" | "week" | "month" => {
     if (view === "day") return "day";
     if (view === "week") return "week";
-    return "month"; // fallback for "month", "agenda", etc.
+    return "month";
   };
+
+  const dateRef = useRef(date);
+  useEffect(() => {
+    dateRef.current = date;
+  }, [date]);
 
   const navigateNext = () => {
     const unit = getDayjsUnit(currentView);
-    const newDate = dayjs(date).add(1, unit).toDate();
+    const newDate = dayjs(dateRef.current).add(1, unit).toDate();
     goToDate(newDate);
   };
 
   const navigateBack = () => {
     const unit = getDayjsUnit(currentView);
-    const newDate = dayjs(date).subtract(1, unit).toDate();
+    const newDate = dayjs(dateRef.current).subtract(1, unit).toDate();
     goToDate(newDate);
   };
 
+  useSwipe({
+    elementSelector: ".rbc-calendar",
+    onSwipeLeft: navigateNext,
+    onSwipeRight: navigateBack,
+  });
+
   useEffect(() => {
-    const el = document.querySelector(".rbc-calendar");
+    const el =
+      document.querySelector(".rbc-month-view") ||
+      document.querySelector(".rbc-time-content");
+
     if (!el) return;
 
-    /* === TUNABLE SABİTLER =============================== */
-    const FIRST_THRESHOLD = 60; // ilk tetik için 2 px
-    const NEXT_THRESHOLD = 400; // aynı jestte 2. tetik için gerekli mesafe
-    const LOCK_AFTER_MS = 0; // jest bitmeden sonraki bekleme
-    const ORIENT_RATIO = 1.2; // yatay > dikey * ORIENT_RATIO
+    // Önce önceki class'ları temizle
+    el.classList.remove("calendar-slide-left", "calendar-slide-right");
 
-    /* === KAYDIRMA DURUMU ================================ */
-    let totalDX = 0; // bu jestte kümülatif deltaX
-    let gestureActive = false; // jest başladı mı?
-    let locked = false; // navigate kilidi
-    let lockTimer: number; // kilit süresi
+    // Yeniden tetiklenmesini garanti etmek için force reflow
+    void (el as HTMLElement).offsetWidth; // <- Bu DOM hack'idir: reflow'u tetikler
 
-    /* ---------------------------------------------------- */
-    const resetGesture = () => {
-      totalDX = 0;
-      gestureActive = false;
-    };
-
-    const unlock = () => {
-      locked = false;
-      resetGesture();
-    };
-
-    /* ---------- TRACK-PAD / MOUSE WHEEL ----------------- */
-    const handleWheel = (e: Event) => {
-      const wheelEvent = e as WheelEvent; // Tip dönüşümü
-      const { deltaX, deltaY } = wheelEvent;
-
-      // dikey baskınsa görmezden gel
-      if (Math.abs(deltaX) < Math.abs(deltaY) * ORIENT_RATIO) return;
-
-      wheelEvent.preventDefault();
-      totalDX += deltaX;
-      gestureActive = true;
-
-      // *ilk* tetik
-      if (!locked && Math.abs(totalDX) > FIRST_THRESHOLD) {
-        deltaX > 0 ? navigateNext() : navigateBack();
-        locked = true; // ardışık çağrıları kilitle
-        totalDX = 0; // hareketi sıfırla
-
-        // jest sürerken 2. tetik için eşiği büyüt
-        clearTimeout(lockTimer);
-        lockTimer = window.setTimeout(unlock, LOCK_AFTER_MS);
-        return;
-      }
-
-      /* jest devam ederken – ikinci / üçüncü tetikler */
-      if (locked && Math.abs(totalDX) > NEXT_THRESHOLD) {
-        deltaX > 0 ? navigateNext() : navigateBack();
-        totalDX = 0; // sıfırla ve süreyi yeniden başlat
-        clearTimeout(lockTimer);
-        lockTimer = window.setTimeout(unlock, LOCK_AFTER_MS);
-      }
-    };
-
-    /* ---------- TOUCH (MOBİL) --------------------------- */
-    let startX = 0;
-    const handleTouchStart = (e: TouchEvent) => {
-      const t = e.touches[0];
-      startX = t.clientX;
-      resetGesture();
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (locked) return;
-      const dx = e.touches[0].clientX - startX;
-
-      if (Math.abs(dx) > FIRST_THRESHOLD) {
-        e.preventDefault();
-        dx < 0 ? navigateNext() : navigateBack();
-        locked = true;
-        lockTimer = window.setTimeout(unlock, LOCK_AFTER_MS);
-      }
-    };
-
-    /* ---------- EVENT LISTENERS ------------------------- */
-    el.addEventListener("wheel", handleWheel as EventListener, {
-      passive: false,
-    });
-    el.addEventListener("touchstart", handleTouchStart as EventListener, {
-      passive: true,
-    });
-    el.addEventListener("touchmove", handleTouchMove as EventListener, {
-      passive: false,
-    });
-
-    return () => {
-      el.removeEventListener("wheel", handleWheel as EventListener);
-      el.removeEventListener("touchstart", handleTouchStart as EventListener);
-      el.removeEventListener("touchmove", handleTouchMove as EventListener);
-      clearTimeout(lockTimer);
-    };
-  }, [currentView, date]);
+    // Yöne göre class ekle
+    const className =
+      slideDirection === "left"
+        ? "calendar-slide-left"
+        : "calendar-slide-right";
+    el.classList.add(className);
+  }, [date, slideDirection]);
 
   return (
     <CalendarWrapper>

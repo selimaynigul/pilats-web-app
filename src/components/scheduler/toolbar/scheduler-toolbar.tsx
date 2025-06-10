@@ -170,6 +170,23 @@ const Toolbar: React.FC<
       return date.format("MMMM YYYY");
     };
 
+    const isToday = (() => {
+      const today = dayjs();
+      const current = dayjs(date);
+
+      if (view === "day") {
+        return current.isSame(today, "day");
+      } else if (view === "month" || view === "agenda") {
+        return current.isSame(today, "month");
+      } else if (view === "week") {
+        return (
+          current.isoWeek() === today.isoWeek() &&
+          current.year() === today.year()
+        );
+      }
+      return false;
+    })();
+
     return (
       <ToolbarContainer>
         {isMobile ? (
@@ -202,7 +219,11 @@ const Toolbar: React.FC<
           <>
             {/* original full layout for desktop */}
             <NavButtons>
-              <ToggleViewButton onClick={() => onNavigate("TODAY")}>
+              <ToggleViewButton
+                onClick={() => {
+                  if (!isToday) onNavigate("TODAY");
+                }}
+              >
                 {t.today}
               </ToggleViewButton>
               <ActionButton onClick={() => onNavigate("PREV")}>

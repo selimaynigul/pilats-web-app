@@ -3,6 +3,39 @@ import { Modal } from "antd";
 import styled from "styled-components";
 
 export const CalendarWrapper = styled.div`
+  .calendar-slide-left {
+    animation: slideLeft 0.2s ease;
+    will-change: transform, opacity;
+    animation-fill-mode: both;
+  }
+  .calendar-slide-right {
+    animation: slideRight 0.2s ease;
+    will-change: transform, opacity;
+    animation-fill-mode: both;
+  }
+
+  @keyframes slideLeft {
+    from {
+      transform: translateX(25px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideRight {
+    from {
+      transform: translateX(-25px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
   background: transparent;
   position: relative;
   display: flex;

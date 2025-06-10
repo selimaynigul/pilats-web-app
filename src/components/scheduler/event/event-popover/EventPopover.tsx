@@ -342,7 +342,6 @@ const EventPopover: React.FC<EventPopoverProps> = ({
                         a.name
                       }
                       placement="top"
-                      mouseEnterDelay={0.4}
                     >
                       <StyledAvatar
                         src={a.imageUrl}
