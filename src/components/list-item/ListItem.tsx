@@ -47,6 +47,7 @@ const ListItem: React.FC<ListItemProps> = ({ data, type = "default" }) => {
 
   return (
     <StyledCard
+      tabIndex={0}
       cover={
         detailUrl ? (
           <Link to={detailUrl}>

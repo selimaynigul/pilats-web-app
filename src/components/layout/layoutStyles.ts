@@ -96,34 +96,46 @@ export const Search = styled(Input).withConfig({
   border: none;
   background: ${({ theme }) => theme.contentBg} !important;
   padding-left: 20px;
+  border: 2px solid transparent;
+
+  &:hover {
+    border: 2px solid ${({ theme }) => theme.primary}10;
+  }
 
   &::placeholder {
     color: #c9c2f0;
-    padding-left: 10px;
   }
 
   &:focus {
     outline: none;
     padding-right: 50px;
+    border: 2px solid transparent;
   }
 `;
 
-export const SearchIcon = styled.div.withConfig({
-  shouldForwardProp: (prop) => prop !== "visible",
-})<{ visible: boolean }>`
+export const ShortcutHint = styled.span`
   position: absolute;
-  right: 10px;
+  right: 16px;
   top: 50%;
   transform: translateY(-50%);
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background-color: ${theme.primaryColor};
-  color: white;
-  display: ${({ visible }) => (visible ? "flex" : "none")};
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
+  background: #f0edff;
+  border: 1px solid #c9c2f0;
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-size: 12px;
+  color: rgba(94, 70, 229, 0.8);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+`;
+
+export const SearchWrapper = styled.div`
+  position: relative;
+  width: 100%;
+
+  &:hover ${ShortcutHint} {
+    opacity: 1;
+  }
 `;
 
 export const ResultContainer = styled.div`

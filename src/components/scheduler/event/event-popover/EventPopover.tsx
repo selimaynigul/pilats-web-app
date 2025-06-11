@@ -135,19 +135,22 @@ const DeleteButton = styled(Button)`
 `;
 const DetailButton = styled(Button)`
   background: transparent !important;
-  border: none !important;
   box-shadow: none !important;
   padding: 0 4px;
-  min-width: 24px;
+  width: 30px;
   height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: grey;
+  transition: 0.3s;
+  border: 1px solid transparent !important;
+  border-radius: 10px;
 
   &:hover {
-    background: transparent !important;
-    box-shadow: none !important;
+    background: rgb(255, 255, 255, 0.5) !important;
+    border: 1px solid white !important;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 12px !important;
     color: grey !important;
   }
 `;
@@ -268,7 +271,7 @@ const EventPopover: React.FC<EventPopoverProps> = ({
               <DeleteOutlined />
             </DeleteButton>
           )}
-          <Tooltip title={t.detail || "Dersi görüntüle"} mouseEnterDelay={0.5}>
+          <Tooltip title={t.detail || "Dersi görüntüle"}>
             <DetailButton onClick={goToSession} type="primary">
               <FiMoreVertical />
             </DetailButton>

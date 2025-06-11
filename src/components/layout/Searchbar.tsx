@@ -4,14 +4,14 @@ import { useNavigate, useLocation } from "react-router-dom";
 import {
   SearchContainer,
   Search,
-  SearchIcon,
   DropdownOverlay,
   TransparentMenu,
   CategoryItem,
   ResultItem,
   ResultContainer,
+  SearchWrapper,
+  ShortcutHint,
 } from "./layoutStyles";
-import { SearchOutlined } from "@ant-design/icons";
 import {
   companyService,
   sessionService,
@@ -38,6 +38,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
   const inputRef = useRef<InputRef>(null);
   const { t, userLanguage } = useLanguage();
   const locale = userLanguage === "tr" ? "tr-TR" : "en-US";
+
+  const [highlightedResultIndex, setHighlightedResultIndex] = useState(0);
+  const resultsRef = useRef<HTMLDivElement[]>([]);
 
   useEffect(() => {
     if (location.pathname.includes("users")) {
@@ -94,12 +97,6 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
     }
   }, [isMobile, searchActive]);
 
-  const handleSearchIconClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    inputRef.current?.focus();
-    fetchResults(searchValue);
-  };
-
   const handleResultClick = (id: string) => {
     setDropdownOpen(false);
     setSearchValue("");
@@ -124,12 +121,60 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
-      fetchResults(searchValue);
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      setHighlightedResultIndex((prev) =>
+        Math.min(prev + 1, results.length - 1)
+      );
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setHighlightedResultIndex((prev) => Math.max(prev - 1, 0));
+    } else if (event.key === "Enter") {
+      if (results[highlightedResultIndex]) {
+        handleResultClick(results[highlightedResultIndex].id);
+      }
+    } else if (event.key === "ArrowRight") {
+      // ileri kategori (opsiyonel)
+      moveCategory(1);
+    } else if (event.key === "ArrowLeft") {
+      // geri kategori (opsiyonel)
+      moveCategory(-1);
+    } else if (event.key === "Escape") {
+      setDropdownOpen(false);
     }
   };
 
+  const categories = ["companies", "trainers", "users", "sessions"];
+  const moveCategory = (dir: number) => {
+    const idx = categories.indexOf(selectedCategory);
+    const next = idx + dir;
+    if (next >= 0 && next < categories.length) {
+      setSelectedCategory(categories[next]);
+      setHighlightedResultIndex(0);
+    }
+  };
+
+  useEffect(() => {
+    const handleFocus = () => {
+      setDropdownOpen(true);
+      inputRef.current?.focus();
+    };
+
+    window.addEventListener("focus-searchbar", handleFocus);
+    return () => window.removeEventListener("focus-searchbar", handleFocus);
+  }, []);
+
+  useEffect(() => {
+    if (resultsRef.current[highlightedResultIndex]) {
+      resultsRef.current[highlightedResultIndex].scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
+    }
+  }, [highlightedResultIndex]);
+
   const renderResults = () => {
+    resultsRef.current = [];
     if (loading) {
       return (
         <div
@@ -141,10 +186,15 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
     }
 
     if (selectedCategory === "companies") {
-      return results.map((company: any) => (
+      return results.map((company: any, index: number) => (
         <ResultItem
           key={company.id}
           onClick={() => handleResultClick(company.id)}
+          ref={(el) => (resultsRef.current[index] = el!)}
+          style={{
+            backgroundColor:
+              index === highlightedResultIndex ? "#f0f0ff" : "transparent",
+          }}
         >
           <Avatar>{company.companyName[0].toUpperCase()}</Avatar>
           <div>
@@ -153,10 +203,15 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
         </ResultItem>
       ));
     } else if (selectedCategory === "trainers") {
-      return results.map((trainer: any) => (
+      return results.map((trainer: any, index: number) => (
         <ResultItem
           key={trainer.id}
           onClick={() => handleResultClick(trainer.id)}
+          ref={(el) => (resultsRef.current[index] = el!)}
+          style={{
+            backgroundColor:
+              index === highlightedResultIndex ? "#f0f0ff" : "transparent",
+          }}
         >
           <Avatar>{trainer.ucGetResponse?.name[0].toUpperCase()}</Avatar>
           <div>
@@ -171,8 +226,16 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
         </ResultItem>
       ));
     } else if (selectedCategory === "users") {
-      return results.map((user: any) => (
-        <ResultItem key={user.id} onClick={() => handleResultClick(user.id)}>
+      return results.map((user: any, index: number) => (
+        <ResultItem
+          key={user.id}
+          onClick={() => handleResultClick(user.id)}
+          ref={(el) => (resultsRef.current[index] = el!)}
+          style={{
+            backgroundColor:
+              index === highlightedResultIndex ? "#f0f0ff" : "transparent",
+          }}
+        >
           <Avatar>{user.ucGetResponse?.name[0].toUpperCase()}</Avatar>
           <div>
             <strong>
@@ -186,7 +249,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
         </ResultItem>
       ));
     } else if (selectedCategory === "sessions") {
-      return results.map((session: any) => {
+      return results.map((session: any, index: number) => {
         const sessionDate = new Date(session.startDate).toLocaleDateString(
           locale,
           {
@@ -211,6 +274,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
           <ResultItem
             key={session.id}
             onClick={() => handleResultClick(session.id)}
+            ref={(el) => (resultsRef.current[index] = el!)}
+            style={{
+              backgroundColor:
+                index === highlightedResultIndex ? "#f0f0ff" : "transparent",
+            }}
           >
             <div>
               <strong>{session.name}</strong>
@@ -297,20 +365,20 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
         searchActive={isMobile ? searchActive : true}
         onClick={() => setDropdownOpen(true)}
       >
-        <Search
-          ref={inputRef}
-          placeholder={t.searchSomething}
-          value={searchValue}
-          onChange={(e) => {
-            setSearchValue(e.target.value);
-            fetchResults(e.target.value);
-          }}
-          focused={dropdownOpen}
-          onKeyDown={handleKeyDown}
-        />
-        <SearchIcon visible={dropdownOpen} onClick={handleSearchIconClick}>
-          <SearchOutlined />
-        </SearchIcon>
+        <SearchWrapper>
+          <Search
+            ref={inputRef}
+            placeholder={t.searchSomething}
+            value={searchValue}
+            onChange={(e) => {
+              setSearchValue(e.target.value);
+              fetchResults(e.target.value);
+            }}
+            focused={dropdownOpen}
+            onKeyDown={handleKeyDown}
+          />
+          <ShortcutHint>Ctrl + K</ShortcutHint>
+        </SearchWrapper>
       </SearchContainer>
     </Dropdown>
   );

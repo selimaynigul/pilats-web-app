@@ -244,7 +244,7 @@ const Scheduler: React.FC<{
 
   useEffect(() => {
     if (visibleRange) {
-      fetchSessions(visibleRange.start, visibleRange.end, true);
+      fetchSessions(visibleRange.start, visibleRange.end, true, false);
     }
   }, [visibleRange, params]);
 
@@ -301,12 +301,13 @@ const Scheduler: React.FC<{
   const fetchSessions = async (
     startDate: Date,
     endDate: Date,
-    showLoading: boolean
+    showLoading: boolean,
+    ignoreCache: boolean
   ) => {
     const key = getCacheKey(startDate, endDate, params);
 
     // Eğer cache’te varsa, anlık göster
-    if (cachedSessions.has(key)) {
+    if (!ignoreCache && cachedSessions.has(key)) {
       setSessions(cachedSessions.get(key)!);
       return;
     }
@@ -322,6 +323,7 @@ const Scheduler: React.FC<{
     try {
       messages.noEventsInRange = "";
       const response = await sessionService.search(finalParams);
+      console.log(response);
       const formatted = response.data.map((session: any) => ({
         ...session,
         start: new Date(session.startDate),
@@ -419,7 +421,7 @@ const Scheduler: React.FC<{
       .then(() => {
         message.success("Event added successfully!");
         if (visibleRange) {
-          fetchSessions(visibleRange.start, visibleRange.end, true);
+          fetchSessions(visibleRange.start, visibleRange.end, true, true);
         }
       })
       .catch((error) => {
@@ -493,7 +495,7 @@ const Scheduler: React.FC<{
       })
       .then(() => {
         if (visibleRange) {
-          fetchSessions(visibleRange.start, visibleRange.end, false);
+          fetchSessions(visibleRange.start, visibleRange.end, false, true);
         }
       })
       .catch((error) => {
@@ -606,7 +608,7 @@ const Scheduler: React.FC<{
       })
       .then(() => {
         if (visibleRange) {
-          fetchSessions(visibleRange.start, visibleRange.end, false);
+          fetchSessions(visibleRange.start, visibleRange.end, false, true);
         }
       })
       .catch(() => {
@@ -641,7 +643,7 @@ const Scheduler: React.FC<{
           message.success(t.deleted || "Silindi");
           /* listeyi yenile */
           if (visibleRange)
-            fetchSessions(visibleRange.start, visibleRange.end, false);
+            fetchSessions(visibleRange.start, visibleRange.end, false, true);
 
           setDrawerVisible(false);
           setSelectedSession(null);
@@ -654,7 +656,7 @@ const Scheduler: React.FC<{
 
   const fetch = () => {
     if (visibleRange) {
-      return fetchSessions(visibleRange.start, visibleRange.end, true);
+      return fetchSessions(visibleRange.start, visibleRange.end, true, false);
     }
   };
 

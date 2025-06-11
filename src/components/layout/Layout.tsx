@@ -100,6 +100,22 @@ const AppLayout: React.FC = () => {
     },
   ];
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        (e.key === "/" || (e.ctrlKey && e.key === "k")) &&
+        document.activeElement?.tagName !== "INPUT"
+      ) {
+        e.preventDefault();
+        const event = new CustomEvent("focus-searchbar");
+        window.dispatchEvent(event);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   return (
     <Layout style={{ height: "100vh" }}>
       {!collapsed && isMobile && (
