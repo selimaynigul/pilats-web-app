@@ -45,6 +45,7 @@ const Scheduler: React.FC<{
   selectedCompany: any;
   setSelectedCompany: any;
 }> = ({ selectedCompany, setSelectedCompany }) => {
+  const isMobile = useMemo(() => window.innerWidth <= 768, []);
   const { date: urlDate } = useParams<{ date?: string }>();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -295,7 +296,55 @@ const Scheduler: React.FC<{
     if (!cachedSessions.has(getCacheKey(startDate, endDate, params))) {
       setSessions([]); // sadece eğer yoksa temizle
     }
-    goToDate(middleDate);
+  };
+
+  const formatSessions = (data: any[]): any[] =>
+    data.map((session: any) => ({
+      ...session,
+      start: new Date(session.startDate),
+      end: new Date(session.endDate),
+    }));
+
+  const updateCache = (key: string, data: any[]) => {
+    setCachedSessions((prev) => {
+      const newMap = new Map(prev);
+      newMap.set(key, data);
+
+      if (newMap.size > 3) {
+        const oldestKey = newMap.keys().next().value;
+        if (oldestKey !== undefined) {
+          newMap.delete(oldestKey);
+        }
+      }
+
+      return newMap;
+    });
+  };
+
+  const fetchFreshSessions = async (
+    key: string,
+    startDate: Date,
+    endDate: Date,
+    showLoading = true
+  ) => {
+    if (showLoading) setLoading(true);
+
+    try {
+      const response = await sessionService.search({
+        ...params,
+        startDate: dayjs(startDate).toISOString(),
+        endDate: dayjs(endDate).toISOString(),
+      });
+
+      const formatted = formatSessions(response.data);
+      setSessions(formatted);
+      updateCache(key, formatted);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+      message.error("Failed to load events.");
+    } finally {
+      if (showLoading) setLoading(false);
+    }
   };
 
   const fetchSessions = async (
@@ -305,55 +354,38 @@ const Scheduler: React.FC<{
     ignoreCache: boolean
   ) => {
     const key = getCacheKey(startDate, endDate, params);
+    const cached = cachedSessions.get(key);
 
-    // Eğer cache’te varsa, anlık göster
-    if (!ignoreCache && cachedSessions.has(key)) {
-      setSessions(cachedSessions.get(key)!);
+    if (!ignoreCache && cached) {
+      setSessions(cached);
+
+      // Sessiz fetch
+      sessionService
+        .search({
+          ...params,
+          startDate: dayjs(startDate).toISOString(),
+          endDate: dayjs(endDate).toISOString(),
+        })
+        .then((res) => {
+          const freshData = formatSessions(res.data);
+
+          const isDifferent =
+            JSON.stringify(freshData) !== JSON.stringify(cached);
+
+          if (isDifferent) {
+            setSessions(freshData);
+            updateCache(key, freshData);
+          }
+        })
+        .catch((err) => {
+          console.error("Silent fetch failed:", err);
+        });
+
       return;
     }
 
-    if (showLoading) setLoading(true);
-
-    const finalParams = {
-      ...params,
-      startDate: dayjs(startDate).toISOString(),
-      endDate: dayjs(endDate).toISOString(),
-    };
-
-    try {
-      messages.noEventsInRange = "";
-      const response = await sessionService.search(finalParams);
-      console.log(response);
-      const formatted = response.data.map((session: any) => ({
-        ...session,
-        start: new Date(session.startDate),
-        end: new Date(session.endDate),
-      }));
-
-      setCachedSessions((prev) => {
-        const newMap = new Map(prev);
-        newMap.set(key, formatted);
-
-        if (newMap.size > 3) {
-          const oldestKey = newMap.keys().next().value;
-          if (oldestKey !== undefined) {
-            newMap.delete(oldestKey);
-          }
-        }
-
-        return newMap;
-      });
-
-      messages.noEventsInRange =
-        formatted.length === 0 ? "No events in range." : "Loading...";
-
-      setSessions(formatted);
-    } catch (error) {
-      console.error("Error fetching events:", error);
-      message.error("Failed to load events.");
-    } finally {
-      if (showLoading) setLoading(false);
-    }
+    // Cache yoksa veya ignore edilmişse doğrudan çek
+    await fetchFreshSessions(key, startDate, endDate, showLoading);
   };
 
   const selectSlot = (slotInfo: { start: Date; end: Date }) => {
@@ -656,7 +688,7 @@ const Scheduler: React.FC<{
 
   const fetch = () => {
     if (visibleRange) {
-      return fetchSessions(visibleRange.start, visibleRange.end, true, false);
+      return fetchSessions(visibleRange.start, visibleRange.end, true, true);
     }
   };
 
@@ -746,21 +778,25 @@ const Scheduler: React.FC<{
     el.classList.add(className);
   }, [date, slideDirection]);
 
+  const addClassFormRef = useRef<any>(null);
+
   return (
     <CalendarWrapper>
       <DragAndDropCalendar
         popup
         date={date}
-        onNavigate={(newDate) => setDate(newDate)}
+        onNavigate={goToDate}
         view={currentView}
         onView={(view) => setCurrentView(view)}
-        draggableAccessor={() => hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN"])}
+        draggableAccessor={() =>
+          !isMobile && hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN"])
+        }
         events={sessions}
         localizer={localizer}
-        selectable={hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN"])}
+        selectable={!isMobile && hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN"])} // Mobilde selectable devre dışı
         onSelectSlot={selectSlot}
         onEventDrop={moveSession}
-        resizable={currentView == "day" || currentView == "week"}
+        resizable={!isMobile && (currentView == "day" || currentView == "week")}
         onEventResize={handleResize}
         messages={messages}
         style={{ height: 700 }}
@@ -814,6 +850,9 @@ const Scheduler: React.FC<{
         onCancel={() => {
           setIsModalVisible(false);
           form.resetFields();
+          if (addClassFormRef.current) {
+            addClassFormRef.current.resetForm();
+          }
         }}
         footer={null}
         closable={false}
@@ -844,6 +883,7 @@ const Scheduler: React.FC<{
           selectedRange={selectedRange}
           nameRef={nameInputRef}
           currentView={currentView}
+          ref={addClassFormRef}
         />
       </StyledModal>
 

@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useImperativeHandle,
+  forwardRef,
+} from "react";
 import {
   Form,
   Input,
@@ -99,16 +105,11 @@ interface AddClassFormProps {
   nameRef: React.RefObject<any>;
   currentView: string;
   form: any;
+  ref: any;
 }
 
-const AddClassForm: React.FC<AddClassFormProps> = ({
-  visible,
-  onSubmit,
-  selectedRange,
-  nameRef,
-  currentView,
-  form,
-}) => {
+const AddClassForm: React.FC<AddClassFormProps> = forwardRef((props, ref) => {
+  const { onSubmit, selectedRange, nameRef, currentView, form } = props;
   const [repeat, setRepeat] = useState(false);
   const [repeatFrequency, setRepeatFrequency] = useState("weekly");
   const [showDescription, setShowDescription] = useState(false);
@@ -119,6 +120,28 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
   const [selectedBranch, setSelectedBranch] = useState<any>(null);
   const [selectedDate, setSelectedDate] = useState<dayjs.Dayjs | null>(null);
   const { t } = useLanguage();
+
+  useImperativeHandle(ref, () => ({
+    resetForm: () => {
+      setTrainers([]);
+      setSelectedBranch(null);
+    },
+  }));
+
+  useEffect(() => {
+    if (selectedBranch || hasRole(["BRANCH_ADMIN"])) {
+      trainerService
+        .search({
+          branchId: hasRole(["COMPANY_ADMIN"]) ? selectedBranch : getBranchId(),
+        })
+        .then((res) => {
+          setTrainers(res?.data || []);
+        })
+        .catch(() => {
+          message.error("Failed to fetch trainers.");
+        });
+    }
+  }, [selectedBranch]);
 
   useEffect(() => {
     const isSingleDay = selectedRange
@@ -170,19 +193,11 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
       });
   }, []);
 
-  useEffect(() => {
-    if (!visible) {
-      form.resetFields();
-      setRepeat(false);
-      setRepeatFrequency("weekly");
-      setShowDescription(false);
-    }
-  }, [visible]);
-
   const handleBranchChange = (branchId: number) => {
     setSelectedBranch(branchId);
     form.setFieldsValue({ trainer: null });
   };
+
   const handleFinish = (values: any) => {
     values = { ...values, repeatFrequency };
 
@@ -457,17 +472,19 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
                 filterOption={false}
                 onFocus={() => setTrainerExpanded(true)}
                 onBlur={() => setTrainerExpanded(false)}
+                disabled={hasRole(["COMPANY_ADMIN"]) && !selectedBranch}
               >
-                {trainers.map((trainer: any) => {
-                  if (trainer.passive || true) {
-                    return (
-                      <Select.Option key={trainer.id} value={trainer.id}>
-                        {trainer.ucGetResponse.name}{" "}
-                        {trainer.ucGetResponse.surname}
-                      </Select.Option>
-                    );
-                  }
-                })}
+                {trainers
+                  .filter(
+                    (trainer: any) =>
+                      !selectedBranch || trainer.branchId === selectedBranch // Branch ID eşleşmesi
+                  )
+                  .map((trainer: any) => (
+                    <Select.Option key={trainer.id} value={trainer.id}>
+                      {trainer.ucGetResponse.name}{" "}
+                      {trainer.ucGetResponse.surname}
+                    </Select.Option>
+                  ))}
               </Select>
             </Form.Item>
             <div
@@ -593,6 +610,6 @@ const AddClassForm: React.FC<AddClassFormProps> = ({
       </Form>
     </StyleOverrides>
   );
-};
+});
 
 export default AddClassForm;

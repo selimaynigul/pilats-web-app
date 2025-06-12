@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Input, InputNumber, Select, Button, Modal, Switch } from "antd";
 import { companyService, branchService } from "services";
+import { getCompanyId, hasRole } from "utils/permissionUtils";
 
 interface AddPackageFormProps {
   visible: boolean;
@@ -20,6 +21,9 @@ const AddPackageForm: React.FC<AddPackageFormProps> = ({
   const [companySearchLoading, setCompanySearchLoading] = useState(false);
   const [branchLoading, setBranchLoading] = useState(false);
   const [isBranchSpecific, setIsBranchSpecific] = useState(false);
+
+  const isBranchAdmin = hasRole(["BRANCH_ADMIN"]);
+  const isCompanyAdmin = hasRole(["COMPANY_ADMIN"]);
 
   const handleCompanySearch = async (value: string) => {
     setCompanySearchLoading(true);
@@ -44,6 +48,13 @@ const AddPackageForm: React.FC<AddPackageFormProps> = ({
       setBranchLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (isCompanyAdmin) {
+      const companyId = getCompanyId();
+      handleCompanySelect(companyId);
+    }
+  }, [isCompanyAdmin]);
 
   const handleSubmit = () => {
     form
@@ -137,52 +148,55 @@ const AddPackageForm: React.FC<AddPackageFormProps> = ({
             placeholder="Enter change count"
           />
         </Form.Item>
-
-        <Form.Item
-          label="Company"
-          name="companyId"
-          rules={[{ required: true, message: "Please select a company" }]}
-        >
-          <Select
-            showSearch
-            placeholder="Search and select company"
-            filterOption={false}
-            onSearch={handleCompanySearch}
-            onSelect={handleCompanySelect}
-            onFocus={() => {
-              handleCompanySearch("");
-            }}
-            loading={companySearchLoading}
+        {!isBranchAdmin && !isCompanyAdmin && (
+          <Form.Item
+            label="Company"
+            name="companyId"
+            rules={[{ required: true, message: "Please select a company" }]}
           >
-            {companies.map((company: any) => (
-              <Select.Option key={company.id} value={company.id}>
-                {company.companyName}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
-
-        <Form.Item
-          label="Is Branch Specific"
-          name="isBranchSpecific"
-          valuePropName="checked"
-        >
-          <Switch
-            checked={isBranchSpecific}
-            onChange={(checked) => {
-              setIsBranchSpecific(checked);
-              if (!checked) {
-                form.setFieldsValue({ branchId: null });
-              }
-            }}
-          />
-        </Form.Item>
-
-        {isBranchSpecific && (
+            <Select
+              showSearch
+              placeholder="Search and select company"
+              filterOption={false}
+              onSearch={handleCompanySearch}
+              onSelect={handleCompanySelect}
+              onFocus={() => {
+                handleCompanySearch("");
+              }}
+              loading={companySearchLoading}
+            >
+              {companies.map((company: any) => (
+                <Select.Option key={company.id} value={company.id}>
+                  {company.companyName}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+        )}
+        {!isBranchAdmin && (
+          <Form.Item
+            label="Is Branch Specific"
+            name="isBranchSpecific"
+            valuePropName="checked"
+          >
+            <Switch
+              checked={isBranchSpecific}
+              onChange={(checked) => {
+                setIsBranchSpecific(checked);
+                if (!checked) {
+                  form.setFieldsValue({ branchId: null });
+                }
+              }}
+            />
+          </Form.Item>
+        )}
+        {isBranchSpecific && !isBranchAdmin && (
           <Form.Item
             label="Branch"
             name="branchId"
-            rules={[{ required: true, message: "Please select a branch" }]}
+            rules={[
+              { required: isBranchSpecific, message: "Please select a branch" },
+            ]}
           >
             <Select placeholder="Select branch" loading={branchLoading}>
               {branches.map((branch: any) => (

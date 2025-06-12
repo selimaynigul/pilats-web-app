@@ -8,6 +8,7 @@ import {
   message,
   Tooltip,
   Spin,
+  Popover,
 } from "antd";
 import { FaCheck } from "react-icons/fa";
 
@@ -190,6 +191,34 @@ const EventDrawer: React.FC<{
     }
   };
 
+  const handleMarkAsAttended = async (userId: number) => {
+    try {
+      await sessionService.markAsAttended({ sessionId, customerId: userId });
+      setAttendees((prev) =>
+        prev.map((att) => (att.id === userId ? { ...att, present: true } : att))
+      );
+      message.success("Kullanıcı katıldı olarak işaretlendi.");
+    } catch (err) {
+      console.error("Mark as attended error:", err);
+      message.error("Bir hata oluştu.");
+    }
+  };
+
+  const handleMarkAsUnattended = async (userId: number) => {
+    try {
+      await sessionService.markAsUnattended({ sessionId, customerId: userId });
+      setAttendees((prev) =>
+        prev.map((att) =>
+          att.id === userId ? { ...att, present: false } : att
+        )
+      );
+      message.success("Kullanıcı katılmadı olarak işaretlendi.");
+    } catch (err) {
+      console.error("Mark as unattended error:", err);
+      message.error("Bir hata oluştu.");
+    }
+  };
+
   const menuItems = searchResults.map((u) => ({
     key: String(u.id), // key zorunlu ⇒ string
     label: (
@@ -215,7 +244,7 @@ const EventDrawer: React.FC<{
       extra={
         hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN"]) && (
           <ActionButtonGroup>
-            {dayjs(event?.start).isSameOrAfter(dayjs(), "day") && (
+            {dayjs(event?.start).isSameOrAfter(dayjs(), "minute") && (
               <SquareButton icon={<EditFilled />} onClick={onEdit} />
             )}
             <SquareButton icon={<DeleteOutlined />} danger onClick={onDelete} />
@@ -342,7 +371,7 @@ const EventDrawer: React.FC<{
             </StickyAttendeeHeader>
 
             <AttendeeList>
-              {loadingAttendees || joining /* 👈 iki yükleme durumu */ ? (
+              {loadingAttendees || joining ? (
                 <div style={{ textAlign: "center" }}>
                   <Spin />
                 </div>
@@ -395,17 +424,41 @@ const EventDrawer: React.FC<{
                             )}
                           </div>
                         </Tooltip>
-                        <MoreOutlined
-                          style={{
-                            fontSize: 16,
-                            color: "gray",
-                            cursor: "pointer",
-                          }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            // Handle more options click
-                          }}
-                        />
+                        <Popover
+                          content={
+                            user.present ? (
+                              <Button
+                                type="primary"
+                                danger
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleMarkAsUnattended(user.id);
+                                }}
+                              >
+                                Katılmadı olarak değiştir
+                              </Button>
+                            ) : (
+                              <Button
+                                type="primary"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleMarkAsAttended(user.id);
+                                }}
+                              >
+                                Katıldı olarak değiştir
+                              </Button>
+                            )
+                          }
+                          trigger="click"
+                        >
+                          <MoreButton
+                            onClick={(e) => {
+                              e.stopPropagation();
+                            }}
+                          >
+                            <MoreOutlined />
+                          </MoreButton>
+                        </Popover>
                       </div>
                     ) : (
                       <DeleteButton
@@ -656,6 +709,23 @@ const DeleteButton = styled(DeleteOutlined)`
 
   &:hover {
     color: #d9363e;
+  }
+`;
+
+const MoreButton = styled.div`
+  font-size: 16px;
+  color: gray;
+  cursor: pointer;
+  height: 30px;
+  width: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  transition: 0.3s;
+
+  &:hover {
+    background: rgb(227, 227, 227);
   }
 `;
 

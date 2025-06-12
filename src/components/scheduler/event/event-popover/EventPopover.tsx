@@ -233,7 +233,7 @@ const EventPopover: React.FC<EventPopoverProps> = ({
         <strong
           style={{
             display: "block",
-            maxWidth: 150,
+            maxWidth: 140,
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
@@ -244,7 +244,7 @@ const EventPopover: React.FC<EventPopoverProps> = ({
           {capitalize(event.name)}
         </strong>
         <ActionButtons>
-          {dayjs(event.start).isSameOrAfter(dayjs(), "day") &&
+          {dayjs(event.start).isSameOrAfter(dayjs(), "minute") &&
             hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN"]) && (
               <EditButton
                 type="primary"

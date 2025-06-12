@@ -11,7 +11,7 @@ import { handleError } from "utils/apiHelpers";
 import { Form, message } from "antd";
 import { CompanyDropdown } from "components";
 import moment from "moment";
-import { hasRole } from "utils/permissionUtils";
+import { getBranchId, getCompanyId, hasRole } from "utils/permissionUtils";
 import { useLanguage } from "hooks";
 
 const ToolbarContainer = styled.div`
@@ -74,9 +74,17 @@ const PackagesToolbar: React.FC<{
       bonusCount: parseInt(values.bonusCount, 10) || 0, // Map bonus count, defaulting to 0 if not provided
       changeCount: parseInt(values.changeCount, 10) || 0, // Map change count, defaulting to 0 if not provided
       creditCount: parseInt(values.creditCount, 10) || 0, // Map credit count, defaulting to 0 if not provided
-      companyId: parseInt(values.companyId, 10), // Ensure companyId is a valid integer
-      isBranchSpecific: values.isBranchSpecific === true, // Map isBranchSpecific field
-      branchId: values.branchId ? parseInt(values.branchId, 10) : null, // Optional branchId
+      companyId: hasRole(["ADMIN"])
+        ? parseInt(values.companyId, 10)
+        : getCompanyId(),
+      isBranchSpecific: hasRole(["BRANCH_ADMIN"])
+        ? true
+        : values.isBranchSpecific,
+      branchId: hasRole(["BRANCH_ADMIN"])
+        ? getBranchId()
+        : values.branchId
+          ? parseInt(values.branchId, 10)
+          : null,
     };
 
     companyPackageService
@@ -110,7 +118,6 @@ const PackagesToolbar: React.FC<{
         form={form}
         visible={isModalVisible}
         onClose={() => {
-          form.resetFields();
           setIsModalVisible(false);
         }}
         onSubmit={handleAddPackage}

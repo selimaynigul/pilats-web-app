@@ -20,6 +20,12 @@ const sessionService = {
   join: (params = {}) => apiClient.post("/session/joinSession", params),
 
   unjoin: (params = {}) => apiClient.post("/session/unjoinSession", params),
+
+  markAsAttended: (params = {}) =>
+    apiClient.post("/session/markCustomerAsAttended", params),
+
+  markAsUnattended: (params = {}) =>
+    apiClient.post("/session/markCustomerAsUnattended", params),
 };
 
 export default sessionService;

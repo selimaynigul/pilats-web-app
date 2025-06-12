@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import {
-  MoreOutlined,
   DeleteOutlined,
   RightOutlined,
   LeftOutlined,
+  UserAddOutlined,
 } from "@ant-design/icons";
 import { Card, Dropdown, Input, Menu, Modal, Tooltip, message } from "antd";
 import type { InputRef } from "antd/es/input";
@@ -48,7 +48,7 @@ const CardContainer = styled.div<{ mode?: "customer" | "admin" }>`
   transition: 0.3s;
 
   &:hover {
-    transform: translateY(-2px);
+    /*  transform: translateY(-2px); */
     box-shadow: 0px 8px 42px -5px rgba(93, 70, 229, 0.2);
   }
 `;
@@ -79,6 +79,9 @@ const Title = styled.h2`
   font-weight: bold;
   margin: 0;
   color: black;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const Price = styled.p`
@@ -86,6 +89,7 @@ const Price = styled.p`
   font-weight: bold;
   margin: 0;
   color: #6a5bff;
+  margin-left: 5px;
 `;
 const Description = styled.p`
   font-size: 0.9rem;
@@ -284,7 +288,7 @@ const PackageCard: React.FC<CardProps> = ({
       {mode === "admin" && (
         <Menu.Item
           key="assign"
-          icon={<MoreOutlined />}
+          icon={<UserAddOutlined />}
           onClick={() => setAssignModalVisible(true)}
         >
           {t.assignToCustomer}
@@ -304,7 +308,7 @@ const PackageCard: React.FC<CardProps> = ({
     <CardContainer mode={mode} onClick={(e) => e.stopPropagation()}>
       <Dropdown overlay={menu} trigger={["click"]}>
         <CardHeader>
-          <Title>{capitalize(title)}</Title>
+          <Title title={capitalize(title)}>{capitalize(title)}</Title>
           <Price>₺{price}</Price>
         </CardHeader>
       </Dropdown>
