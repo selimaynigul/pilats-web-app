@@ -84,7 +84,6 @@ const CustomEvent: React.FC<{
     "#5d46e5",
     "#2980b9",
     "#619c86",
-    "#5bbdd4",
     "#6f7597",
     "#afa8ba",
     "#67baa7",

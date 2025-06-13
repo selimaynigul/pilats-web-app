@@ -43,7 +43,7 @@ export const Heading = styled.div.withConfig({
   justify-content: space-between;
   padding: ${({ isMobile }) => (isMobile ? "0 10px" : "0 36px")};
   margin-top: ${({ isMobile }) => (isMobile ? "0" : "16px")};
-
+  gap: 10px;
   z-index: 0;
 
   &.search-active {

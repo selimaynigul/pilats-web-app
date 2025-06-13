@@ -2,17 +2,13 @@ import React from "react";
 import { Layout, Dropdown, Menu } from "antd";
 import styled from "styled-components";
 import { AiOutlineMenu } from "react-icons/ai";
-import {
-  SettingOutlined,
-  LogoutOutlined,
-  SearchOutlined,
-  CloseOutlined,
-} from "@ant-design/icons";
+import { SettingOutlined, LogoutOutlined } from "@ant-design/icons";
 import { useLanguage } from "hooks";
 import { StyledAvatar } from "./layoutStyles";
-import { getUserName, hasRole } from "utils/permissionUtils";
+import { getCompanyName, getUserName, hasRole } from "utils/permissionUtils";
 import { useAuth } from "contexts/AuthProvider";
 import { useLocation, useNavigate } from "react-router-dom";
+import { IoLanguage } from "react-icons/io5";
 
 const { Header } = Layout;
 
@@ -141,7 +137,6 @@ const AppHeader: React.FC<HeaderProps> = ({
   setSearchActive,
   pageTitle,
 }) => {
-  const { t } = useLanguage();
   const getUserInitial = () => {
     const name = getUserName() || "U";
     return name.charAt(0).toUpperCase();
@@ -155,12 +150,41 @@ const AppHeader: React.FC<HeaderProps> = ({
     logout(location);
   };
 
+  const { t, userLanguage, userLanguageChange } = useLanguage();
+
+  const toggleLanguage = () => {
+    const newLanguage = userLanguage === "en" ? "tr" : "en";
+    userLanguageChange(); // useLanguage provider'ını kullanarak dili değiştir
+    console.log(`Dil değiştirildi: ${newLanguage}`);
+  };
+
   const handleMenuClick = ({ key }: { key: string }) => {
     if (key === "settings") navigate("/role-management");
     if (key === "logout") handleLogout();
   };
 
   const dropdownItems = [
+    {
+      key: "userInfo",
+      label: (
+        <div>
+          <h4 style={{ marginBottom: 0 }}>{getUserName()}</h4>
+          <span>{getCompanyName()}</span>
+        </div>
+      ),
+    },
+    {
+      type: "divider" as const,
+    },
+    {
+      key: "language",
+      label: (
+        <div style={{ width: "100%" }} onClick={() => toggleLanguage()}>
+          {t.language} {userLanguage === "en" ? "English" : "Türkçe"}
+        </div>
+      ),
+      icon: <IoLanguage />,
+    },
     ...(hasRole(["ADMIN", "COMPANY_ADMIN"])
       ? [
           {
@@ -176,7 +200,6 @@ const AppHeader: React.FC<HeaderProps> = ({
       icon: <LogoutOutlined style={{ color: "red" }} />,
     },
   ];
-
   const toggleSearch = () => setSearchActive(!searchActive);
 
   return (

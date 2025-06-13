@@ -4,6 +4,8 @@ import {
   NavButtons,
   ActionButton,
   ToggleViewButton,
+  MobileDateContainer,
+  MobileActionContainer,
 } from "./ToolbarStyles";
 import { RightOutlined, LeftOutlined } from "@ant-design/icons";
 import { Form, ConfigProvider, DatePicker, Tooltip } from "antd";
@@ -92,13 +94,28 @@ const Toolbar: React.FC<
 
     const currentLocale = userLanguage === "tr" ? trTR : enUS;
 
-    const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
-    useEffect(() => {
-      const handleResize = () => setIsMobile(window.innerWidth <= 1024);
-      window.addEventListener("resize", handleResize);
-      return () => window.removeEventListener("resize", handleResize);
-    }, []);
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    const [isTablet, setIsTablet] = useState(
+      window.innerWidth > 768 && window.innerWidth <= 1080
+    );
 
+    useEffect(() => {
+      const handleResize = () => {
+        const width = window.innerWidth;
+        setIsMobile(width <= 768);
+        setIsTablet(width > 768 && width <= 1080);
+      };
+
+      // İlk yüklemede ekran boyutunu kontrol et
+      handleResize();
+
+      // Ekran boyutu değişikliklerini dinle
+      window.addEventListener("resize", handleResize);
+
+      return () => {
+        window.removeEventListener("resize", handleResize);
+      };
+    }, []);
     const handleModalToggle = (visible: boolean) => {
       setIsModalVisible(visible);
       if (!visible) form.resetFields();
@@ -187,11 +204,41 @@ const Toolbar: React.FC<
       return false;
     })();
 
+    const viewButton = (
+      <Dropdown menu={{ items }} trigger={["click"]}>
+        <ToggleViewButton
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 40,
+            height: 40,
+            borderRadius: "50%",
+            padding: 0,
+          }}
+        >
+          {viewOptions.find((v) => v.key === view)?.icon}
+        </ToggleViewButton>
+      </Dropdown>
+    );
+
     return (
       <ToolbarContainer>
         {isMobile ? (
           <MobileRow>
-            <div>
+            <MobileActionContainer style={{ display: "flex", gap: 8 }}>
+              {hasRole(["ADMIN", "COMPANY_ADMIN"]) && (
+                <CompanyDropdown
+                  selectedItem={company}
+                  onSelect={(selectedCompany) => setCompany(selectedCompany)}
+                />
+              )}
+              {viewButton}
+              {hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN"]) && (
+                <AddButton onClick={() => handleModalToggle(true)} />
+              )}
+            </MobileActionContainer>
+            <MobileDateContainer>
               <ConfigProvider locale={currentLocale}>
                 <StyledDatePicker
                   picker={getPickerType()}
@@ -202,36 +249,29 @@ const Toolbar: React.FC<
                   style={{ width: "100%" }}
                 />
               </ConfigProvider>
-            </div>
-            <div style={{ display: "flex", gap: 8 }}>
-              {hasRole(["ADMIN", "COMPANY_ADMIN"]) && (
-                <CompanyDropdown
-                  selectedItem={company}
-                  onSelect={(selectedCompany) => setCompany(selectedCompany)}
-                />
-              )}
-              {hasRole(["BRANCH_ADMIN"]) && (
-                <AddButton onClick={() => handleModalToggle(true)} />
-              )}
-            </div>
+            </MobileDateContainer>
           </MobileRow>
         ) : (
           <>
             {/* original full layout for desktop */}
             <NavButtons>
-              <ToggleViewButton
-                onClick={() => {
-                  if (!isToday) onNavigate("TODAY");
-                }}
-              >
-                {t.today}
-              </ToggleViewButton>
-              <ActionButton onClick={() => onNavigate("PREV")}>
-                <LeftOutlined />
-              </ActionButton>
-              <ActionButton onClick={() => onNavigate("NEXT")}>
-                <RightOutlined />
-              </ActionButton>
+              {!isTablet && (
+                <>
+                  <ToggleViewButton
+                    onClick={() => {
+                      if (!isToday) onNavigate("TODAY");
+                    }}
+                  >
+                    {t.today}
+                  </ToggleViewButton>
+                  <ActionButton onClick={() => onNavigate("PREV")}>
+                    <LeftOutlined />
+                  </ActionButton>
+                  <ActionButton onClick={() => onNavigate("NEXT")}>
+                    <RightOutlined />
+                  </ActionButton>
+                </>
+              )}
               <ConfigProvider locale={currentLocale}>
                 <StyledDatePicker
                   picker={getPickerType()}
@@ -251,14 +291,18 @@ const Toolbar: React.FC<
                   onSelect={(selectedCompany) => setCompany(selectedCompany)}
                 />
               )}
-              <Dropdown menu={{ items }} trigger={["click"]}>
-                <ToggleViewButton
-                  style={{ display: "flex", alignItems: "center", gap: 8 }}
-                >
-                  {viewOptions.find((v) => v.key === view)?.icon}
-                  {viewOptions.find((v) => v.key === view)?.label}
-                </ToggleViewButton>
-              </Dropdown>
+              {isTablet ? (
+                viewButton
+              ) : (
+                <Dropdown menu={{ items }} trigger={["click"]}>
+                  <ToggleViewButton
+                    style={{ display: "flex", alignItems: "center", gap: 8 }}
+                  >
+                    {viewOptions.find((v) => v.key === view)?.icon}
+                    {viewOptions.find((v) => v.key === view)?.label}
+                  </ToggleViewButton>
+                </Dropdown>
+              )}
               {hasRole(["COMPANY_ADMIN", "BRANCH_ADMIN"]) && (
                 <AddButton onClick={() => handleModalToggle(true)} />
               )}

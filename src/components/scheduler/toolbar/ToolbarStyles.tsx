@@ -7,6 +7,25 @@ export const ToolbarContainer = styled.div`
   align-items: center;
 `;
 
+export const MobileDateContainer = styled.div`
+  @media (max-width: 768px) {
+    display: block;
+    width: 100%;
+  }
+`;
+export const MobileActionContainer = styled.div`
+  @media (max-width: 768px) {
+    display: block;
+    width: 100%;
+    background: white;
+    border-radius: 50px;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    margin: 0 10px;
+  }
+`;
+
 export const NavButtons = styled.div`
   display: flex;
   align-items: center;

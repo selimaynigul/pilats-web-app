@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Layout, Dropdown, Menu, Avatar } from "antd";
+import { Layout, Dropdown } from "antd";
 import Sidebar from "./Sider";
+import type { MenuProps } from "antd";
 import Header from "./Header";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
@@ -20,11 +21,13 @@ import { useLanguage } from "hooks";
 const AppLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(window.innerWidth <= 768);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isTablet, setIsTablet] = useState(
+    window.innerWidth > 768 && window.innerWidth <= 1080
+  );
   const [searchActive, setSearchActive] = useState(false);
   const { t } = useLanguage();
   const navigate = useNavigate();
 
-  const { user } = useAuth();
   const location = useLocation();
 
   const getUserInitial = () => {
@@ -34,8 +37,11 @@ const AppLayout: React.FC = () => {
 
   useEffect(() => {
     const handleResize = () => {
-      const mobileView = window.innerWidth <= 768;
+      const width = window.innerWidth;
+      const mobileView = width <= 768;
+      const tabletView = width > 768 && width <= 1080;
       setIsMobile(mobileView);
+      setIsTablet(tabletView);
       setCollapsed(mobileView);
     };
 
@@ -48,28 +54,6 @@ const AppLayout: React.FC = () => {
   const handleLogout = () => {
     logout(location);
   };
-
-  const profileMenu = (
-    <Menu>
-      {hasRole(["ADMIN", "COMPANY_ADMIN"]) && (
-        <Menu.Item
-          onClick={() => navigate("/role-management")}
-          key="settings"
-          icon={<SettingOutlined />}
-        >
-          {t.roleManagement}
-        </Menu.Item>
-      )}
-      <Menu.Item
-        onClick={handleLogout}
-        key="logout"
-        icon={<LogoutOutlined style={{ color: "red" }} />}
-        style={{ color: "red" }}
-      >
-        {t.logout}
-      </Menu.Item>
-    </Menu>
-  );
 
   const getUserInfo = (info: string) => {
     if (info === "name") {
@@ -98,6 +82,22 @@ const AppLayout: React.FC = () => {
       icon: <LogoutOutlined style={{ color: "red" }} />,
       onClick: handleLogout,
     },
+  ];
+
+  const profileDropdownItems: MenuProps["items"] = [
+    {
+      key: "userInfo",
+      label: (
+        <div>
+          <h4 style={{ marginBottom: 0 }}>{getUserInfo("name")}</h4>
+          <span>{getCompanyName()}</span>
+        </div>
+      ),
+    },
+    {
+      type: "divider" as const,
+    },
+    ...profileMenuItems,
   ];
 
   useEffect(() => {
@@ -162,17 +162,29 @@ const AppLayout: React.FC = () => {
 
           {!isMobile && (
             <ProfileContainer>
-              <ProfileInfo>
-                <h4 style={{ marginBottom: 3 }}>{getUserInfo("name")}</h4>
-                <span>{getCompanyName()}</span>
-              </ProfileInfo>
-              <Dropdown
-                menu={{ items: profileMenuItems }}
-                trigger={["click"]}
-                placement="bottomRight"
-              >
-                <StyledAvatar>{getUserInitial()}</StyledAvatar>
-              </Dropdown>
+              {isTablet ? (
+                <Dropdown
+                  menu={{ items: profileDropdownItems }}
+                  trigger={["click"]}
+                  placement="bottomRight"
+                >
+                  <StyledAvatar>{getUserInitial()}</StyledAvatar>
+                </Dropdown>
+              ) : (
+                <>
+                  <ProfileInfo>
+                    <h4 style={{ marginBottom: 3 }}>{getUserInfo("name")}</h4>
+                    <span>{getCompanyName()}</span>
+                  </ProfileInfo>
+                  <Dropdown
+                    menu={{ items: profileMenuItems }}
+                    trigger={["click"]}
+                    placement="bottomRight"
+                  >
+                    <StyledAvatar>{getUserInitial()}</StyledAvatar>
+                  </Dropdown>
+                </>
+              )}
             </ProfileContainer>
           )}
         </Heading>
