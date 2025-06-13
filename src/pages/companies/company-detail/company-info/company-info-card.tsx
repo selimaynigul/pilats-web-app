@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
-import { Avatar, Spin } from "antd";
+import { Avatar, Button, Spin } from "antd";
 import { Link, useParams } from "react-router-dom";
 import { BsBuilding, BsEnvelopeFill } from "react-icons/bs";
 import {
@@ -8,6 +8,8 @@ import {
   WhatsAppOutlined,
   UserOutlined,
   UploadOutlined,
+  EditFilled,
+  DeleteOutlined,
 } from "@ant-design/icons";
 import { companyService, branchService, imageService } from "services";
 import { capitalize } from "utils/permissionUtils";
@@ -64,6 +66,55 @@ const ContactInfo = styled.div`
   padding: 0 24px;
   align-items: center;
   margin: 0 32px;
+`;
+
+const ActionButtons = styled.div`
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  gap: 8px;
+
+  button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 16px;
+
+    &:hover {
+      color: ${({ theme }) => theme.primary};
+    }
+  }
+`;
+
+const EditButton = styled(Button)`
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid white;
+  width: 36px;
+  height: 36px;
+  color: grey;
+  box-shadow: none;
+  &:hover {
+    background: transparent !important;
+    color: grey !important;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 12px;
+  }
+`;
+
+const DeleteButton = styled(Button)`
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid #f54263;
+  width: 36px;
+  height: 36px;
+  color: #f54263;
+  box-shadow: none;
+  &:hover {
+    background: #f54263 !important;
+    color: white !important;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 12px;
+  }
 `;
 
 const ContactButton = styled.div`
@@ -148,6 +199,10 @@ const CompanyInfo: React.FC<{ setBranches: any }> = ({ setBranches }) => {
       });
   }, [id]);
 
+  const handleEdit = () => {};
+  const handleEditSubmit = () => {};
+  const handleDelete = () => {};
+
   if (loading) {
     return (
       <Container>
@@ -191,6 +246,14 @@ const CompanyInfo: React.FC<{ setBranches: any }> = ({ setBranches }) => {
         <title>Pilats - {company.companyName}</title>
       </Helmet>
       <Container>
+        <ActionButtons>
+          <EditButton onClick={handleEdit} type="primary">
+            <EditFilled />
+          </EditButton>
+          <DeleteButton onClick={handleDelete} type="primary">
+            <DeleteOutlined />
+          </DeleteButton>
+        </ActionButtons>
         <ProfileSection>
           <AvatarContainer onClick={handleAvatarClick}>
             <AvatarWrapper>

@@ -6,6 +6,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import CustomEvent from "./test-event";
 import styled from "styled-components";
+import { TimePicker } from "react-ios-time-picker";
 
 const DragAndDropCalendar = withDragAndDrop(Calendar);
 const localizer = momentLocalizer(moment);
@@ -85,26 +86,13 @@ const TestCalendar: React.FC = () => {
     };
   };
 
-  return (
-    <CalendarWrapper>
-      <DragAndDropCalendar
-        events={events}
-        localizer={localizer}
-        date={currentDate} // Controlled date for navigation
-        onNavigate={(date) => setCurrentDate(date)} // Update current date on manual navigation
-        selectable
-        onDragOver={handleDragOver} // Track dragging over the calendar
-        onEventDrop={moveEvent}
-        onSelectSlot={addNewEvent}
-        components={{
-          event: CustomEvent, // Custom event component
-        }}
-        eventPropGetter={eventPropGetter} // Apply custom styles
-        style={{ height: 700 }}
-        defaultView={Views.MONTH}
-      />
-    </CalendarWrapper>
-  );
+  const [value, setValue] = useState(null);
+
+  const onChange = (timeValue: any) => {
+    setValue(timeValue);
+  };
+
+  return <TimePicker onChange={onChange} value={value} use12Hours />;
 };
 
 export default TestCalendar;
