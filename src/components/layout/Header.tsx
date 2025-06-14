@@ -153,9 +153,7 @@ const AppHeader: React.FC<HeaderProps> = ({
   const { t, userLanguage, userLanguageChange } = useLanguage();
 
   const toggleLanguage = () => {
-    const newLanguage = userLanguage === "en" ? "tr" : "en";
-    userLanguageChange(); // useLanguage provider'ını kullanarak dili değiştir
-    console.log(`Dil değiştirildi: ${newLanguage}`);
+    userLanguageChange();
   };
 
   const handleMenuClick = ({ key }: { key: string }) => {

@@ -107,6 +107,7 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
       }
     }
   }, [selectedItem]);
+
   useEffect(() => {
     if (buttonRef.current) {
       const buttonWidth = buttonRef.current.offsetWidth;
@@ -146,23 +147,20 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
   }, []);
 
   useEffect(() => {
-    if (searchQuery) {
-      const fetchService = hasRole(["COMPANY_ADMIN"])
-        ? (query: string) => fetchBranches(query)
-        : selectedCompany
-          ? (query: any) =>
-              fetchBranches(
-                query,
-                selectedCompany.companyId || selectedCompany.id // önce companyId varsa onu, yoksa id
-              )
-          : fetchCompanies;
+    const fetchService = hasRole(["COMPANY_ADMIN"])
+      ? (query: string) => fetchBranches(query)
+      : selectedCompany
+        ? (query: string) =>
+            fetchBranches(
+              query,
+              selectedCompany.companyId || selectedCompany.id
+            )
+        : fetchCompanies;
+
+    if (selectedCompany || searchQuery) {
       fetchData(searchQuery, fetchService);
     } else {
-      if (!selectedCompany) {
-        fetchData("", fetchCompanies);
-      } else {
-        setResponse([]);
-      }
+      fetchData("", fetchCompanies);
     }
   }, [searchQuery, fetchData, fetchBranches, fetchCompanies, selectedCompany]);
 
@@ -188,12 +186,15 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
   };
 
   const handleSelect = (item: any) => {
+    // company select
     if (!selectedCompany && !hasRole(["COMPANY_ADMIN"])) {
       setSelectedCompany(item);
       setSearchQuery("");
       onSelect(item);
       fetchData("", (query: string) => fetchBranches(query, item.id));
-    } else {
+    }
+    // branch select
+    else {
       onSelect(item);
       handleSearchMode(false);
     }

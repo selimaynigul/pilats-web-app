@@ -28,10 +28,13 @@ import {
   AlignLeftOutlined,
   PlusOutlined,
   ApartmentOutlined,
+  SwapRightOutlined,
 } from "@ant-design/icons";
 import { branchService, trainerService } from "services";
 import { getBranchId, getCompanyId, hasRole } from "utils/permissionUtils";
 import { useLanguage } from "hooks";
+import SpinnerTimePicker from "components/SpinnerTimePicker";
+import { isMobile } from "utils/utils";
 
 const StyleOverrides = styled.div`
   .trainer-select {
@@ -63,6 +66,16 @@ const StyleOverrides = styled.div`
   }
 `;
 
+const SpinnerContainer = styled.span`
+  display: flex;
+  padding-bottom: 2px;
+  background: #f5f5f5;
+  border-radius: 6px;
+
+  &:first-child > div:last-child {
+    /*  border-left: 1px solid rgb(216, 216, 216); */
+  }
+`;
 const CustomIcon = styled.span`
   display: inline-flex;
   align-items: center;
@@ -198,12 +211,44 @@ const AddClassForm: React.FC<AddClassFormProps> = forwardRef((props, ref) => {
     form.setFieldsValue({ trainer: null });
   };
 
+  /* const parseTimeString = (date: dayjs.Dayjs, timeStr: string) => {
+    const is12Hour = /AM|PM/i.test(timeStr);
+    const format = is12Hour ? "YYYY-MM-DD hh.mm A" : "YYYY-MM-DD HH.mm";
+    return dayjs(`${date.format("YYYY-MM-DD")} ${timeStr}`, format);
+  }; */
+
   const handleFinish = (values: any) => {
     values = { ...values, repeatFrequency };
 
     const now = dayjs();
     const selectedDate = values.startDate;
-    const [startTime, endTime] = values.timeRange || [null, null];
+
+    let startTime = null;
+    let endTime = null;
+
+    if (isMobile()) {
+      const [startStr, endStr] = spinnerTime;
+
+      const is12Hour = /AM|PM/i.test(startStr);
+      const format = is12Hour ? "YYYY-MM-DD hh:mm A" : "YYYY-MM-DD HH:mm";
+
+      startTime = dayjs(
+        `${selectedDate.format("YYYY-MM-DD")} ${startStr}`,
+        format
+      );
+      endTime = dayjs(`${selectedDate.format("YYYY-MM-DD")} ${endStr}`, format);
+
+      // Bu değerleri formdaki timeRange alanına da yazalım (uyumlu kalsın)
+      values.timeRange = [startTime, endTime];
+    } else {
+      [startTime, endTime] = values.timeRange || [null, null];
+    }
+
+    console.log(startTime, endTime);
+    if (!startTime || !endTime) {
+      message.warning("Başlangıç ve bitiş saatleri zorunludur.");
+      return;
+    }
 
     const startDateTime = selectedDate
       .hour(dayjs(startTime).hour())
@@ -233,18 +278,22 @@ const AddClassForm: React.FC<AddClassFormProps> = forwardRef((props, ref) => {
       }
 
       const diff = dayjs(endDate).diff(selectedDate, "day");
-
       if (diff < 1) {
         message.warning("End date, start date'ten en az 1 gün sonra olmalı.");
         return;
       }
     }
 
+    // Zamanları startDate & endDate'e at (formata dahil)
+    values.startDate = startDateTime.toISOString();
+    values.endDate = endDateTime.toISOString();
+
     onSubmit(values);
     form.resetFields();
     setRepeat(false);
     setRepeatFrequency("weekly");
     setShowDescription(false);
+    setSpinnerTime([]); // Temizlik
   };
 
   const dateFormat = (value: dayjs.Dayjs) => value.format("MMMM D, YYYY"); // Custom format
@@ -290,6 +339,8 @@ const AddClassForm: React.FC<AddClassFormProps> = forwardRef((props, ref) => {
         message.error("Error searching branches");
       });
   };
+
+  const [spinnerTime, setSpinnerTime] = useState<any>([]);
 
   return (
     <StyleOverrides>
@@ -380,39 +431,87 @@ const AddClassForm: React.FC<AddClassFormProps> = forwardRef((props, ref) => {
           <Form.Item
             style={{ width: "100%" }}
             name="timeRange"
-            rules={formItems.time.rules}
+            rules={isMobile() ? undefined : formItems.time.rules}
           >
-            <TimePicker.RangePicker
-              format="HH:mm"
-              minuteStep={5}
-              style={{ width: "100%" }}
-              suffixIcon={null}
-              disabledTime={() => {
-                if (!selectedDate) return {};
+            {isMobile() ? (
+              <SpinnerContainer>
+                <Form.Item
+                  noStyle
+                  name="startTime"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Başlangıç saati zorunlu",
+                    },
+                  ]}
+                  getValueFromEvent={(v) => v}
+                >
+                  <SpinnerTimePicker
+                    placeHolder="Start time"
+                    value={spinnerTime[0]}
+                    onChange={(val) => {
+                      setSpinnerTime([val, spinnerTime[1]]);
+                      form.setFieldValue("startTime", val);
+                    }}
+                  />
+                </Form.Item>
+                <SwapRightOutlined
+                  style={{
+                    color: "#B4B4B4",
+                    fontSize: 16,
+                    marginTop: 1,
+                  }}
+                />
 
-                const isToday = selectedDate.isSame(dayjs(), "day");
+                <Form.Item
+                  noStyle
+                  name="endTime"
+                  rules={[{ required: true, message: "Bitiş saati zorunlu" }]}
+                  getValueFromEvent={(v) => v}
+                >
+                  <SpinnerTimePicker
+                    placeHolder="End time"
+                    value={spinnerTime[1]}
+                    onChange={(val) => {
+                      setSpinnerTime([spinnerTime[0], val]);
+                      form.setFieldValue("endTime", val);
+                    }}
+                  />
+                </Form.Item>
+              </SpinnerContainer>
+            ) : (
+              <TimePicker.RangePicker
+                format="HH:mm"
+                minuteStep={5}
+                style={{ width: "100%" }}
+                suffixIcon={null}
+                disabledTime={() => {
+                  if (!selectedDate) return {};
 
-                if (isToday) {
-                  const currentHour = dayjs().hour();
-                  const currentMinute = dayjs().minute();
+                  const isToday = selectedDate.isSame(dayjs(), "day");
 
-                  return {
-                    disabledHours: () =>
-                      Array.from({ length: 24 }, (_, i) => i).filter(
-                        (hour) => hour < currentHour
-                      ),
-                    disabledMinutes: (hour) =>
-                      hour === currentHour
-                        ? Array.from({ length: 60 }, (_, i) => i).filter(
-                            (min) => min < currentMinute
-                          )
-                        : [],
-                  };
-                }
+                  if (isToday) {
+                    const currentHour = dayjs().hour();
+                    const currentMinute = dayjs().minute();
 
-                return {};
-              }}
-            />
+                    return {
+                      disabledHours: () =>
+                        Array.from({ length: 24 }, (_, i) => i).filter(
+                          (hour) => hour < currentHour
+                        ),
+                      disabledMinutes: (hour) =>
+                        hour === currentHour
+                          ? Array.from({ length: 60 }, (_, i) => i).filter(
+                              (min) => min < currentMinute
+                            )
+                          : [],
+                    };
+                  }
+
+                  return {};
+                }}
+              />
+            )}
           </Form.Item>
         </div>
 

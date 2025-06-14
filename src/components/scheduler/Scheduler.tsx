@@ -7,7 +7,7 @@ import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import CustomEvent from "./event/Event";
-import { Form, message, Modal, Spin } from "antd";
+import { Form, message, Modal } from "antd";
 import AddClassForm from "components/scheduler/add-class-form/AddClassForm";
 import CustomToolbar from "components/scheduler/toolbar/scheduler-toolbar";
 import {
@@ -864,17 +864,21 @@ const Scheduler: React.FC<{
         styles={{
           mask: { background: "transparent" },
         }}
-        modalRender={(modal) => (
-          <Draggable
-            handle=".ant-modal-content"
-            cancel=".ant-modal-body"
-            bounds={bounds}
-            nodeRef={draggleRef}
-            onStart={onStart}
-          >
-            <div ref={draggleRef}>{modal}</div>
-          </Draggable>
-        )}
+        modalRender={
+          isMobile
+            ? undefined
+            : (modal) => (
+                <Draggable
+                  handle=".ant-modal-content"
+                  cancel=".ant-modal-body"
+                  bounds={bounds}
+                  nodeRef={draggleRef}
+                  onStart={onStart}
+                >
+                  <div ref={draggleRef}>{modal}</div>
+                </Draggable>
+              )
+        }
       >
         <AddClassForm
           form={form}

@@ -24,3 +24,58 @@ div,
 button {
   font-family: "Instrument Sans", sans-serif !important;
 }
+
+.react-ios-time-picker-btn-container {
+  background: white;
+}
+
+.react-ios-time-picker-container {
+  background: white;
+}
+
+.react-ios-time-picker-selected-overlay {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.react-ios-time-picker-cell-inner-hour,
+.react-ios-time-picker-cell-inner-minute,
+.react-ios-time-picker-cell-inner-hour-format {
+  color: hsl(0, 0%, 79%);
+}
+
+.react-ios-time-picker-cell-inner-hour-format-selected,
+.react-ios-time-picker-cell-inner-selected {
+  font-weight: 500;
+  color: black;
+  filter: none;
+}
+
+.react-ios-time-picker-cell-inner-hour:hover,
+.react-ios-time-picker-cell-inner-minute:hover,
+.react-ios-time-picker-cell-inner-hour-format:hover {
+  background: #5d46e5;
+  filter: none;
+}
+
+.react-ios-time-picker-btn {
+  color: black;
+}
+
+.react-ios-time-picker-btn-container {
+  border-bottom: 1px solid rgb(235, 235, 235);
+}
+
+.react-ios-time-picker-btn-cancel {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.react-ios-time-picker-popup-overlay {
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(2px);
+}
+
+.react-ios-time-picker-colon {
+  color: black;
+  padding-bottom: 4px;
+}
