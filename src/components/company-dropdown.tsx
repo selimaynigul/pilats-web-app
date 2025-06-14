@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { Dropdown, Input, Menu, Spin } from "antd";
+import { Dropdown, Input, Spin } from "antd";
 import styled from "styled-components";
 import { AiOutlineSearch } from "react-icons/ai";
 import { branchService, companyService } from "services";
@@ -13,13 +13,13 @@ const CompanyDropdownButton = styled.button`
   border: none;
   height: 35px;
   padding: 5px 15px;
-  color: #4d3abd;
+  color: ${({ theme }) => theme.calendarHeaderText};
   cursor: pointer;
   background: transparent;
   display: flex;
   align-items: center;
   font-weight: bold;
-  border: 1px solid #4d3abd;
+  border: 1px solid ${({ theme }) => theme.calendarHeaderText};
   border-radius: 50px;
   transition: all 0.3s ease;
 
@@ -55,25 +55,22 @@ const StyledInput = styled(Input).withConfig({
     }
 
     &.ant-input-affix-wrapper-focused {
-      border-color: #4d3abd;
+      border-color: ${({ theme }) => theme.title};
       box-shadow: none;
     }
   }
+
+  .ant-input::placeholder {
+    color: ${({ theme }) => theme.placeholder} !important;
+  }
   height: 35px;
-  border: 1px solid #4d3abd;
   border-radius: 50px;
   padding: 5px 15px;
   font-weight: bold;
-  color: #4d3abd;
-  background: transparent;
+  color: ${({ theme }) => theme.primary};
+  background: ${({ theme }) => theme.bodyBg} !important;
   transition: width 0.3s ease;
   width: ${({ inputWidth }) => inputWidth};
-
-  &:focus {
-    outline: none;
-    box-shadow: none;
-    border-color: #4d3abd !important;
-  }
 `;
 
 const StyledReload = styled(AiOutlineReload)`

@@ -63,7 +63,7 @@ export const Heading = styled.div.withConfig({
 `;
 
 export const Title = styled.h2`
-  color: ${theme.primaryColor};
+  color: ${({ theme }) => theme.title};
 
   @media (max-width: 768px) {
     display: none;
@@ -80,6 +80,7 @@ export const SearchContainer = styled.div.withConfig({
   width: 500px;
   margin: ${({ isMobile }) => (isMobile ? "16px 0" : "0")};
   display: ${({ searchActive }) => (searchActive ? "flex" : "none")};
+  z-index: 99;
 
   @media (max-width: 768px) {
     width: 100%;
@@ -97,13 +98,16 @@ export const Search = styled(Input).withConfig({
   background: ${({ theme }) => theme.contentBg} !important;
   padding-left: 20px;
   border: 2px solid transparent;
+  z-index: 99;
+
+  color: ${({ theme }) => theme.text};
 
   &:hover {
     border: 2px solid ${({ theme }) => theme.primary}10;
   }
 
   &::placeholder {
-    color: #c9c2f0;
+    color: ${({ theme }) => theme.placeholder};
   }
 
   &:focus {
@@ -132,6 +136,7 @@ export const ShortcutHint = styled.span`
 export const SearchWrapper = styled.div`
   position: relative;
   width: 100%;
+  z-index: 99;
 
   &:hover ${ShortcutHint} {
     opacity: 1;
@@ -141,6 +146,23 @@ export const SearchWrapper = styled.div`
 export const ResultContainer = styled.div`
   max-height: 300px;
   overflow-y: auto;
+  background: ${({ theme }) => theme.contentBg};
+  border-radius: 14px;
+
+  /* Scrollbar styles */
+  &::-webkit-scrollbar {
+    width: 6px;
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: ${({ theme }) => theme.bodyBg};
+    border-radius: 6px;
+    border: none;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 10px 0;
+  }
 
   @media (max-width: 768px) {
     max-height: 70dvh;
@@ -176,52 +198,56 @@ export const StyledAvatar = styled(Avatar)`
   background-size: cover;
   font-size: 18px;
   cursor: pointer;
-  background-color: #e6e3ff;
+  background-color: ${({ theme }) => theme.avatarBg};
 `;
 
 export const ResultItem = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 16px;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 6px 16px;
   cursor: pointer;
+  margin: 5px;
+  border-radius: 9px;
+  transition: 0.1s;
+  color: ${({ theme }) => theme.text};
 
   &:hover {
-    background: ${theme.hoverBackgroundColor};
+    background: ${({ theme }) => theme.bodyBg} !important;
+  }
+
+  small {
+    color: ${({ theme }) => theme.text}90;
   }
 `;
 
 export const DropdownOverlay = styled.div`
   border-radius: 20px;
   padding: 6px;
-  background-color: ${theme.blurBackgroundColor};
-  backdrop-filter: blur(8px);
-  border: 1px solid white;
+  background-color: ${({ theme }) => theme.cardBg};
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 8px 12px !important;
 `;
 
 export const TransparentMenu = styled.div`
   display: flex;
   justify-content: start;
-  padding: 6px 6px;
-  padding-bottom: 10px;
+  padding: 6px;
   box-shadow: none;
   gap: 5px;
-  border-bottom: 1px solid #f0f0f0;
 `;
 
 export const CategoryItem = styled.div.withConfig({
   shouldForwardProp: (prop) => prop !== "isSelected",
 })<{ isSelected: boolean }>`
   cursor: pointer;
-  padding: 5px 10px;
+  padding: 2px 10px;
   border-radius: 50px;
   font-weight: bold;
-  color: ${({ isSelected }) => (isSelected ? theme.primaryColor : "inherit")};
-  background: ${({ isSelected }) =>
-    isSelected ? theme.secondaryColor : "transparent"};
+  color: ${({ isSelected, theme }) => (isSelected ? theme.title : theme.text)};
+  background: ${({ isSelected, theme }) =>
+    isSelected ? theme.contentBg : "transparent"};
 
   &:hover {
-    background: rgba(238, 237, 251, 0.57);
+    background: ${({ theme }) => theme.contentBg};
   }
 `;

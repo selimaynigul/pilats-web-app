@@ -20,6 +20,7 @@ import {
 } from "services";
 import { hasRole } from "utils/permissionUtils";
 import { useLanguage } from "hooks";
+import { useTheme } from "contexts/ThemeProvider";
 
 interface SearchBarProps {
   isMobile: boolean;
@@ -27,7 +28,11 @@ interface SearchBarProps {
   setSearchActive: (active: boolean) => void;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
+const SearchBar: React.FC<SearchBarProps> = ({
+  isMobile,
+  searchActive,
+  setSearchActive,
+}) => {
   const [selectedCategory, setSelectedCategory] = useState("company");
   const [searchValue, setSearchValue] = useState("");
   const [results, setResults] = useState<any[]>([]);
@@ -38,8 +43,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
   const inputRef = useRef<InputRef>(null);
   const { t, userLanguage } = useLanguage();
   const locale = userLanguage === "tr" ? "tr-TR" : "en-US";
-
-  const [highlightedResultIndex, setHighlightedResultIndex] = useState(0);
+  const { theme } = useTheme();
+  const [highlightedResultIndex, setHighlightedResultIndex] = useState(-1);
   const resultsRef = useRef<HTMLDivElement[]>([]);
 
   useEffect(() => {
@@ -193,7 +198,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
           ref={(el) => (resultsRef.current[index] = el!)}
           style={{
             backgroundColor:
-              index === highlightedResultIndex ? "#f0f0ff" : "transparent",
+              index === highlightedResultIndex
+                ? theme.contentBg
+                : "transparent",
           }}
         >
           <Avatar>{company.companyName[0].toUpperCase()}</Avatar>
@@ -210,7 +217,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
           ref={(el) => (resultsRef.current[index] = el!)}
           style={{
             backgroundColor:
-              index === highlightedResultIndex ? "#f0f0ff" : "transparent",
+              index === highlightedResultIndex
+                ? theme.contentBg
+                : "transparent",
           }}
         >
           <Avatar>{trainer.ucGetResponse?.name[0].toUpperCase()}</Avatar>
@@ -219,7 +228,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
               {trainer.ucGetResponse?.name} {trainer.ucGetResponse?.surname}
             </strong>
             <br />
-            <small style={{ color: "#888" }}>
+            <small>
               {trainer.companyName} - {trainer.branchName}
             </small>
           </div>
@@ -233,7 +242,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
           ref={(el) => (resultsRef.current[index] = el!)}
           style={{
             backgroundColor:
-              index === highlightedResultIndex ? "#f0f0ff" : "transparent",
+              index === highlightedResultIndex
+                ? theme.contentBg
+                : "transparent",
           }}
         >
           <Avatar>{user.ucGetResponse?.name[0].toUpperCase()}</Avatar>
@@ -242,7 +253,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
               {user.ucGetResponse?.name} {user.ucGetResponse?.surname}
               <br />
             </strong>
-            <small style={{ color: "#888" }}>
+            <small>
               {user.companyName} - {user.branchName}
             </small>
           </div>
@@ -277,20 +288,20 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
             ref={(el) => (resultsRef.current[index] = el!)}
             style={{
               backgroundColor:
-                index === highlightedResultIndex ? "#f0f0ff" : "transparent",
+                index === highlightedResultIndex
+                  ? theme.contentBg
+                  : "transparent",
             }}
           >
             <div>
               <strong>{session.name}</strong>
               <br />
-              <small style={{ color: "#888" }}>
+              <small>
                 {session.companyName} - {session.branchName}
               </small>
             </div>
-            <div
-              style={{ textAlign: "right", marginLeft: "auto", color: "#888" }}
-            >
-              <small style={{ color: "black" }}>{sessionDate}</small>
+            <div style={{ textAlign: "right", marginLeft: "auto" }}>
+              <small>{sessionDate}</small>
               <br />
               <small>
                 {startTime} - {endTime}
@@ -340,7 +351,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
         ) : results.length > 0 ? (
           renderResults()
         ) : (
-          <div style={{ textAlign: "center", marginTop: 8 }}>Sonuç yok</div>
+          <div
+            style={{ textAlign: "center", margin: "12px 0", color: theme.text }}
+          >
+            Sonuç yok
+          </div>
         )}
       </ResultContainer>
     </DropdownOverlay>
@@ -353,9 +368,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ isMobile, searchActive }) => {
       placement="bottom"
       onOpenChange={(visible) => {
         setDropdownOpen(visible);
+        setSearchActive(visible);
         if (!visible) {
           setSearchValue("");
           setResults([]);
+          setHighlightedResultIndex(-1);
         }
       }}
       open={dropdownOpen}

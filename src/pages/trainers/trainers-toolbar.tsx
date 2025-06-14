@@ -22,7 +22,8 @@ const CountContainer = styled.div`
   font-size: 16px;
   font-weight: bold;
   height: 50px;
-  background: white;
+  color: ${({ theme }) => theme.text};
+  background: ${({ theme }) => theme.bodyBg};
   padding: 10px 20px;
   gap: 6px;
   border-radius: 50px;
@@ -37,8 +38,7 @@ const CountContainer = styled.div`
 const ActionContainer = styled.div`
   display: flex;
   gap: 8px;
-  background: red;
-  background: white;
+  background: ${({ theme }) => theme.bodyBg};
   height: 50px;
   border-radius: 50px;
   align-items: center;

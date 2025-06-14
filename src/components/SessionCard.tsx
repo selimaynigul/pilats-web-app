@@ -11,10 +11,10 @@ import { TiCancel } from "react-icons/ti";
 import { FaCheck } from "react-icons/fa";
 
 const Card = styled.div`
-  border: 1px solid #e6e6e6;
+  /*  border: 1px solid #e6e6e6; */
   border-radius: 12px;
   padding: 16px;
-  background-color: #fff;
+  background-color: ${({ theme }) => theme.cardBg};
   transition: 0.2s;
   display: flex;
   justify-content: space-between;
@@ -23,7 +23,7 @@ const Card = styled.div`
   h3 {
     margin-bottom: 12px;
     font-size: 1.1em;
-    color: #333;
+    color: ${({ theme }) => theme.text};
   }
 
   p {

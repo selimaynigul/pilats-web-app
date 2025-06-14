@@ -18,6 +18,7 @@ import {
 import styled from "styled-components";
 import { getCompanyId, hasRole } from "utils/permissionUtils";
 import { useLanguage } from "hooks";
+import { useTheme } from "contexts/ThemeProvider";
 
 const { Sider } = Layout;
 const { Option } = Select;
@@ -32,7 +33,7 @@ const StyledSider = styled(Sider).withConfig({
   top: 0;
   left: 0;
   margin: 0 10px;
-  z-index: 100;
+  z-index: 3;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -50,7 +51,7 @@ const LogoContainer = styled.div.withConfig({
   justify-content: ${({ collapsed }) => (collapsed ? "center" : "flex-start")};
   padding: ${({ collapsed }) => (collapsed ? "10px 0" : "10px 20px")};
   margin-bottom: 20px;
-  background: #ffffff;
+  background: ${({ theme }) => theme.bodyBg};
 
   .logo-icon {
     width: ${({ collapsed, isMobile }) =>
@@ -79,7 +80,7 @@ const CustomTrigger = styled.div.withConfig({
   bottom: 20px;
   left: 10px;
   border-radius: 10px;
-  background: #e9e6ff;
+  background: ${({ theme }) => theme.triggerBg};
   color: black;
 `;
 
@@ -94,10 +95,15 @@ const LanguageSelector = styled(Select)`
   position: absolute;
   bottom: 120px;
   left: 5px;
-  background: white !important;
+  background: ${({ theme }) => theme.bodyBg};
 
   .ant-select-selector {
     border: none !important;
+    background: ${({ theme }) => theme.bodyBg} !important;
+  }
+
+  .ant-select-selection-item, .ant-select-arrow {
+    color:  ${({ theme }) => theme.menuItemText}; !important;
   }
 `;
 
@@ -123,6 +129,7 @@ const Sidebar: React.FC<SiderProps> = ({
   const navigate = useNavigate();
 
   const loc = useLocation();
+  const { toggleTheme } = useTheme();
 
   // Update selected key based on URL path
   useEffect(() => {
@@ -189,7 +196,15 @@ const Sidebar: React.FC<SiderProps> = ({
     >
       <LogoContainer collapsed={collapsed} isMobile={isMobile}>
         <img className="logo-icon" src="/logo-icon.svg" alt="Logo Icon" />
-        <img className="logo-text" src="/logo-text.svg" alt="Logo Text" />
+        <img
+          className="logo-text"
+          src={
+            window.localStorage.getItem("app-theme") === "dark"
+              ? "/logo-text.svg"
+              : "/logo-text-white.svg"
+          }
+          alt="Logo Text"
+        />
       </LogoContainer>
       <Menu
         defaultSelectedKeys={[window.location.pathname]}
@@ -209,7 +224,7 @@ const Sidebar: React.FC<SiderProps> = ({
       {!isMobile && (
         <>
           <LanguageSelector
-            value={userLanguage} // Use context state
+            value={userLanguage}
             onChange={(value) => userLanguageChange()}
           >
             <Option value="en">EN</Option>
@@ -219,7 +234,7 @@ const Sidebar: React.FC<SiderProps> = ({
           <BottomSwitch
             checkedChildren={<MoonFilled />}
             unCheckedChildren={<SunFilled />}
-            /* onChange={toggleTheme} */
+            onChange={toggleTheme}
           />
 
           <CustomTrigger

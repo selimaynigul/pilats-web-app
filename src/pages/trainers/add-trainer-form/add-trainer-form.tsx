@@ -44,7 +44,6 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
   useEffect(() => {
     if (!visible) {
       form.resetFields();
-      setBranches([]); // şube listesini temizle
     }
   }, [visible]);
 
@@ -183,11 +182,7 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
         )}
         {!hasRole(["BRANCH_ADMIN"]) && (
           <Form.Item {...addTrainerFormItems.branch} name="branch">
-            <Select
-              placeholder="Select branch"
-              loading={branchLoading}
-              disabled={!branches.length}
-            >
+            <Select placeholder="Select branch" loading={branchLoading}>
               {branches.map((branch: any) => (
                 <Select.Option key={branch.id} value={branch.id}>
                   {branch.branchName}

@@ -12,7 +12,8 @@ interface CardInfoProps {
 }
 
 const CompanyInfo = styled.div`
-  border: 1px solid white;
+  /*   border: 1px solid white;
+ */
   width: 100%;
   border-radius: 10px;
   padding: 5px;
@@ -22,6 +23,7 @@ const CompanyInfo = styled.div`
   gap: 10px;
   cursor: pointer;
   transition: 0.2s;
+  background: ${({ theme }) => theme.cardBg};
 
   &:hover {
     div:nth-of-type(3) {
@@ -33,7 +35,7 @@ const CompanyInfo = styled.div`
 `;
 
 const CompanyLogo = styled.div`
-  background: #e6e3ff;
+  background: ${({ theme }) => theme.avatarBg};
   height: 40px;
   width: 40px;
   border-radius: 10px;
@@ -47,10 +49,10 @@ const CompanyName = styled.div`
   display: flex;
   flex-direction: column;
   strong {
-    color: black;
+    color: ${({ theme }) => theme.text};
   }
   small {
-    color: gray;
+    color: ${({ theme }) => theme.text}90;
   }
 `;
 

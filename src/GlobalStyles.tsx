@@ -43,7 +43,7 @@ a {
 
 
   .ant-menu-item-selected {
-  background: #5d46e5 !important;
+  background: ${({ theme }) => theme.menuItemSelected} !important;
   .anticon,
   svg,
   path {
@@ -55,16 +55,27 @@ a {
   }
 }
 
+.ant-dropdown .ant-dropdown-menu {
+  background-color:  ${({ theme }) => theme.cardBg} !important;
+  
+ 
+  }
+
+   .ant-dropdown .ant-dropdown-menu .ant-dropdown-menu-title-content {
+    color:  ${({ theme }) => theme.text} !important;
+  
+  }
+
 .ant-menu {
   background:  ${({ theme }) => theme.bodyBg}!important;
 
 }
 .ant-menu-item {
-  color:  ${({ theme }) => theme.primary}!important;
+  color:  ${({ theme }) => theme.menuItemText}!important;
   border-radius: 15px !important;
 }
 .ant-menu-item:hover {
-  background: #f6f5ff !important;
+  background: ${({ theme }) => theme.menuItemHover}  !important;
 }
 
 .ant-menu.ant-menu-inline-collapsed {
@@ -72,13 +83,12 @@ a {
 }
 
 .ant-menu-item-selected:hover {
-  background: #5d46e5 !important;
+  background:  ${({ theme }) => theme.menuItemSelected} !important;
 }
 
 .ant-popover-inner {
-  background-color: rgba(255, 255, 255, 0.7) !important;
-  backdrop-filter: blur(8px) !important;
-  border: 1px solid white;
+  background-color:  ${({ theme }) => theme.cardBg} !important;
+/*   border: 1px solid white; */
   border-radius: 15px !important;
 }
 
@@ -179,6 +189,9 @@ border-radius: 50px !important;
   90% {
     background-color: #5d46e5; /* Gradually return to the original color */
   }
+
+
+
 
 `;
 

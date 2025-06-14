@@ -815,6 +815,7 @@ const Scheduler: React.FC<{
           toolbar: (props) => (
             <CustomToolbar
               {...props}
+              loading={loading}
               setCompany={setSelectedCompany}
               company={selectedCompany}
               setIsModalVisible={setIsModalVisible}

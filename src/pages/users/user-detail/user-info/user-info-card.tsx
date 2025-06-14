@@ -81,7 +81,7 @@ const AvatarWrapper = styled.div`
   }
 `;
 const Container = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.cardBg};
   border-radius: 20px;
   height: 100%;
   display: flex;
@@ -118,6 +118,7 @@ const ProfileSection = styled.div`
 const Name = styled.h2`
   font-size: 1.5em;
   margin: 10px 0 5px;
+  color: ${({ theme }) => theme.text};
 `;
 
 const Title = styled.h4`
@@ -138,6 +139,7 @@ const InfoItem = styled.div`
   margin-bottom: 10px;
   font-size: 1em;
   line-height: 1.5;
+  color: ${({ theme }) => theme.text};
 
   span {
     font-weight: bold;

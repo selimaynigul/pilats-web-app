@@ -65,7 +65,7 @@ export const CalendarWrapper = styled.div`
   .rbc-header {
     border: none;
 
-    color: #4d3abd;
+    color: ${({ theme }) => theme.calendarHeaderText};
   }
 
   .rbc-agenda-time-cell,
@@ -124,7 +124,7 @@ export const CalendarWrapper = styled.div`
   }
 
   .rbc-button-link {
-    color: #4d3abd;
+    color: ${({ theme }) => theme.calendarCellText};
   }
 
   .rbc-button-link > span {
@@ -132,15 +132,15 @@ export const CalendarWrapper = styled.div`
   }
 
   .rbc-day-bg {
-    border-color: #e6e3ff;
+    border-color: ${({ theme }) => theme.calendarBorder};
   }
 
   .rbc-today {
-    background: #f6f5ff;
+    background: ${({ theme }) => theme.calendarTodayBg};
   }
 
   .rbc-off-range-bg {
-    background: #e6e3ff;
+    background: ${({ theme }) => theme.offRangeBg};
   }
 
   .rbc-month-row + .rbc-month-row {
@@ -162,6 +162,7 @@ export const CalendarWrapper = styled.div`
   .rbc-show-more {
     position: absolute;
     top: 28px;
+    background: transparent;
   }
 
   .rbc-event {

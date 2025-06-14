@@ -8,7 +8,7 @@ import {
   MobileActionContainer,
 } from "./ToolbarStyles";
 import { RightOutlined, LeftOutlined } from "@ant-design/icons";
-import { Form, ConfigProvider, DatePicker, Tooltip } from "antd";
+import { Form, ConfigProvider, DatePicker, Spin } from "antd";
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
 import weekOfYear from "dayjs/plugin/weekOfYear";
@@ -43,16 +43,17 @@ const StyledDatePicker = styled(DatePicker)`
   background: transparent;
   border-radius: 50px;
   border: none;
-  transition: background 0.2s;
+  transition: all 0.2s;
   cursor: pointer;
 
   &:hover {
-    background: #f6f5ff;
+    background: ${({ theme }) => theme.contentBg};
   }
 
   .ant-picker-input > input {
     text-align: center; /* Center align the text */
-    color: #5d46e5; /* Customize the text color */
+    color: ${({ theme }) =>
+      theme.calendarHeaderText}; /* Customize the text color */
     font-size: 16px;
   }
 
@@ -76,7 +77,12 @@ const MobileRow = styled.div`
 `;
 
 const Toolbar: React.FC<
-  ToolbarProps & { company: any; setCompany: any; setIsModalVisible: any }
+  ToolbarProps & {
+    company: any;
+    setCompany: any;
+    setIsModalVisible: any;
+    loading: boolean;
+  }
 > = React.memo(
   ({
     onNavigate,
@@ -87,6 +93,7 @@ const Toolbar: React.FC<
     setCompany,
     company,
     setIsModalVisible,
+    loading,
   }) => {
     const [form] = Form.useForm();
     const { t, userLanguage } = useLanguage();
@@ -277,7 +284,7 @@ const Toolbar: React.FC<
                   picker={getPickerType()}
                   value={dayjs(date)}
                   onChange={handleDateChange}
-                  suffixIcon={null}
+                  suffixIcon={loading && <Spin size="small" />}
                   format={getDateFormat}
                   style={{ width: "100%" }}
                 />

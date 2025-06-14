@@ -59,7 +59,7 @@ export const TitleButton = styled.button`
 export const ActionButton = styled.button`
   border: 1px solid transparent;
   background: ${({ theme }) => theme.contentBg};
-  color: #4d3abd;
+  color: ${({ theme }) => theme.calendarHeaderText};
   border-radius: 50px;
   padding: 5px;
   display: flex;

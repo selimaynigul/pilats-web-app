@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Avatar, Tooltip, Button, Popover, Modal } from "antd";
+import { Avatar, Tooltip, Button, Popover } from "antd";
 import {
-  AntDesignOutlined,
   ArrowRightOutlined,
   CalendarOutlined,
   ClockCircleOutlined,
@@ -11,6 +10,7 @@ import {
 } from "@ant-design/icons";
 import { FiMoreVertical } from "react-icons/fi";
 import styled from "styled-components";
+import { useTheme } from "contexts/ThemeProvider";
 import dayjs from "dayjs";
 import { Link, useNavigate } from "react-router-dom";
 import { capitalize, hasRole } from "utils/permissionUtils";
@@ -24,22 +24,21 @@ dayjs.extend(isSameOrAfter);
 
 const Header = styled.div`
   height: 30px;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   transition: all 0.2s ease;
   cursor: pointer;
   border-radius: 10px;
 `;
 
 const TrainerInfo = styled.div`
-  border: 1px solid white;
-  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 12px;
   width: 100%;
   border-radius: 10px;
   margin: 7px 0 15px 0;
   padding: 5px;
   box-sizing: border-box;
   display: flex;
-  background: transparent;
+  background: ${({ theme }) => theme.contentBg};
+  border: 1px solid transparent;
   align-items: center;
   transition: all 0.1s ease;
   gap: 10px;
@@ -50,28 +49,26 @@ const TrainerInfo = styled.div`
       opacity: 1;
     }
 
-    box-shadow: rgba(149, 157, 165, 0.4) 0px 8px 24px;
+    border: 1px solid ${({ theme }) => theme.bodyBg};
   }
 `;
 
 const DateInfo = styled.div`
-  background: transparent;
+  background: ${({ theme }) => theme.contentBg};
   width: fit-content;
   border-radius: 10px;
   padding: 5px 15px;
-  border: 1px solid white;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 8px;
-  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 12px;
 `;
 
 const TrainerPhoto = styled.div`
-  background: grey;
+  background: ${({ theme }) => theme.avatarBg};
   height: 40px;
   width: 40px;
-  border-radius: 10px;
+  border-radius: 50px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -81,6 +78,11 @@ const TrainerPhoto = styled.div`
 const TrainerName = styled.div`
   display: flex;
   flex-direction: column;
+
+  strong,
+  small {
+    color: ${({ theme }) => theme.text};
+  }
 `;
 
 const TrainerDetailButton = styled.div`
@@ -159,6 +161,7 @@ const AttendeeInfo = styled.div`
   justify-content: space-between;
   align-items: center;
   padding-top: 7px;
+  color: ${({ theme }) => theme.text};
 `;
 
 const StyledAvatar = styled(Avatar)`
@@ -190,7 +193,7 @@ const EventPopover: React.FC<EventPopoverProps> = ({
   const { openId, setOpenId, triggerRef } = usePopover();
 
   const selfRef = useRef<HTMLDivElement | null>(null);
-
+  const { theme } = useTheme();
   const isOpen = openId === event.id && triggerRef.current === selfRef.current;
 
   useEffect(() => {
@@ -232,6 +235,7 @@ const EventPopover: React.FC<EventPopoverProps> = ({
       <Header onClick={goToSession}>
         <strong
           style={{
+            color: theme.text,
             display: "block",
             maxWidth: 140,
             whiteSpace: "nowrap",
@@ -278,16 +282,21 @@ const EventPopover: React.FC<EventPopoverProps> = ({
           </Tooltip>
         </ActionButtons>
       </Header>
-      <div style={{ display: "flex", gap: 5 }}>
+      {event.description && (
+        <small style={{ color: theme.text }}>
+          {event.description ? event.description : t.noDescription}
+        </small>
+      )}
+      <div style={{ marginTop: 15, display: "flex", gap: 5 }}>
         <DateInfo>
-          <CalendarOutlined style={{ color: "grey  " }} />
-          <strong style={{ display: "block" }}>
+          <CalendarOutlined style={{ color: theme.title }} />
+          <strong style={{ color: theme.text, display: "block" }}>
             <small>{dayjs(event.start).format("DD.MM.YYYY")}</small>
           </strong>
         </DateInfo>
         <DateInfo>
-          <ClockCircleOutlined style={{ color: "grey  " }} />
-          <strong style={{ display: "block" }}>
+          <ClockCircleOutlined style={{ color: theme.title }} />
+          <strong style={{ color: theme.text, display: "block" }}>
             <small>
               {dayjs(event.start).format("HH:mm")} -{" "}
               {dayjs(event.end).format("HH:mm")}
@@ -295,14 +304,11 @@ const EventPopover: React.FC<EventPopoverProps> = ({
           </strong>
         </DateInfo>
       </div>
-      <strong style={{ display: "block", marginTop: 15 }}>
-        {t.description}
-      </strong>
-      <small style={{ color: "grey" }}>
-        {event.description ? event.description : t.noDescription}
-      </small>
 
-      <strong style={{ display: "block", marginTop: 10 }}>{t.trainer}</strong>
+      <strong style={{ color: theme.text, display: "block", marginTop: 10 }}>
+        {t.trainer}
+      </strong>
+
       <div style={{ marginTop: 0 }}>
         <Link to={`/trainers/${event.trainerId}`}>
           <TrainerInfo>
@@ -313,21 +319,23 @@ const EventPopover: React.FC<EventPopoverProps> = ({
               <strong>
                 {event.trainerName} {event.trainerSurname}{" "}
               </strong>
-              <small style={{ color: "grey" }}>Trainer</small>
+              <small>
+                {event.companyName} - {event.branchName}
+              </small>
             </TrainerName>
             <TrainerDetailButton>
               <ArrowRightOutlined />
             </TrainerDetailButton>
           </TrainerInfo>
         </Link>
-        <strong style={{ display: "block", marginTop: 15 }}>
+        <strong style={{ color: theme.text, display: "block", marginTop: 15 }}>
           {t.attendees}
         </strong>
         <AttendeeInfo>
           {loadingAttendees ? (
             <span>{t.loading}</span>
           ) : attendees.length === 0 ? (
-            <small style={{ color: "grey" }}>{t.noAttendeesYet}</small>
+            <small>{t.noAttendeesYet}</small>
           ) : (
             <Avatar.Group
               max={{

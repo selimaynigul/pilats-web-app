@@ -3,6 +3,9 @@ import { Card } from "antd";
 
 export const StyledCard = styled(Card)`
   border-radius: 20px;
+  background: ${({ theme }) => theme.cardBg};
+  border: 1px solid transparent;
+
   .ant-card-body {
     padding: 10px;
   }
@@ -16,6 +19,7 @@ export const StyledCard = styled(Card)`
 
   .ant-card-meta-title {
     margin-bottom: 0 !important;
+    color: ${({ theme }) => theme.text};
   }
 `;
 
