@@ -4,13 +4,18 @@ import { addTrainerFormItems } from "./add-trainer-form-items";
 import { companyService, branchService, jobService } from "services";
 import { PlusOutlined } from "@ant-design/icons";
 import { Divider } from "antd";
-import { hasRole, getCompanyId, getBranchId } from "utils/permissionUtils";
+import {
+  hasRole,
+  getCompanyId,
+  getBranchId,
+  getUser,
+} from "utils/permissionUtils";
+import StepModal, { CustomStep, FormRow } from "components/StepModal";
 interface AddTrainerFormProps {
   visible: boolean;
   onClose: () => void;
   onSubmit: (values: any) => void;
   loading: boolean;
-  company?: any;
   form: any;
 }
 
@@ -19,7 +24,6 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
   onClose,
   onSubmit,
   loading,
-  company,
   form,
 }) => {
   const [companies, setCompanies] = useState([]);
@@ -114,160 +118,196 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
         }
 
         onSubmit(modifiedValues);
-        form.resetFields();
       })
       .catch((info: any) => {
         console.error("Validation Failed:", info);
       });
   };
+  const steps: CustomStep[] = [
+    {
+      label: "About trainer",
+      buttonText: "Save & Continue",
+      blocks: [
+        {
+          title: "Personal Info",
+          description: "Provide trainer's personal info",
+          fields: [
+            <Form.Item
+              name="jobId"
+              rules={[
+                { required: false, message: "Please select or add a job" },
+              ]}
+            >
+              {isAddingJob ? (
+                <Input.Group compact>
+                  <Input
+                    style={{ width: "calc(100% - 90px)" }}
+                    value={newJobName}
+                    onChange={(e) => setNewJobName(e.target.value)}
+                    placeholder="Enter new job name"
+                  />
+                  <Input
+                    style={{
+                      width: "calc(100% - 90px)",
+                      marginTop: "7px",
+                      marginBottom: "7px",
+                    }}
+                    value={newJobDesc}
+                    onChange={(e) => setNewJobDesc(e.target.value)}
+                    placeholder="Enter new job description"
+                  />
+                  <br />
+                  <Button
+                    type="primary"
+                    onClick={handleAddNewJob}
+                    loading={jobLoading}
+                  >
+                    Add
+                  </Button>
+                  <Button
+                    onClick={() => setIsAddingJob(false)}
+                    style={{ marginLeft: "8px" }}
+                  >
+                    Cancel
+                  </Button>
+                </Input.Group>
+              ) : (
+                <Select
+                  loading={jobLoading}
+                  placeholder="Select job"
+                  dropdownRender={(menu) => (
+                    <>
+                      {menu}
+                      <Divider style={{ margin: "8px 0" }} />
+                      <Button
+                        type="text"
+                        icon={<PlusOutlined />}
+                        onClick={() => setIsAddingJob(true)}
+                        style={{ paddingLeft: 8 }}
+                      >
+                        Add new job
+                      </Button>
+                    </>
+                  )}
+                >
+                  {jobs.map((job) => (
+                    <Select.Option key={job.id} value={job.id}>
+                      {job.jobName}
+                    </Select.Option>
+                  ))}
+                </Select>
+              )}
+            </Form.Item>,
+            <FormRow>
+              <Form.Item {...addTrainerFormItems.name} name="name">
+                <Input placeholder="Firstname *" />
+              </Form.Item>
+              <Form.Item {...addTrainerFormItems.surname} name="surname">
+                <Input placeholder="Lastname *" />
+              </Form.Item>
+            </FormRow>,
+            <FormRow>
+              <Form.Item {...addTrainerFormItems.gender} name="gender">
+                <Select placeholder="Select gender">
+                  <Select.Option value="male">Male</Select.Option>
+                  <Select.Option value="female">Female</Select.Option>
+                </Select>
+              </Form.Item>
+              <Form.Item {...addTrainerFormItems.birthdate} name="birthdate">
+                <DatePicker style={{ width: "100%" }} placeholder="Birthdate" />
+              </Form.Item>
+            </FormRow>,
+          ],
+        },
+        {
+          title: "Contact Info",
+          description: "Provide trainer's contact info",
+          fields: [
+            <FormRow>
+              <Form.Item {...addTrainerFormItems.email} name="email">
+                <Input placeholder="Email *" />
+              </Form.Item>
+              <Form.Item
+                {...addTrainerFormItems.phoneNumber}
+                name="phoneNumber"
+              >
+                <Input placeholder="Phone No *" />
+              </Form.Item>
+            </FormRow>,
+            <Form.Item
+              name="location"
+              rules={[
+                { required: false, message: "Please enter the location" },
+              ]}
+            >
+              <Input placeholder="Location" />
+            </Form.Item>,
+          ],
+        },
+      ],
+    },
+    {
+      label: "Company info",
+      buttonText: "Add Trainer",
+      blocks: [
+        {
+          title: "Company Info",
+          description: "Provide trainer's company/branch info",
+          fields: [
+            <Form.Item {...addTrainerFormItems.company} name="company">
+              <Select
+                disabled={!hasRole(["ADMIN"])}
+                showSearch
+                placeholder="Search and select company"
+                filterOption={false}
+                onSearch={handleCompanySearch}
+                onSelect={(value) => fetchBranches(value)}
+                loading={companySearchLoading}
+                defaultValue={
+                  hasRole(["COMPANY_ADMIN", "BRANCH_ADMIN"])
+                    ? getUser().companyName
+                    : undefined
+                }
+              >
+                {companies.map((company: any) => (
+                  <Select.Option key={company.id} value={company.id}>
+                    {company.companyName}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>,
+            <Form.Item {...addTrainerFormItems.branch} name="branch">
+              <Select
+                disabled={hasRole(["BRANCH_ADMIN"])}
+                placeholder="Select branch"
+                loading={branchLoading}
+                defaultValue={
+                  hasRole(["BRANCH_ADMIN"]) ? getUser().branchName : undefined
+                }
+              >
+                {branches.map((branch: any) => (
+                  <Select.Option key={branch.id} value={branch.id}>
+                    {branch.branchName}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>,
+          ],
+        },
+      ],
+    },
+  ];
 
   return (
-    <Modal title="Add Trainer" open={visible} onCancel={onClose} footer={null}>
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-        variant="filled"
-      >
-        <Form.Item {...addTrainerFormItems.name} name="name">
-          <Input placeholder="Enter trainer's name" />
-        </Form.Item>
-        <Form.Item {...addTrainerFormItems.surname} name="surname">
-          <Input placeholder="Enter trainer's surname" />
-        </Form.Item>
-        <Form.Item {...addTrainerFormItems.email} name="email">
-          <Input placeholder="Enter email address" />
-        </Form.Item>
-        <Form.Item {...addTrainerFormItems.phoneNumber} name="phoneNumber">
-          <Input placeholder="Enter phone number" />
-        </Form.Item>
-        {!hasRole(["COMPANY_ADMIN", "BRANCH_ADMIN"]) && (
-          <Form.Item {...addTrainerFormItems.company} name="company">
-            <Select
-              showSearch
-              placeholder="Search and select company"
-              filterOption={false}
-              onSearch={handleCompanySearch}
-              onSelect={(value) => fetchBranches(value)}
-              loading={companySearchLoading}
-            >
-              {companies.map((company: any) => (
-                <Select.Option key={company.id} value={company.id}>
-                  {company.companyName}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-        )}
-        {!hasRole(["BRANCH_ADMIN"]) && (
-          <Form.Item {...addTrainerFormItems.branch} name="branch">
-            <Select placeholder="Select branch" loading={branchLoading}>
-              {branches.map((branch: any) => (
-                <Select.Option key={branch.id} value={branch.id}>
-                  {branch.branchName}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-        )}
-        <Form.Item {...addTrainerFormItems.birthdate} name="birthdate">
-          <DatePicker style={{ width: "100%" }} />
-        </Form.Item>
-        <Form.Item {...addTrainerFormItems.gender} name="gender">
-          <Select placeholder="Select gender">
-            <Select.Option value="male">Male</Select.Option>
-            <Select.Option value="female">Female</Select.Option>
-          </Select>
-        </Form.Item>
-        <Form.Item
-          name="jobId"
-          label="Job"
-          rules={[{ required: false, message: "Please select or add a job" }]}
-        >
-          {isAddingJob ? (
-            <Input.Group compact>
-              <Input
-                style={{ width: "calc(100% - 90px)" }}
-                value={newJobName}
-                onChange={(e) => setNewJobName(e.target.value)}
-                placeholder="Enter new job name"
-              />
-              <Input
-                style={{
-                  width: "calc(100% - 90px)",
-                  marginTop: "7px",
-                  marginBottom: "7px",
-                }}
-                value={newJobDesc}
-                onChange={(e) => setNewJobDesc(e.target.value)}
-                placeholder="Enter new job description"
-              />
-              <br />
-              <Button
-                type="primary"
-                onClick={handleAddNewJob}
-                loading={jobLoading}
-              >
-                Add
-              </Button>
-              <Button
-                onClick={() => setIsAddingJob(false)}
-                style={{ marginLeft: "8px" }}
-              >
-                Cancel
-              </Button>
-            </Input.Group>
-          ) : (
-            <Select
-              loading={jobLoading}
-              placeholder="Select job"
-              dropdownRender={(menu) => (
-                <>
-                  {menu}
-                  <Divider style={{ margin: "8px 0" }} />
-                  <Button
-                    type="text"
-                    icon={<PlusOutlined />}
-                    onClick={() => setIsAddingJob(true)}
-                    style={{ paddingLeft: 8 }}
-                  >
-                    Add new job
-                  </Button>
-                </>
-              )}
-            >
-              {jobs.map((job) => (
-                <Select.Option key={job.id} value={job.id}>
-                  {job.jobName}
-                </Select.Option>
-              ))}
-            </Select>
-          )}
-        </Form.Item>
-        <Form.Item
-          name="location"
-          label="Location"
-          rules={[{ required: false, message: "Please enter the location" }]}
-        >
-          <Input placeholder="Location" />
-        </Form.Item>
-
-        <Form.Item>
-          <Button
-            onClick={handleSubmit}
-            loading={loading}
-            type="primary"
-            htmlType="submit"
-          >
-            Submit
-          </Button>
-
-          <Button style={{ marginLeft: "10px" }} onClick={onClose}>
-            Cancel
-          </Button>
-        </Form.Item>
-      </Form>
-    </Modal>
+    <StepModal
+      visible={visible}
+      onClose={onClose}
+      onSubmit={handleSubmit}
+      title="Add Trainer"
+      steps={steps}
+      loading={loading}
+      form={form}
+    />
   );
 };
 

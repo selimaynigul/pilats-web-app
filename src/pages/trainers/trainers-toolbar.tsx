@@ -90,6 +90,7 @@ const TrainersToolbar: React.FC<{
       .then(() => {
         message.success("Trainer is added");
         setIsModalVisible(false);
+        form.resetFields();
         window.location.reload();
       })
       .catch((err) => {
@@ -126,10 +127,8 @@ const TrainersToolbar: React.FC<{
         visible={isModalVisible}
         onClose={() => {
           setIsModalVisible(false);
-          form.resetFields();
         }}
         onSubmit={handleAddTrainer}
-        company={selectedCompany}
         form={form}
       />
     </ToolbarContainer>

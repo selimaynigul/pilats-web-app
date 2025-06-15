@@ -182,8 +182,7 @@ const StepModal: React.FC<StepModalProps> = ({
       footer={null}
       closable
       width={1000}
-      style={{ padding: 0 }}
-      bodyStyle={{ padding: 0 }}
+      styles={{ body: { padding: 0 } }}
       centered
     >
       <ModalBody>
@@ -266,7 +265,10 @@ const StepModal: React.FC<StepModalProps> = ({
                 <Button
                   type="primary"
                   htmlType="submit"
-                  onClick={onSubmit}
+                  onClick={() => {
+                    onSubmit();
+                    setTimeout(() => setCurrentStep(0), 300);
+                  }}
                   loading={loading}
                 >
                   {current.buttonText || "Submit"}
