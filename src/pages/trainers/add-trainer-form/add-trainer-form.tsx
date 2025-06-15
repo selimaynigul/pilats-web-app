@@ -41,27 +41,6 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
     fetchJobs();
   }, []);
 
-  useEffect(() => {
-    if (!visible) {
-      form.resetFields();
-    }
-  }, [visible]);
-
-  /*  useEffect(() => {
-    // ADMIN ise tüm şirketler aransın
-    if (hasRole(["ADMIN"])) {
-      handleCompanySearch("All");
-    }
-
-    // company prop geldiyse formda otomatik setle
-    if (company?.id || company?.companyParam) {
-      form.setFieldsValue({ company: company.id });
-      fetchBranches(company.id);
-    }
-
-    fetchJobs();
-  }, [company]); */
-
   const fetchBranches = async (companyId: string) => {
     if (!companyId) return;
     setBranchLoading(true);

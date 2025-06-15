@@ -1,98 +1,190 @@
-import React, { useState, useRef } from "react";
-import { Calendar, momentLocalizer, Views } from "react-big-calendar";
-import moment from "moment";
-import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
-import "react-big-calendar/lib/css/react-big-calendar.css";
-import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
-import CustomEvent from "./test-event";
+import React, { useState } from "react";
+import { Button, Card, Form, Input, DatePicker, TimePicker, List } from "antd";
+import StepModal, { CustomStep } from "components/StepModal";
 import styled from "styled-components";
-import { TimePicker } from "react-ios-time-picker";
 
-const DragAndDropCalendar = withDragAndDrop(Calendar);
-const localizer = momentLocalizer(moment);
+export interface CalendarEvent {
+  trainer: string;
+  topic: string;
+  date: string;
+  time: string;
+}
 
-const CalendarWrapper = styled.div`
-  .rbc-toolbar {
-    margin-bottom: 1rem;
+const FormRow = styled.div<{ fullWidth?: boolean }>`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  > * {
+    flex: ${({ fullWidth }) =>
+      fullWidth ? "1 1 100%" : "1 1 calc(50% - 8px)"};
+  }
+
+  @media (max-width: 768px) {
+    > * {
+      flex: 1 1 100% !important;
+    }
   }
 `;
 
 const TestCalendar: React.FC = () => {
-  const [events, setEvents] = useState([
+  const [modalVisible, setModalVisible] = useState(false);
+  const [events, setEvents] = useState<CalendarEvent[]>([
     {
-      id: 0,
-      title: "Meeting with Team",
-      start: new Date(2023, 10, 8, 10, 0),
-      end: new Date(2023, 10, 8, 11, 0),
-    },
-    {
-      id: 1,
-      title: "Lunch Break",
-      start: new Date(2023, 10, 8, 13, 0),
-      end: new Date(2023, 10, 8, 14, 0),
+      trainer: "John Doe",
+      date: "2025-06-15",
+      time: "14:00",
+      topic: "React Basics",
     },
   ]);
-  const [currentDate, setCurrentDate] = useState(new Date(2023, 10, 8)); // Current view date
-  const timerRef = useRef<NodeJS.Timeout | null>(null); // Timer reference
+  const [form] = Form.useForm();
 
-  const moveEvent = ({ event, start, end }: any) => {
-    const updatedEvents = events.map((evt) =>
-      evt.id === event.id ? { ...evt, start, end } : evt
-    );
-    setEvents(updatedEvents);
+  const handleAddEvent = () => {
+    form
+      .validateFields()
+      .then((values) => {
+        const newEvent: CalendarEvent = {
+          trainer: values.trainer,
+          topic: values.topic,
+          date: values.date.format("YYYY-MM-DD"),
+          time: values.time.format("HH:mm"),
+        };
+        setEvents([...events, newEvent]);
+        form.resetFields();
+        setModalVisible(false);
+      })
+      .catch((info) => console.error("Validation Failed:", info));
   };
+  const steps: CustomStep[] = [
+    {
+      label: "About trainer",
+      buttonText: "Save & Continue",
+      blocks: [
+        {
+          title: "Personal Info",
+          description: "Provide trainer's personal info",
+          fullWidth: true,
+          fields: [
+            <Form.Item name="job" style={{ marginBottom: 0, width: "100%" }}>
+              <Input placeholder="Job" />
+            </Form.Item>,
+            <FormRow>
+              <Form.Item
+                name="firstname"
+                style={{ marginBottom: 0, width: "100%" }}
+              >
+                <Input placeholder="Firstname *" />
+              </Form.Item>
+              <Form.Item
+                name="lastname"
+                style={{ marginBottom: 0, width: "100%" }}
+              >
+                <Input placeholder="Lastname *" />
+              </Form.Item>
+            </FormRow>,
+            <FormRow>
+              <Form.Item
+                name="gender"
+                style={{ marginBottom: 0, width: "100%" }}
+              >
+                <Input placeholder="Gender" />
+              </Form.Item>
+              <Form.Item
+                name="birthdate"
+                style={{ marginBottom: 0, width: "100%" }}
+              >
+                <DatePicker style={{ width: "100%" }} placeholder="Birthdate" />
+              </Form.Item>
+            </FormRow>,
+          ],
+        },
+        {
+          title: "Contact Info",
+          description: "Provide trainer's contact info",
+          fullWidth: true,
+          fields: [
+            <FormRow>
+              <Form.Item
+                name="email"
+                style={{ marginBottom: 0, width: "100%" }}
+              >
+                <Input placeholder="Email *" />
+              </Form.Item>
+              <Form.Item
+                name="phone"
+                style={{ marginBottom: 0, width: "100%" }}
+              >
+                <Input placeholder="Phone No *" />
+              </Form.Item>
+            </FormRow>,
+            <Form.Item
+              name="location"
+              style={{ marginBottom: 0, width: "100%" }}
+            >
+              <Input placeholder="Location" />
+            </Form.Item>,
+          ],
+        },
+      ],
+    },
+    {
+      label: "Company info",
+      buttonText: "Add Trainer",
+      blocks: [
+        {
+          title: "Company Info",
+          description: "Provide trainer's personal info",
+          fullWidth: true,
+          fields: [
+            <Form.Item
+              name="company"
+              style={{ marginBottom: 0, width: "100%" }}
+            >
+              <Input placeholder="Company" />
+            </Form.Item>,
+            <Form.Item name="branch" style={{ marginBottom: 0, width: "100%" }}>
+              <Input placeholder="Branch" />
+            </Form.Item>,
+          ],
+        },
+      ],
+    },
+  ];
 
-  const addNewEvent = ({ start, end }: any) => {
-    const newId = events.length
-      ? Math.max(...events.map((evt) => evt.id)) + 1
-      : 0;
-    const newEvent = {
-      id: newId,
-      title: "New Event",
-      start,
-      end,
-    };
-    setEvents([...events, newEvent]);
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    const calendarWidth = e.currentTarget.clientWidth;
-    const mouseX = e.clientX;
-
-    // If near the right edge, start a timer to navigate to the next month
-    if (mouseX > calendarWidth - 100) {
-      if (!timerRef.current) {
-        timerRef.current = setTimeout(() => {
-          setCurrentDate(moment(currentDate).add(1, "month").toDate());
-          timerRef.current = null; // Reset the timer
-        }, 1000); // 1 second delay
+  return (
+    <Card
+      title="Trainer Calendar"
+      extra={
+        <Button onClick={() => setModalVisible(true)}>Add Training</Button>
       }
-    } else {
-      // Clear the timer if the mouse moves away from the right edge
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-        timerRef.current = null;
-      }
-    }
-  };
+      style={{ maxWidth: 600, margin: "0 auto" }}
+    >
+      <List
+        header={<strong>Scheduled Trainings</strong>}
+        bordered
+        dataSource={events}
+        renderItem={(item) => (
+          <List.Item>
+            <strong>
+              {item.date} {item.time}
+            </strong>{" "}
+            — {item.topic} ({item.trainer})
+          </List.Item>
+        )}
+      />
 
-  const eventPropGetter = (event: any) => {
-    return {
-      style: {
-        backgroundColor: "transparent", // Remove default background
-        border: "none", // Remove border
-        boxShadow: "none", // Remove shadows
-      },
-    };
-  };
-
-  const [value, setValue] = useState(null);
-
-  const onChange = (timeValue: any) => {
-    setValue(timeValue);
-  };
-
-  return <TimePicker onChange={onChange} value={value} use12Hours />;
+      <Form form={form} layout="vertical">
+        <StepModal
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          onSubmit={handleAddEvent}
+          title="Add trainer"
+          steps={steps}
+          form={form}
+        />
+      </Form>
+    </Card>
+  );
 };
 
 export default TestCalendar;

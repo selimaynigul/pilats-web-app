@@ -24,9 +24,16 @@ a {
   background-color: ${({ theme }) => theme.bodyBg};
 }
 
+.ant-input-filled, .ant-picker-filled, .ant-select-filled {
+height: 40px;
+border-radius: 8px;}
 
  .ant-modal-content {
   border-radius: 20px !important;
+  }
+
+  .ant-modal-wrap {
+  backdrop-filter: blur(2px);
   }
 
   
