@@ -89,5 +89,7 @@
   "measurements": "Ölçümler",
   "credit": "katılım hakkı",
   "cancelRight": "iptal hakkı",
-  "bonusRight": "bonus hakkı"
+  "bonusRight": "bonus hakkı",
+  "previous": "Geri",
+  "thisFieldIsMandatory": "Bu alan zorunludur"
 }

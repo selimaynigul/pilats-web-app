@@ -22,14 +22,15 @@ a {
  margin: 0;}
   .ant-layout {
   background-color: ${({ theme }) => theme.bodyBg};
-}
-
-.ant-input-filled, .ant-picker-filled, .ant-select-filled {
-height: 40px;
-border-radius: 8px;}
-
- .ant-modal-content {
-  border-radius: 20px !important;
+  }
+  
+  .ant-input-filled, .ant-picker-filled, .ant-select-filled {
+    height: 40px;
+    border-radius: 8px;}
+    
+    .ant-modal-content {
+      border-radius: 20px !important;
+      background-color: ${({ theme }) => theme.bodyBg} !important;
   }
 
   .ant-modal-wrap {

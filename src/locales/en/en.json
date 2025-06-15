@@ -89,5 +89,7 @@
   "measurements": "Measurements",
   "credit": "credits",
   "cancelRight": "cancel right",
-  "bonusRight": "bonus right"
+  "bonusRight": "bonus right",
+  "previous": "Previous",
+  "thisFieldIsMandatory": "This field is mandatory"
 }
