@@ -11,6 +11,7 @@ import {
   getUser,
 } from "utils/permissionUtils";
 import StepModal, { CustomStep, FormRow } from "components/StepModal";
+import { useCompanyBranchSelect } from "hooks/useCompanyBranchSelect";
 interface AddTrainerFormProps {
   visible: boolean;
   onClose: () => void;
@@ -26,55 +27,20 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
   loading,
   form,
 }) => {
-  const [companies, setCompanies] = useState([]);
-  const [branches, setBranches] = useState([]);
-  const [companySearchLoading, setCompanySearchLoading] = useState(false);
-  const [branchLoading, setBranchLoading] = useState(false);
   const [jobs, setJobs] = useState<any[]>([]);
   const [isAddingJob, setIsAddingJob] = useState(false);
   const [newJobName, setNewJobName] = useState("");
   const [newJobDesc, setNewJobDesc] = useState("");
   const [jobLoading, setJobLoading] = useState(false);
 
-  useEffect(() => {
-    if (hasRole(["ADMIN"])) {
-      handleCompanySearch("All");
-    } else if (hasRole(["COMPANY_ADMIN"])) {
-      fetchBranches(getCompanyId());
-    }
-    fetchJobs();
-  }, []);
-
-  const fetchBranches = async (companyId: string) => {
-    if (!companyId) return;
-    setBranchLoading(true);
-    try {
-      const res = await branchService.search({ companyId });
-      setBranches(res.data);
-    } catch (error) {
-      console.error("Error fetching branches:", error);
-    } finally {
-      setBranchLoading(false);
-    }
-  };
-
-  const handleCompanySearch = async (value: string) => {
-    let companyName;
-    if (value === "All") {
-      companyName = null;
-    } else {
-      companyName = value;
-    }
-    setCompanySearchLoading(true);
-    try {
-      const res = await companyService.search({ companyName });
-      setCompanies(res.data);
-    } catch (error) {
-      console.error("Error fetching companies:", error);
-    } finally {
-      setCompanySearchLoading(false);
-    }
-  };
+  const {
+    companies,
+    branches,
+    companySearchLoading,
+    branchLoading,
+    searchCompanies,
+    fetchBranches,
+  } = useCompanyBranchSelect();
 
   const fetchJobs = async () => {
     setJobLoading(true);
@@ -260,8 +226,11 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
                 showSearch
                 placeholder="Search and select company"
                 filterOption={false}
-                onSearch={handleCompanySearch}
-                onSelect={(value) => fetchBranches(value)}
+                onSearch={searchCompanies}
+                onSelect={(value) => {
+                  fetchBranches(value);
+                  form.setFieldsValue({ branchId: undefined });
+                }}
                 loading={companySearchLoading}
                 defaultValue={
                   hasRole(["COMPANY_ADMIN", "BRANCH_ADMIN"])

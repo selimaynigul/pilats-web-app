@@ -192,13 +192,15 @@ const StepModal: React.FC<StepModalProps> = ({
             <Title>{title}</Title>
           </Col>
           <Col xs={24} md={16}>
-            <StepBarWrapper>
-              <Steps size="small" current={currentStep}>
-                {steps.map((s, i) => (
-                  <Steps.Step key={i} title={s.label} />
-                ))}
-              </Steps>
-            </StepBarWrapper>
+            {steps.length > 1 && (
+              <StepBarWrapper>
+                <Steps size="small" current={currentStep}>
+                  {steps.map((s, i) => (
+                    <Steps.Step key={i} title={s.label} />
+                  ))}
+                </Steps>
+              </StepBarWrapper>
+            )}
           </Col>
         </Row>
 

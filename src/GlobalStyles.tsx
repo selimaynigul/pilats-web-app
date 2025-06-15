@@ -24,14 +24,16 @@ a {
   background-color: ${({ theme }) => theme.bodyBg};
   }
   
-  .ant-input-filled, .ant-picker-filled, .ant-select-filled {
+  .ant-input-filled, .ant-picker-filled, .ant-select-filled, .ant-input-number-input{
     height: 40px;
-    border-radius: 8px;}
+    border-radius: 8px;
+  }
     
     .ant-modal-content {
       border-radius: 20px !important;
       background-color: ${({ theme }) => theme.bodyBg} !important;
   }
+
 
   .ant-modal-wrap {
   backdrop-filter: blur(2px);

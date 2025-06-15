@@ -64,6 +64,7 @@ const PackagesToolbar: React.FC<{
   const [isModalVisible, setIsModalVisible] = React.useState(false);
   const { t } = useLanguage();
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
 
   const handleAddPackage = (values: any) => {
     const payload = {
@@ -77,9 +78,8 @@ const PackagesToolbar: React.FC<{
       companyId: hasRole(["ADMIN"])
         ? parseInt(values.companyId, 10)
         : getCompanyId(),
-      isBranchSpecific: hasRole(["BRANCH_ADMIN"])
-        ? true
-        : values.isBranchSpecific,
+      isBranchSpecific:
+        hasRole(["BRANCH_ADMIN"]) || values.branchId ? true : false,
       branchId: hasRole(["BRANCH_ADMIN"])
         ? getBranchId()
         : values.branchId
@@ -87,6 +87,7 @@ const PackagesToolbar: React.FC<{
           : null,
     };
 
+    setLoading(true);
     companyPackageService
       .add(payload)
       .then(() => {
@@ -97,6 +98,9 @@ const PackagesToolbar: React.FC<{
       .catch((err) => {
         console.error("Error adding package:", err);
         handleError(err);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -117,6 +121,7 @@ const PackagesToolbar: React.FC<{
       <AddPackageForm
         form={form}
         visible={isModalVisible}
+        loading={loading}
         onClose={() => {
           setIsModalVisible(false);
         }}
