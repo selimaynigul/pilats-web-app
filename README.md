@@ -1,33 +1,33 @@
 # 🏋️‍♀️ PILATS – Your Gym Body
 
-PILATS, spor salonları için geliştirilen modern ve kapsamlı bir yönetim sistemidir. Web ve mobil platformlar üzerinden çalışan bu sistem, yöneticilerin, eğitmenlerin ve müşterilerin tüm süreçlerini tek bir çatı altında verimli bir şekilde yürütmesini sağlar.
+PILATS is a modern and comprehensive gym management system designed to streamline the daily operations of gyms. It offers an all-in-one solution accessible via web and mobile platforms for administrators, trainers, and customers to efficiently manage users, schedules, sessions, and health data.
 
-## 🚀 Özellikler
+## 🚀 Features
 
-- 🌐 **Web Paneli:** Admin, şirket yöneticisi ve şube yöneticileri için kullanıcı, eğitmen, müşteri, paket ve ders yönetimi.
-- 📱 **Mobil Uygulama (Flutter):** Eğitmen ve müşteriler için ders görüntüleme, rezervasyon, sağlık verileri takibi ve QR ile giriş sistemi.
-- 🔐 **Rol Tabanlı Erişim:** Her kullanıcının yalnızca kendi yetkileri dahilinde işlem yapabildiği güvenli mimari.
-- 📦 **Paket Sistemi:** Şube ya da şirket seviyesinde müşteri bazlı özel paketler tanımlama ve yönetme.
-- 🗓️ **Takvim & Planlama:** Eğitmenlerin derslerini planlaması ve müşterilerin kolayca katılım sağlaması için sürükle-bırak takvim sistemi.
-- 📊 **Raporlama:** Kullanıcı aktiviteleri, sağlık verileri ve paket kullanımı gibi birçok metrik üzerinde grafik destekli analiz.
+- 🌐 **Web Panel:** For Admins, Company Admins, and Branch Admins to manage users, trainers, customers, packages, and sessions.
+- 📱 **Mobile App (Flutter):** Enables trainers and customers to view sessions, make reservations, track health metrics, and use QR codes for check-ins.
+- 🔐 **Role-Based Access:** Ensures secure and limited access based on user roles.
+- 📦 **Package Management:** Define and assign personalized membership packages on a company or branch level.
+- 🗓️ **Calendar & Scheduling:** Drag-and-drop calendar interface for trainers to plan sessions and for customers to book them easily.
+- 📊 **Reporting:** Visual insights on user activity, health data, and package usage through integrated analytics dashboards.
 
 ---
 
 ## 🎥 Demo GIFs
 
-Aşağıda uygulamaya ait çeşitli arayüzlerin ve özelliklerin tanıtım GIF'lerini bulabilirsiniz.
+Here are several demo GIFs showcasing the core features and interface of the application:
 
-### 📅 Takvim Üzerinde Sürükle-Bırak ile Ders Ekleme
+### 📅 Calendar Drag & Drop – Add Session
 
 ![Calendar Drag & Drop](./assets/scheduler.gif)
 
-### 🧑‍🏫 Eğitmen Ekleme – Form Süreci
+### 🧑‍🏫 Add Trainer – Form Flow
 
 ![Add Trainer Form](./assets/form.gif)
 
-### 📊 Müşteri Paneli – Sağlık Verileri ve Paket Bilgisi
+### 📊 Customer Dashboard – Health Metrics & Package Info
 
-![Customer Analytics](./assets/customer.gif)
+![Customer Analytics](./assets/user.gif)
 
 ### 🌓 Dark Theme & Search Bar
 
@@ -35,4 +35,10 @@ Aşağıda uygulamaya ait çeşitli arayüzlerin ve özelliklerin tanıtım GIF'
 
 ---
 
-📌 **Not:** GIF dosyalarının `./assets/` dizininde yer aldığından emin olun. Eğer başka bir konumdaysa, yol bilgisini güncellemeniz yeterlidir.
+## 🔗 Full Video Demo
+
+Watch the full demonstration of the PILATS system on YouTube:
+
+📺 [Click here to watch](https://www.youtube.com/watch?v=xDgxAK2ydxs)
+
+---
