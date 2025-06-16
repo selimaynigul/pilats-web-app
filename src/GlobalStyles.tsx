@@ -28,6 +28,11 @@ a {
     height: 40px;
     border-radius: 8px;
   }
+
+  .country-code.ant-select-single .ant-select-selector  {
+    border-radius: 8px 0 0 8px;
+    
+  }
     
     .ant-modal-content {
       border-radius: 20px !important;

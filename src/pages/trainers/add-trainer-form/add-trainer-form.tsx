@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Form, Input, DatePicker, Select, Button, Modal, message } from "antd";
 import { addTrainerFormItems } from "./add-trainer-form-items";
 import { companyService, branchService, jobService } from "services";
@@ -12,6 +12,7 @@ import {
 } from "utils/permissionUtils";
 import StepModal, { CustomStep, FormRow } from "components/StepModal";
 import { useCompanyBranchSelect } from "hooks/useCompanyBranchSelect";
+import JobForm from "components/JobForm";
 interface AddTrainerFormProps {
   visible: boolean;
   onClose: () => void;
@@ -19,6 +20,14 @@ interface AddTrainerFormProps {
   loading: boolean;
   form: any;
 }
+
+const countryCodes = [
+  { code: "+90", country: "TR" },
+  { code: "+1", country: "USA" },
+  { code: "+44", country: "UK" },
+  { code: "+49", country: "GR" },
+  { code: "+33", country: "FR" },
+];
 
 const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
   visible,
@@ -28,10 +37,14 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
   form,
 }) => {
   const [jobs, setJobs] = useState<any[]>([]);
-  const [isAddingJob, setIsAddingJob] = useState(false);
-  const [newJobName, setNewJobName] = useState("");
-  const [newJobDesc, setNewJobDesc] = useState("");
   const [jobLoading, setJobLoading] = useState(false);
+  const [isAddingJob, setIsAddingJob] = useState(false);
+
+  useEffect(() => {
+    if (visible) {
+      fetchJobs();
+    }
+  }, [visible]);
 
   const {
     companies,
@@ -42,7 +55,7 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
     fetchBranches,
   } = useCompanyBranchSelect();
 
-  const fetchJobs = async () => {
+  const fetchJobs = useCallback(async () => {
     setJobLoading(true);
     try {
       const response = await jobService.getAll();
@@ -52,31 +65,17 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
     } finally {
       setJobLoading(false);
     }
-  };
-
-  const handleAddNewJob = async () => {
-    try {
-      if (!newJobName) return message.error("Please enter a job name");
-      if (!newJobDesc) return message.error("Please enter a job description");
-      await jobService.add({
-        jobName: newJobName,
-        jobDesc: newJobDesc,
-      });
-      message.success("Job added successfully");
-      setIsAddingJob(false);
-      setNewJobName("");
-      setNewJobDesc("");
-      fetchJobs();
-    } catch (error) {
-      message.error("Failed to add job");
-    }
-  };
+  }, []);
 
   const handleSubmit = () => {
     form
       .validateFields()
       .then((values: any) => {
         let modifiedValues = values;
+
+        const fullPhoneNumber = `${values.countryCode}${values.phoneNumber}`;
+        modifiedValues.phoneNumber = fullPhoneNumber;
+        delete modifiedValues.countryCode;
 
         if (hasRole(["BRANCH_ADMIN"])) {
           const branchId = getBranchId();
@@ -98,71 +97,44 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
           title: "Personal Info",
           description: "Provide trainer's personal info",
           fields: [
-            <Form.Item
-              name="jobId"
-              rules={[
-                { required: false, message: "Please select or add a job" },
-              ]}
-            >
-              {isAddingJob ? (
-                <Input.Group compact>
-                  <Input
-                    style={{ width: "calc(100% - 90px)" }}
-                    value={newJobName}
-                    onChange={(e) => setNewJobName(e.target.value)}
-                    placeholder="Enter new job name"
-                  />
-                  <Input
-                    style={{
-                      width: "calc(100% - 90px)",
-                      marginTop: "7px",
-                      marginBottom: "7px",
-                    }}
-                    value={newJobDesc}
-                    onChange={(e) => setNewJobDesc(e.target.value)}
-                    placeholder="Enter new job description"
-                  />
-                  <br />
-                  <Button
-                    type="primary"
-                    onClick={handleAddNewJob}
-                    loading={jobLoading}
-                  >
-                    Add
-                  </Button>
-                  <Button
-                    onClick={() => setIsAddingJob(false)}
-                    style={{ marginLeft: "8px" }}
-                  >
-                    Cancel
-                  </Button>
-                </Input.Group>
-              ) : (
-                <Select
-                  loading={jobLoading}
-                  placeholder="Select job"
-                  dropdownRender={(menu) => (
-                    <>
-                      {menu}
-                      <Divider style={{ margin: "8px 0" }} />
-                      <Button
-                        type="text"
-                        icon={<PlusOutlined />}
-                        onClick={() => setIsAddingJob(true)}
-                        style={{ paddingLeft: 8 }}
-                      >
-                        Add new job
-                      </Button>
-                    </>
-                  )}
-                >
-                  {jobs.map((job) => (
-                    <Select.Option key={job.id} value={job.id}>
-                      {job.jobName}
-                    </Select.Option>
-                  ))}
-                </Select>
-              )}
+            <Form.Item name="jobId">
+              <Select
+                loading={jobLoading}
+                placeholder="Select job"
+                dropdownRender={(menu) => (
+                  <>
+                    {menu}
+                    <Divider style={{ margin: "8px 0" }} />
+                    {isAddingJob ? (
+                      <JobForm
+                        loading={jobLoading}
+                        onCancel={() => setIsAddingJob(false)}
+                        onAdded={() => {
+                          setIsAddingJob(false);
+                          fetchJobs();
+                        }}
+                      />
+                    ) : (
+                      <div style={{ padding: "0px 4px 2px 4px" }}>
+                        <Button
+                          type="text"
+                          icon={<PlusOutlined />}
+                          onClick={() => setIsAddingJob(true)}
+                          block
+                        >
+                          Add new job
+                        </Button>
+                      </div>
+                    )}
+                  </>
+                )}
+              >
+                {jobs.map((job) => (
+                  <Select.Option key={job.id} value={job.id}>
+                    {job.jobName}
+                  </Select.Option>
+                ))}
+              </Select>
             </Form.Item>,
             <FormRow>
               <Form.Item {...addTrainerFormItems.name} name="name">
@@ -191,13 +163,32 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
           fields: [
             <FormRow>
               <Form.Item {...addTrainerFormItems.email} name="email">
-                <Input placeholder="Email *" />
+                <Input type="email" placeholder="Email *" />
               </Form.Item>
-              <Form.Item
-                {...addTrainerFormItems.phoneNumber}
-                name="phoneNumber"
-              >
-                <Input placeholder="Phone No *" />
+              <Form.Item>
+                <Input.Group compact style={{ display: "flex" }}>
+                  <Form.Item name="countryCode" initialValue="+90" noStyle>
+                    <Select className="country-code">
+                      {countryCodes.map(({ code, country }) => (
+                        <Select.Option key={code} value={code}>
+                          {code}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+
+                  <Form.Item
+                    {...addTrainerFormItems.phoneNumber}
+                    name="phoneNumber"
+                  >
+                    <Input
+                      type="tel"
+                      style={{ borderRadius: "0px 8px 8px 0" }}
+                      maxLength={10}
+                      placeholder="Phone No *"
+                    />
+                  </Form.Item>
+                </Input.Group>
               </Form.Item>
             </FormRow>,
             <Form.Item
