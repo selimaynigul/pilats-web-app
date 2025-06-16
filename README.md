@@ -21,17 +21,17 @@ Aşağıda uygulamaya ait çeşitli arayüzlerin ve özelliklerin tanıtım GIF'
 
 ![Calendar Drag & Drop](./assets/scheduler.gif)
 
-### 🌓 Dark Theme & Search Bar
-
-![Dark Theme and Search Bar](./assets/searchbar.gif)
-
 ### 🧑‍🏫 Eğitmen Ekleme – Form Süreci
 
 ![Add Trainer Form](./assets/form.gif)
 
 ### 📊 Müşteri Paneli – Sağlık Verileri ve Paket Bilgisi
 
-![Customer Analytics](./assets/custome.gif)
+![Customer Analytics](./assets/customer.gif)
+
+### 🌓 Dark Theme & Search Bar
+
+![Dark Theme and Search Bar](./assets/search.gif)
 
 ---
 
