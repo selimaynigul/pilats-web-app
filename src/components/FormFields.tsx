@@ -234,7 +234,7 @@ export const JobSelect: React.FC<JobSelectWithAddProps> = ({
                 }}
               />
             ) : (
-              <div style={{ padding: "0 8px" }}>
+              <div style={{ padding: "0 8px", paddingBottom: "4px" }}>
                 <Button
                   type="text"
                   icon={<PlusOutlined />}

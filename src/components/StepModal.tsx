@@ -62,7 +62,7 @@ const MiniDescription = styled.small`
 
 const StepBarWrapper = styled.div`
   margin: 8px auto 0;
-  width: 60%;
+  max-width: 70%;
 
   .ant-steps .ant-steps-item-process .ant-steps-item-icon {
     background: ${({ theme }) => theme.primary};

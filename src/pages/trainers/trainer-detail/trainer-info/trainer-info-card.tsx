@@ -1,18 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
-import {
-  Avatar,
-  Spin,
-  Modal,
-  Form,
-  Input,
-  Select,
-  DatePicker,
-  Button,
-  message,
-  Checkbox,
-} from "antd";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Avatar, Spin, Modal, Button, message } from "antd";
+import { Link, useNavigate } from "react-router-dom";
 import { BsBuilding, BsEnvelopeFill, BsWhatsapp } from "react-icons/bs";
 import {
   ArrowRightOutlined,
@@ -21,26 +10,11 @@ import {
   PhoneFilled,
   UserOutlined,
   UploadOutlined,
-  PhoneOutlined,
 } from "@ant-design/icons";
-import { imageService, jobService, trainerService } from "services";
+import { imageService, trainerService } from "services";
 import moment from "moment";
-import { PlusOutlined } from "@ant-design/icons";
-import { Divider } from "antd";
 import { capitalize } from "utils/permissionUtils";
-import dayjs, { Dayjs } from "dayjs";
-
-const safeFormat = (d?: Dayjs | null) =>
-  d && dayjs.isDayjs(d) && d.isValid() ? d.format("YYYY-MM-DD") : null;
-
-const countryCodes = [
-  { code: "+90", country: "TR" },
-  { code: "+1", country: "USA" },
-  { code: "+44", country: "UK" },
-  { code: "+49", country: "GR" },
-  { code: "+33", country: "FR" },
-  // if need add more no necc mens1s
-];
+import EditTrainerForm from "../edit-trainer-form/edit-trainer-form";
 
 const UploadOverlay = styled.div`
   position: absolute;
@@ -292,134 +266,28 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
   loading,
 }) => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [isActive, setIsActive] = useState(!trainer?.passive); // ✅ tek kaynak
-  const [form] = Form.useForm();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [jobs, setJobs] = useState<any[]>([]);
-  const [isAddingJob, setIsAddingJob] = useState(false);
-  const [newJobName, setNewJobName] = useState("");
-  const [newJobDesc, setNewJobDesc] = useState("");
-  const [jobLoading, setJobLoading] = useState(false);
+  const [editLoading, setEditLoading] = useState(false);
 
-  useEffect(() => {
-    if (isEditModalVisible) {
-      fetchJobs();
-    }
-  }, [isEditModalVisible]);
-
-  const fetchJobs = async () => {
-    setJobLoading(true);
-    try {
-      const response = await jobService.getAll(); // Implement this API call
-      setJobs(response.data);
-    } catch (error) {
-      message.error("Failed to fetch jobs");
-    } finally {
-      setJobLoading(false);
-    }
-  };
-
-  // ----------  trainer değiştiğinde ----------
-  useEffect(() => {
-    if (!trainer) return;
-    setIsActive(!trainer.passive); // ✅ doğru yön
-    // telefon vs. aynı kaldı
-    form.setFieldsValue({
-      ...trainer.ucGetResponse,
-      birthdate: dayjs(trainer.ucGetResponse.birthdate),
-      isActive: !trainer.passive, // ✅ form alanı
-      endDate: trainer.passive ? dayjs(trainer.passiveEndDate) : null,
-      jobId: trainer.jobName,
-      location: trainer.location,
-    });
-  }, [trainer]);
-
-  const handleAddNewJob = async () => {
-    try {
-      if (!newJobName) return message.error("Please enter a job name");
-      if (!newJobDesc) return message.error("Please enter a job name");
-      await jobService.add({
-        jobName: newJobName,
-        jobDesc: "Designs, develops, tests and deploys software products.",
-      });
-      message.success("Job added successfully");
-      setIsAddingJob(false);
-      setNewJobName("");
-      setNewJobDesc("");
-      fetchJobs(); // Refresh jobs list
-    } catch (error) {
-      message.error("Failed to add job");
-    }
-  };
-
-  // ----------  edit butonuna basıldığında ----------
   const handleEdit = () => {
-    form.setFieldsValue({
-      ...trainer.ucGetResponse,
-      birthdate: dayjs(trainer.ucGetResponse.birthdate),
-      isActive: !trainer.passive, // ✅
-      endDate: trainer.passive ? dayjs(trainer.passiveEndDate) : null,
-      jobId: trainer.jobName,
-      location: trainer.location,
-    });
     setIsEditModalVisible(true);
   };
 
-  const handleEditSubmit = (values: any) => {
-    const formattedPhone = `${values.countryCode}${values.phoneNumber}`;
-
-    const payload = {
-      id: trainer.id,
-      passive: !values.isActive, // ✅ tek satır
-      passiveEndDate: values.isActive ? null : safeFormat(values.endDate),
-      ucUpdateRequest: {
-        name: values.name,
-        surname: values.surname,
-        birthdate: safeFormat(values.birthdate),
-        telNo1: formattedPhone,
-      },
-      jobId: jobs.find((j) => j.jobName === values.jobId)?.id,
-      gender: values.gender?.toUpperCase() ?? null,
-      location: values.location,
-    };
-
-    trainerService
-      .update(payload)
-      .then(() => {
-        message.success("Trainer updated successfully");
-        setIsEditModalVisible(false);
-        window.location.reload();
-      })
-      .catch((error) => {
-        console.error("Error updating trainer:", error);
-        message.error("Failed to update trainer. " + error);
-      });
-  };
-
-  useEffect(() => {
-    setIsActive((prev: any) => !prev);
-    if (trainer) {
-      var phoneNumber = trainer.ucGetResponse.telNo1 || "";
-      // Extract country code and number from phone number
-      for (const code of countryCodes) {
-        if (phoneNumber.startsWith(code.code)) {
-          phoneNumber = phoneNumber.replace(code.code, "");
-          form.setFieldsValue({ countryCode: code.code });
-          form.setFieldsValue({ phoneNumber: phoneNumber });
-          break;
-        }
-      }
-      form.setFieldsValue({
-        ...trainer.ucGetResponse,
-        birthdate: moment(trainer.ucGetResponse.birthdate),
-        active: trainer.active,
-        endDate: trainer.passiveEndDate,
-        jobId: trainer.jobName,
-        location: trainer.location,
-      });
+  const handleEditSubmit = async (payload: any) => {
+    setEditLoading(true);
+    try {
+      await trainerService.update(payload);
+      message.success("Trainer updated successfully");
+      setIsEditModalVisible(false);
+      window.location.reload();
+    } catch (error) {
+      console.error("Error updating trainer:", error);
+      message.error("Failed to update trainer.");
+    } finally {
+      setEditLoading(false);
     }
-  }, [trainer, form]);
+  };
 
   const handleDelete = () => {
     Modal.confirm({
@@ -443,29 +311,6 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
     });
   };
 
-  const handleCheckboxChange = (e: any) => {
-    setIsActive(e.target.checked); // Update active status
-    if (e.target.checked) {
-      form.setFieldsValue({ endDate: null }); // Reset end date if active
-    }
-  };
-
-  if (loading) {
-    return (
-      <Container>
-        <Spin size="large" style={{ margin: "auto" }} />
-      </Container>
-    );
-  }
-
-  if (!trainer) {
-    return (
-      <Container>
-        <p style={{ textAlign: "center" }}>Trainer not found</p>
-      </Container>
-    );
-  }
-
   /*  const whatsappLink = `https://wa.me/${trainer.phone.replace(/\s+/g, "")}`;
 
  */
@@ -473,7 +318,7 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
   const whatsappLink = "https://wa.me/+905077845678";
 
   const handleAvatarClick = () => {
-    fileInputRef.current?.click(); // File input'u tıklanmış gibi tetikle
+    fileInputRef.current?.click();
   };
 
   const handleFileChange = async (
@@ -494,6 +339,23 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
     await imageService.postTrainerImage(formData);
     window.location.reload();
   };
+
+  if (loading) {
+    return (
+      <Container>
+        <Spin size="large" style={{ margin: "auto" }} />
+      </Container>
+    );
+  }
+
+  if (!trainer) {
+    return (
+      <Container>
+        <p style={{ textAlign: "center" }}>Trainer not found</p>
+      </Container>
+    );
+  }
+
   return (
     <>
       <Container>
@@ -592,164 +454,13 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
           </a>
         </ContactInfo>
 
-        <Modal
-          title="Edit Trainer"
-          open={isEditModalVisible}
-          onCancel={() => setIsEditModalVisible(false)}
-          onOk={() => {
-            form.validateFields().then(handleEditSubmit).catch(console.error);
-          }}
-        >
-          <Form form={form} layout="vertical" variant="filled">
-            <Form.Item
-              name="name"
-              label="Name"
-              rules={[{ required: true, message: "Please enter the name" }]}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item
-              name="surname"
-              label="Surname"
-              rules={[{ required: true, message: "Please enter the surname" }]}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item
-              name="birthdate"
-              label="Birthdate"
-              rules={[
-                { required: true, message: "Please select the birthdate" },
-              ]}
-            >
-              <DatePicker style={{ width: "100%" }} />
-            </Form.Item>
-            <Form.Item label="Phone Number" required>
-              <Input.Group compact>
-                <Form.Item name="countryCode" noStyle initialValue="+90">
-                  <Select style={{ width: "30%" }}>
-                    {countryCodes.map(({ code, country }) => (
-                      <Select.Option key={code} value={code}>
-                        {`${code} ${country}`}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-                <Form.Item
-                  name="phoneNumber"
-                  noStyle
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please input your phone number!",
-                    },
-                  ]}
-                >
-                  <Input
-                    style={{ width: "70%" }}
-                    prefix={<PhoneOutlined />}
-                    maxLength={10}
-                    onChange={(e) => {
-                      const value = e.target.value.replace(/\D/g, "");
-                      form.setFieldsValue({ phoneNumber: value });
-                    }}
-                  />
-                </Form.Item>
-              </Input.Group>
-            </Form.Item>
-            <Form.Item
-              name="jobId"
-              label="Job"
-              rules={[
-                { required: false, message: "Please select or add a job" },
-              ]}
-            >
-              {isAddingJob ? (
-                <Input.Group compact>
-                  <Input
-                    style={{ width: "calc(100% - 90px)" }}
-                    value={newJobName}
-                    onChange={(e) => setNewJobName(e.target.value)}
-                    placeholder="Enter new job name"
-                  />
-
-                  <Input
-                    style={{
-                      width: "calc(100% - 90px)",
-                      marginTop: "7px",
-                      marginBottom: "7px",
-                    }}
-                    value={newJobDesc}
-                    onChange={(e) => setNewJobDesc(e.target.value)}
-                    placeholder="Enter new job description"
-                  />
-                  <br />
-                  <Button
-                    type="primary"
-                    onClick={handleAddNewJob}
-                    loading={jobLoading}
-                  >
-                    Add
-                  </Button>
-                  <Button
-                    onClick={() => setIsAddingJob(false)}
-                    style={{ marginLeft: "8px" }}
-                  >
-                    Cancel
-                  </Button>
-                </Input.Group>
-              ) : (
-                <Select
-                  loading={jobLoading}
-                  placeholder="Select job"
-                  dropdownRender={(menu) => (
-                    <>
-                      {menu}
-                      <Divider style={{ margin: "8px 0" }} />
-                      <Button
-                        type="text"
-                        icon={<PlusOutlined />}
-                        onClick={() => setIsAddingJob(true)}
-                        style={{ paddingLeft: 8 }}
-                      >
-                        Add new job
-                      </Button>
-                    </>
-                  )}
-                >
-                  {jobs.map((job) => (
-                    <Select.Option key={job.id} value={job.jobName}>
-                      {job.jobName}
-                    </Select.Option>
-                  ))}
-                </Select>
-              )}
-            </Form.Item>
-            <Form.Item name="gender" label="Gender">
-              <Select placeholder="Select gender" allowClear>
-                <Select.Option value="MALE">Male</Select.Option>
-                <Select.Option value="FEMALE">Female</Select.Option>
-              </Select>
-            </Form.Item>
-            <Form.Item name="location" label="Location">
-              <Input placeholder="Enter location" />
-            </Form.Item>
-            <Form.Item
-              name="isActive"
-              label="Is Active"
-              valuePropName="checked"
-            >
-              <Checkbox onChange={(e) => setIsActive(e.target.checked)}>
-                Is Active
-              </Checkbox>
-            </Form.Item>
-            {!isActive && (
-              <Form.Item name="endDate" label="End Date">
-                <DatePicker style={{ width: "100%" }} />
-              </Form.Item>
-            )}
-          </Form>
-        </Modal>
+        <EditTrainerForm
+          visible={isEditModalVisible}
+          onClose={() => setIsEditModalVisible(false)}
+          onSubmit={handleEditSubmit}
+          initialValues={trainer}
+          loading={editLoading}
+        />
       </Container>
     </>
   );
