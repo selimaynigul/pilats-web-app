@@ -256,7 +256,7 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
         </Dropdown>
       ) : (
         <CompanyDropdownButton ref={buttonRef} onClick={handleButtonClick}>
-          {selectedItem.companyName === "Loading" ? (
+          {selectedItem?.companyName === "Loading" ? (
             <Spin size="small" />
           ) : (
             `${selectedItem?.companyName || selectedCompany?.companyName || (hasRole(["ADMIN"]) ? t.selectCompany : t.selectBranch)} ${

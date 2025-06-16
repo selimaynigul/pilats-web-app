@@ -1,258 +1,136 @@
-import React, { useState, useEffect } from "react";
-import { Form, Input, DatePicker, Select, Button, Modal, message } from "antd";
-import { addTrainerFormItems } from "./add-user-form-items";
-import { companyService, branchService, jobService } from "services";
-import { PlusOutlined } from "@ant-design/icons";
-import { Divider } from "antd";
-import { hasRole, getCompanyId, getBranchId } from "utils/permissionUtils";
+import React from "react";
+import { Form } from "antd";
+import StepModal, { CustomStep, FormRow } from "components/StepModal";
+import { useCompanyBranchSelect } from "hooks/useCompanyBranchSelect";
+import {
+  NameInput,
+  SurnameInput,
+  GenderSelect,
+  BirthdatePicker,
+  EmailInput,
+  PhoneInput,
+  LocationInput,
+  CompanySelect,
+  BranchSelect,
+  JobSelect,
+} from "components/FormFields";
+import { hasRole, getBranchId } from "utils/permissionUtils";
 
 interface AddUserFormProps {
   visible: boolean;
   onClose: () => void;
   onSubmit: (values: any) => void;
+  loading: boolean;
+  form: any;
 }
 
 const AddUserForm: React.FC<AddUserFormProps> = ({
   visible,
   onClose,
   onSubmit,
+  loading,
+  form,
 }) => {
-  const [form] = Form.useForm();
-  const [companies, setCompanies] = useState([]);
-  const [branches, setBranches] = useState([]);
-  const [companySearchLoading, setCompanySearchLoading] = useState(false);
-  const [branchLoading, setBranchLoading] = useState(false);
-  const [jobs, setJobs] = useState<any[]>([]);
-  const [isAddingJob, setIsAddingJob] = useState(false);
-  const [newJobName, setNewJobName] = useState("");
-  const [newJobDesc, setNewJobDesc] = useState("");
-  const [jobLoading, setJobLoading] = useState(false);
-
-  useEffect(() => {
-    if (hasRole(["ADMIN"])) {
-      handleCompanySearch("All");
-    } else if (hasRole(["COMPANY_ADMIN"])) {
-      fetchBranches(getCompanyId());
-    } else if (hasRole(["BRANCH_ADMIN"])) {
-      form.setFieldsValue({ branch: getBranchId() });
-    }
-    fetchJobs();
-  }, []);
-
-  const fetchBranches = async (companyId: string) => {
-    if (!companyId) return;
-    setBranchLoading(true);
-    try {
-      const res = await branchService.search({ companyId });
-      setBranches(res.data);
-    } catch (error) {
-      console.error("Error fetching branches:", error);
-    } finally {
-      setBranchLoading(false);
-    }
-  };
-
-  const handleCompanySearch = async (value: string) => {
-    if (!value) return;
-    let companyName = value === "All" ? null : value;
-    setCompanySearchLoading(true);
-    try {
-      const res = await companyService.search({ companyName });
-      setCompanies(res.data);
-    } catch (error) {
-      console.error("Error fetching companies:", error);
-    } finally {
-      setCompanySearchLoading(false);
-    }
-  };
-
-  const fetchJobs = async () => {
-    setJobLoading(true);
-    try {
-      const response = await jobService.getAll();
-      setJobs(response.data);
-    } catch (error) {
-      message.error("Failed to fetch jobs");
-    } finally {
-      setJobLoading(false);
-    }
-  };
-
-  const handleAddNewJob = async () => {
-    try {
-      if (!newJobName) return message.error("Please enter a job name");
-      if (!newJobDesc) return message.error("Please enter a job description");
-      await jobService.add({
-        jobName: newJobName,
-        jobDesc: newJobDesc,
-      });
-      message.success("Job added successfully");
-      setIsAddingJob(false);
-      setNewJobName("");
-      setNewJobDesc("");
-      fetchJobs();
-    } catch (error) {
-      message.error("Failed to add job");
-    }
-  };
+  const {
+    companies,
+    branches,
+    companySearchLoading,
+    branchLoading,
+    searchCompanies,
+    fetchBranches,
+  } = useCompanyBranchSelect();
 
   const handleSubmit = () => {
     form
       .validateFields()
-      .then((values) => {
-        onSubmit(values);
-        form.resetFields();
+      .then((values: any) => {
+        let modifiedValues = values;
+
+        const fullPhoneNumber = `${values.countryCode}${values.phoneNumber}`;
+        modifiedValues.phoneNumber = fullPhoneNumber;
+        delete modifiedValues.countryCode;
+
+        if (hasRole(["BRANCH_ADMIN"])) {
+          const branchId = getBranchId();
+          modifiedValues = { ...modifiedValues, branch: branchId };
+        }
+
+        onSubmit(modifiedValues);
       })
-      .catch((info) => {
+      .catch((info: any) => {
         console.error("Validation Failed:", info);
       });
   };
 
-  return (
-    <Modal title="Add User" open={visible} onCancel={onClose} footer={null}>
-      <Form
-        variant="filled"
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-      >
-        <Form.Item {...addTrainerFormItems.name} name="name">
-          <Input placeholder="Enter user's name" />
-        </Form.Item>
-        <Form.Item {...addTrainerFormItems.surname} name="surname">
-          <Input placeholder="Enter user's surname" />
-        </Form.Item>
-        {!hasRole(["COMPANY_ADMIN", "BRANCH_ADMIN"]) && (
-          <Form.Item {...addTrainerFormItems.company} name="company">
-            <Select
-              showSearch
-              placeholder="Search and select company"
-              filterOption={false}
-              onSearch={handleCompanySearch}
-              onSelect={(value) => fetchBranches(value)}
-              loading={companySearchLoading}
-            >
-              {companies.map((company: any) => (
-                <Select.Option key={company.id} value={company.id}>
-                  {company.companyName}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-        )}
-        {!hasRole(["BRANCH_ADMIN"]) && (
-          <Form.Item {...addTrainerFormItems.branch} name="branch">
-            <Select
-              placeholder="Select branch"
-              loading={branchLoading}
-              disabled={!branches.length}
-            >
-              {branches.map((branch: any) => (
-                <Select.Option key={branch.id} value={branch.id}>
-                  {branch.branchName}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-        )}
-        <Form.Item {...addTrainerFormItems.birthdate} name="birthdate">
-          <DatePicker style={{ width: "100%" }} />
-        </Form.Item>
-        <Form.Item {...addTrainerFormItems.gender} name="gender">
-          <Select placeholder="Select gender">
-            <Select.Option value="male">MALE</Select.Option>
-            <Select.Option value="female">FEMALE</Select.Option>
-          </Select>
-        </Form.Item>
-        <Form.Item {...addTrainerFormItems.email} name="email">
-          <Input placeholder="Enter email address" />
-        </Form.Item>
-        <Form.Item {...addTrainerFormItems.phoneNumber} name="phoneNumber">
-          <Input placeholder="Enter phone number" />
-        </Form.Item>
-        <Form.Item
-          name="jobId"
-          label="Job"
-          rules={[{ required: false, message: "Please select or add a job" }]}
-        >
-          {isAddingJob ? (
-            <Input.Group compact>
-              <Input
-                style={{ width: "calc(100% - 90px)" }}
-                value={newJobName}
-                onChange={(e) => setNewJobName(e.target.value)}
-                placeholder="Enter new job name"
-              />
-              <Input
-                style={{
-                  width: "calc(100% - 90px)",
-                  marginTop: "7px",
-                  marginBottom: "7px",
+  const formSteps: CustomStep[] = [
+    {
+      label: "About user",
+      buttonText: "Save & Continue",
+      blocks: [
+        {
+          title: "Personal Info",
+          description: "Provide user's personal info",
+          fields: [
+            <JobSelect />,
+            <FormRow>
+              <NameInput />
+              <SurnameInput />
+            </FormRow>,
+            <FormRow>
+              <GenderSelect />
+              <BirthdatePicker />
+            </FormRow>,
+          ],
+        },
+        {
+          title: "Contact Info",
+          description: "Provide user's contact info",
+          fields: [
+            <FormRow>
+              <EmailInput />
+              <PhoneInput />
+            </FormRow>,
+            <LocationInput />,
+          ],
+        },
+      ],
+    },
+    {
+      label: "Company info",
+      buttonText: "Add User",
+      blocks: [
+        {
+          title: "Company Info",
+          description: "Provide user's company/branch info",
+          fields: [
+            <Form.Item name="company">
+              <CompanySelect
+                companies={companies}
+                loading={companySearchLoading}
+                onSearch={searchCompanies}
+                onSelect={(value) => {
+                  fetchBranches(value);
+                  form.setFieldsValue({ branch: undefined });
                 }}
-                value={newJobDesc}
-                onChange={(e) => setNewJobDesc(e.target.value)}
-                placeholder="Enter new job description"
               />
-              <br />
-              <Button
-                type="primary"
-                onClick={handleAddNewJob}
-                loading={jobLoading}
-              >
-                Add
-              </Button>
-              <Button
-                onClick={() => setIsAddingJob(false)}
-                style={{ marginLeft: "8px" }}
-              >
-                Cancel
-              </Button>
-            </Input.Group>
-          ) : (
-            <Select
-              loading={jobLoading}
-              placeholder="Select job"
-              dropdownRender={(menu) => (
-                <>
-                  {menu}
-                  <Divider style={{ margin: "8px 0" }} />
-                  <Button
-                    type="text"
-                    icon={<PlusOutlined />}
-                    onClick={() => setIsAddingJob(true)}
-                    style={{ paddingLeft: 8 }}
-                  >
-                    Add new job
-                  </Button>
-                </>
-              )}
-            >
-              {jobs.map((job) => (
-                <Select.Option key={job.id} value={job.id}>
-                  {job.jobName}
-                </Select.Option>
-              ))}
-            </Select>
-          )}
-        </Form.Item>
-        <Form.Item
-          name="location"
-          label="Location"
-          rules={[{ required: false, message: "Please enter the location" }]}
-        >
-          <Input />
-        </Form.Item>
+              <BranchSelect branches={branches} loading={branchLoading} />
+            </Form.Item>,
+          ],
+        },
+      ],
+    },
+  ];
 
-        <Form.Item>
-          <Button type="primary" htmlType="submit">
-            Submit
-          </Button>
-          <Button style={{ marginLeft: "10px" }} onClick={onClose}>
-            Cancel
-          </Button>
-        </Form.Item>
-      </Form>
-    </Modal>
+  return (
+    <StepModal
+      visible={visible}
+      onClose={onClose}
+      onSubmit={handleSubmit}
+      title="Add User"
+      steps={formSteps}
+      loading={loading}
+      form={form}
+    />
   );
 };
 

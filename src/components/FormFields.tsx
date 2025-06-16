@@ -15,6 +15,7 @@ import JobForm from "./JobForm";
 
 interface FormFieldProps {
   rules?: any[];
+  placeholder?: string;
 }
 
 const countryCodes = [
@@ -25,12 +26,12 @@ const countryCodes = [
   { code: "+33", country: "FR" },
 ];
 
-export const NameInput: React.FC<FormFieldProps> = ({ rules }) => (
+export const NameInput: React.FC<FormFieldProps> = ({ rules, placeholder }) => (
   <Form.Item
     name="name"
     rules={rules || [{ required: true, message: "Please enter name" }]}
   >
-    <Input placeholder="Firstname *" />
+    <Input placeholder={placeholder || "Firstname *"} />
   </Form.Item>
 );
 

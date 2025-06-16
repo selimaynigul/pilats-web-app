@@ -1,66 +1,24 @@
 import React, { useState } from "react";
-import styled from "styled-components";
-import AddButton from "components/AddButton";
+import { Form, message } from "antd";
 import AddUserModal from "./add-user-form/add-user-form";
-import { trainerService, userService } from "services";
+import { userService } from "services";
 import { handleError } from "utils/apiHelpers";
-import { message } from "antd";
-import { CompanyDropdown } from "components";
-import moment from "moment";
 import { getBranchId, hasRole } from "utils/permissionUtils";
+import moment from "moment";
+import EntityToolbar from "components/EntityToolbar";
 import { useLanguage } from "hooks";
-
-const ToolbarContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  align-items: center;
-`;
-
-const CountContainer = styled.div`
-  font-size: 16px;
-  font-weight: bold;
-  height: 50px;
-  background: white;
-  padding: 10px 20px;
-  gap: 6px;
-  border-radius: 50px;
-  display: flex;
-  align-items: center;
-
-  @media (max-width: 768px) {
-    display: none;
-  }
-`;
-
-const ActionContainer = styled.div`
-  display: flex;
-  gap: 8px;
-  background: red;
-  background: white;
-  height: 50px;
-  border-radius: 50px;
-  align-items: center;
-  padding: 10px;
-
-  @media (max-width: 768px) {
-    margin-left: auto;
-  }
-`;
-
-const CountNumber = styled.span`
-  color: ${({ theme }) => theme.primary}; /* Primary color for the number */
-`;
 
 const UsersToolbar: React.FC<{
   userCount: number;
   selectedCompany: any;
   setSelectedCompany: any;
 }> = ({ userCount, selectedCompany, setSelectedCompany }) => {
-  const [isModalVisible, setIsModalVisible] = React.useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [form] = Form.useForm();
   const { t } = useLanguage();
 
-  const handleAddUser = (values: any) => {
+  const handleAddUser = async (values: any) => {
     const payload = {
       uaRegisterRequest: {
         email: values.email,
@@ -72,7 +30,7 @@ const UsersToolbar: React.FC<{
         birthdate: values.birthdate
           ? moment(values.birthdate).format("YYYY-MM-DD")
           : null,
-        gender: values.gender.toUpperCase(),
+        gender: values.gender ? values.gender.toUpperCase() : null,
         telNo1: values.phoneNumber,
       },
       branchId: hasRole(["BRANCH_ADMIN"])
@@ -82,43 +40,42 @@ const UsersToolbar: React.FC<{
       location: values.location,
     };
 
-    userService
-      .register(payload)
-      .then(() => {
-        message.success("User is added");
-        setIsModalVisible(false);
-        window.location.reload();
-      })
-      .catch((err) => {
-        if (err.response?.data.errorCode === 102) {
-          message.error("User with this email already exists");
-          console.error("Error adding user:", err);
-          return;
-        }
+    setLoading(true);
+    try {
+      await userService.register(payload);
+      message.success("User is added");
+      setIsModalVisible(false);
+      form.resetFields();
+      window.location.reload();
+    } catch (err: any) {
+      if (err.response?.data.errorCode === 102) {
+        message.error("User with this email already exists");
+      } else {
         handleError(err);
-      });
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <ToolbarContainer>
-      <CountContainer>
-        <CountNumber>{userCount}</CountNumber> {t.usersListed}
-      </CountContainer>
-      <ActionContainer>
-        {hasRole(["ADMIN", "COMPANY_ADMIN"]) && (
-          <CompanyDropdown
-            selectedItem={selectedCompany}
-            onSelect={(company) => setSelectedCompany(company)}
-          />
-        )}
-        <AddButton onClick={() => setIsModalVisible(true)} />
-      </ActionContainer>
+    <>
+      <EntityToolbar
+        count={userCount}
+        entityLabel={t.usersListed}
+        selectedCompany={selectedCompany}
+        setSelectedCompany={setSelectedCompany}
+        onAddClick={() => setIsModalVisible(true)}
+        showCompanyDropdown={hasRole(["ADMIN", "COMPANY_ADMIN"])}
+      />
       <AddUserModal
         visible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
         onSubmit={handleAddUser}
+        form={form}
+        loading={loading}
       />
-    </ToolbarContainer>
+    </>
   );
 };
 
