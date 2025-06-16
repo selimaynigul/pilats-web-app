@@ -10,11 +10,7 @@ export const addTrainerFormItems = {
   title: {
     rules: [{ required: true, message: "Please enter the trainer's title" }],
   },
-  company: {
-    rules: [
-      { required: hasRole(["ADMIN"]), message: "Please select the company" },
-    ],
-  },
+  company: {},
   branch: {
     rules: [
       {
