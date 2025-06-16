@@ -1,46 +1,38 @@
-# Getting Started with Create React App
+# 🏋️‍♀️ PILATS – Your Gym Body
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+PILATS, spor salonları için geliştirilen modern ve kapsamlı bir yönetim sistemidir. Web ve mobil platformlar üzerinden çalışan bu sistem, yöneticilerin, eğitmenlerin ve müşterilerin tüm süreçlerini tek bir çatı altında verimli bir şekilde yürütmesini sağlar.
 
-## Available Scripts
+## 🚀 Özellikler
 
-In the project directory, you can run:
+- 🌐 **Web Paneli:** Admin, şirket yöneticisi ve şube yöneticileri için kullanıcı, eğitmen, müşteri, paket ve ders yönetimi.
+- 📱 **Mobil Uygulama (Flutter):** Eğitmen ve müşteriler için ders görüntüleme, rezervasyon, sağlık verileri takibi ve QR ile giriş sistemi.
+- 🔐 **Rol Tabanlı Erişim:** Her kullanıcının yalnızca kendi yetkileri dahilinde işlem yapabildiği güvenli mimari.
+- 📦 **Paket Sistemi:** Şube ya da şirket seviyesinde müşteri bazlı özel paketler tanımlama ve yönetme.
+- 🗓️ **Takvim & Planlama:** Eğitmenlerin derslerini planlaması ve müşterilerin kolayca katılım sağlaması için sürükle-bırak takvim sistemi.
+- 📊 **Raporlama:** Kullanıcı aktiviteleri, sağlık verileri ve paket kullanımı gibi birçok metrik üzerinde grafik destekli analiz.
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## 🎥 Demo GIFs
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+Aşağıda uygulamaya ait çeşitli arayüzlerin ve özelliklerin tanıtım GIF'lerini bulabilirsiniz.
 
-### `npm test`
+### 📅 Takvim Üzerinde Sürükle-Bırak ile Ders Ekleme
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+![Calendar Drag & Drop](./assets/scheduler.gif)
 
-### `npm run build`
+### 🌓 Dark Theme & Search Bar
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+![Dark Theme and Search Bar](./assets/searchbar.gif)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 🧑‍🏫 Eğitmen Ekleme – Form Süreci
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+![Add Trainer Form](./assets/form.gif)
 
-### `npm run eject`
+### 📊 Müşteri Paneli – Sağlık Verileri ve Paket Bilgisi
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+![Customer Analytics](./assets/custome.gif)
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+---
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+📌 **Not:** GIF dosyalarının `./assets/` dizininde yer aldığından emin olun. Eğer başka bir konumdaysa, yol bilgisini güncellemeniz yeterlidir.
