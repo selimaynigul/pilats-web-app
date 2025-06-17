@@ -198,9 +198,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           ref={(el) => (resultsRef.current[index] = el!)}
           style={{
             backgroundColor:
-              index === highlightedResultIndex
-                ? theme.contentBg
-                : "transparent",
+              index === highlightedResultIndex ? theme.bodyBg : "transparent",
           }}
         >
           <Avatar>{company.companyName[0].toUpperCase()}</Avatar>
@@ -217,9 +215,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           ref={(el) => (resultsRef.current[index] = el!)}
           style={{
             backgroundColor:
-              index === highlightedResultIndex
-                ? theme.contentBg
-                : "transparent",
+              index === highlightedResultIndex ? theme.bodyBg : "transparent",
           }}
         >
           <Avatar>{trainer.ucGetResponse?.name[0].toUpperCase()}</Avatar>
@@ -242,9 +238,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           ref={(el) => (resultsRef.current[index] = el!)}
           style={{
             backgroundColor:
-              index === highlightedResultIndex
-                ? theme.contentBg
-                : "transparent",
+              index === highlightedResultIndex ? theme.bodyBg : "transparent",
           }}
         >
           <Avatar>{user.ucGetResponse?.name[0].toUpperCase()}</Avatar>
@@ -288,9 +282,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             ref={(el) => (resultsRef.current[index] = el!)}
             style={{
               backgroundColor:
-                index === highlightedResultIndex
-                  ? theme.contentBg
-                  : "transparent",
+                index === highlightedResultIndex ? theme.bodyBg : "transparent",
             }}
           >
             <div>

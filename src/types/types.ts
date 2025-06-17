@@ -32,6 +32,7 @@ export interface ItemData {
   company?: {
     id: string | null;
     name: string | null;
+    location: string | null;
     branch?: string | null;
   };
 

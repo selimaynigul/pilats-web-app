@@ -12,6 +12,9 @@ import { getUser, hasRole } from "utils/permissionUtils";
 import { PlusOutlined } from "@ant-design/icons";
 import { jobService } from "services";
 import JobForm from "./JobForm";
+import { useLanguage } from "hooks";
+import { useTheme } from "contexts/ThemeProvider";
+import styled from "styled-components";
 
 interface FormFieldProps {
   rules?: any[];
@@ -27,106 +30,182 @@ const countryCodes = [
   { code: "+33", country: "FR" },
 ];
 
-export const NameInput: React.FC<FormFieldProps> = ({ rules, placeholder }) => (
-  <Form.Item
-    name="name"
-    rules={rules || [{ required: true, message: "Please enter name" }]}
-  >
-    <Input placeholder={placeholder || "Firstname *"} />
-  </Form.Item>
-);
+export const NameInput: React.FC<FormFieldProps> = ({ rules, placeholder }) => {
+  const { t } = useLanguage();
+  const { theme } = useTheme();
 
-export const SurnameInput: React.FC<FormFieldProps> = ({ rules }) => (
-  <Form.Item
-    name="surname"
-    rules={rules || [{ required: true, message: "Please enter surname" }]}
-  >
-    <Input placeholder="Lastname *" />
-  </Form.Item>
-);
+  return (
+    <Form.Item
+      name="name"
+      rules={
+        rules || [
+          { required: true, message: t.pleaseEnterName || "Please enter name" },
+        ]
+      }
+    >
+      <Input
+        style={{ background: theme.inputBg }}
+        placeholder={placeholder || t.firstname || "Firstname *"}
+      />
+    </Form.Item>
+  );
+};
 
-export const GenderSelect: React.FC<FormFieldProps> = ({ rules }) => (
-  <Form.Item name="gender" rules={rules}>
-    <Select placeholder="Select gender">
-      <Select.Option value="male">Male</Select.Option>
-      <Select.Option value="female">Female</Select.Option>
-    </Select>
-  </Form.Item>
-);
+export const SurnameInput: React.FC<FormFieldProps> = ({
+  rules,
+  placeholder,
+}) => {
+  const { t } = useLanguage();
+  const { theme } = useTheme();
 
-export const BirthdatePicker: React.FC<FormFieldProps> = ({ rules }) => (
-  <Form.Item name="birthdate" rules={rules}>
-    <DatePicker style={{ width: "100%" }} placeholder="Birthdate" />
-  </Form.Item>
-);
+  return (
+    <Form.Item
+      name="surname"
+      rules={
+        rules || [
+          {
+            required: true,
+            message: t.pleaseEnterSurname || "Please enter surname",
+          },
+        ]
+      }
+    >
+      <Input
+        style={{ background: theme.inputBg }}
+        placeholder={placeholder || t.lastname || "Lastname *"}
+      />
+    </Form.Item>
+  );
+};
 
+export const GenderSelect: React.FC<FormFieldProps> = ({ rules }) => {
+  const { t } = useLanguage();
+  const { theme } = useTheme();
+
+  return (
+    <Form.Item name="gender" rules={rules}>
+      <Select
+        style={{ background: theme.transparentInputBg }}
+        placeholder={
+          <span style={{ color: theme.formPlaceholder }}>{t.selectGender}</span>
+        }
+      >
+        <Select.Option value="male">{t.male || "Male"}</Select.Option>
+        <Select.Option value="female">{t.female || "Female"}</Select.Option>
+      </Select>
+    </Form.Item>
+  );
+};
+
+const StyledDatePicker = styled(DatePicker)`
+  input::placeholder {
+    color: ${({ theme }) => theme.formPlaceholder} !important;
+  }
+`;
+export const BirthdatePicker: React.FC<FormFieldProps> = ({ rules }) => {
+  const { t } = useLanguage();
+  const { theme } = useTheme();
+
+  return (
+    <Form.Item name="birthdate" rules={rules}>
+      <StyledDatePicker
+        style={{ background: theme.inputBg, width: "100%" }}
+        placeholder={t.birthdate}
+      />
+    </Form.Item>
+  );
+};
 export const EmailInput: React.FC<FormFieldProps> = ({
   rules,
   disabled = false,
-}) => (
-  <Form.Item
-    name="email"
-    rules={
-      rules || [
-        { required: true, message: "Please enter email" },
-        { type: "email", message: "Invalid email format" },
-      ]
-    }
-  >
-    <Input disabled={disabled} placeholder="Email *" />
-  </Form.Item>
-);
+  placeholder,
+}) => {
+  const { t } = useLanguage();
+  const { theme } = useTheme();
 
-export const PhoneInput: React.FC<FormFieldProps> = ({ rules }) => (
-  <Form.Item>
-    <Input.Group compact style={{ display: "flex" }}>
-      <Form.Item name="countryCode" initialValue="+90" noStyle>
-        <Select style={{ width: "30%" }}>
-          {countryCodes.map(({ code }) => (
-            <Select.Option key={code} value={code}>
-              {code}
-            </Select.Option>
-          ))}
-        </Select>
-      </Form.Item>
-      <Form.Item
-        name="phoneNumber"
-        rules={[
-          ...(rules || [
-            { required: true, message: "Please enter phone number" },
-          ]),
+  return (
+    <Form.Item
+      name="email"
+      rules={
+        rules || [
           {
-            validator: (_, value) => {
-              if (!value || value.length === 10) {
-                return Promise.resolve();
-              }
-              // Sadece submit sırasında hata gösterilsin
-              return Promise.reject("Geçerli bir telefon numarası giriniz");
-            },
-            validateTrigger: "onSubmit",
+            required: true,
+            message: t.pleaseEnterEmail || "Please enter email",
           },
-        ]}
-        noStyle
-      >
-        <Input
-          style={{ width: "70%" }}
-          placeholder="Phone No *"
-          maxLength={10}
-          type="tel"
-        />
-      </Form.Item>
-    </Input.Group>
-  </Form.Item>
-);
+          {
+            type: "email",
+            message: t.invalidEmailFormat || "Invalid email format",
+          },
+        ]
+      }
+    >
+      <Input
+        style={{ background: theme.inputBg }}
+        disabled={disabled}
+        placeholder={placeholder || t.email || "Email *"}
+      />
+    </Form.Item>
+  );
+};
 
-export const LocationInput: React.FC<FormFieldProps> = ({ rules }) => (
-  <Form.Item
-    name="location"
-    rules={rules || []} // Opsiyonel alan
-  >
-    <Input placeholder="Location" />
-  </Form.Item>
-);
+export const PhoneInput: React.FC<FormFieldProps> = ({ rules }) => {
+  const { t } = useLanguage();
+  const { theme } = useTheme();
+
+  return (
+    <Form.Item>
+      <Input.Group compact style={{ display: "flex" }}>
+        <Form.Item name="countryCode" initialValue="+90" noStyle>
+          <Select
+            style={{ width: "30%", background: theme.transparentInputBg }}
+          >
+            {countryCodes.map(({ code }) => (
+              <Select.Option key={code} value={code}>
+                {code}
+              </Select.Option>
+            ))}
+          </Select>
+        </Form.Item>
+        <Form.Item
+          name="phoneNumber"
+          rules={[
+            ...(rules || [
+              { required: true, message: "Please enter phone number" },
+            ]),
+            {
+              validator: (_, value) => {
+                if (!value || value.length === 10) {
+                  return Promise.resolve();
+                }
+                return Promise.reject("Geçerli bir telefon numarası giriniz");
+              },
+              validateTrigger: "onSubmit",
+            },
+          ]}
+          noStyle
+        >
+          <Input
+            style={{ width: "70%", background: theme.inputBg }}
+            placeholder={t.phoneNumber}
+            maxLength={10}
+            type="tel"
+          />
+        </Form.Item>
+      </Input.Group>
+    </Form.Item>
+  );
+};
+
+export const LocationInput: React.FC<FormFieldProps> = ({ rules }) => {
+  const { t } = useLanguage();
+  const { theme } = useTheme();
+
+  return (
+    <Form.Item name="location" rules={rules || []}>
+      <Input style={{ background: theme.inputBg }} placeholder={t.location} />
+    </Form.Item>
+  );
+};
 
 export const CompanySelect = ({
   companies,
@@ -141,6 +220,9 @@ export const CompanySelect = ({
   onSelect: (id: string) => void;
   disabled?: boolean;
 }) => {
+  const { t } = useLanguage();
+  const { theme } = useTheme();
+
   const isDisabled = !hasRole(["ADMIN"]);
   const defaultCompany = hasRole(["COMPANY_ADMIN", "BRANCH_ADMIN"])
     ? getUser().companyName
@@ -153,14 +235,19 @@ export const CompanySelect = ({
       style={{ marginBottom: 8 }}
     >
       <Select
+        style={{ background: theme.transparentInputBg }}
         disabled={disabled ? disabled : isDisabled}
         showSearch
-        placeholder="Search and select company"
         filterOption={false}
         onSearch={onSearch}
         onSelect={onSelect}
         loading={loading}
         defaultValue={defaultCompany}
+        placeholder={
+          <span style={{ color: theme.formPlaceholder }}>
+            {t.selectCompany}
+          </span>
+        }
       >
         {companies.map((company: any) => (
           <Select.Option key={company.id} value={company.id}>
@@ -179,6 +266,9 @@ export const BranchSelect = ({
   branches: any[];
   loading: boolean;
 }) => {
+  const { t } = useLanguage();
+  const { theme } = useTheme();
+
   const isDisabled = hasRole(["BRANCH_ADMIN"]);
   const defaultBranch = hasRole(["BRANCH_ADMIN"])
     ? getUser().branchName
@@ -190,10 +280,13 @@ export const BranchSelect = ({
       rules={[{ required: true, message: "Please select branch" }]}
     >
       <Select
+        style={{ background: theme.transparentInputBg }}
         disabled={isDisabled}
-        placeholder="Select branch"
         loading={loading}
         defaultValue={defaultBranch}
+        placeholder={
+          <span style={{ color: theme.formPlaceholder }}>{t.selectBranch}</span>
+        }
       >
         {branches.map((branch: any) => (
           <Select.Option key={branch.id} value={branch.id}>
@@ -213,6 +306,8 @@ export const JobSelect: React.FC<JobSelectWithAddProps> = ({
   name = "jobId",
   rules,
 }) => {
+  const { t } = useLanguage();
+  const { theme } = useTheme();
   const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
@@ -236,8 +331,11 @@ export const JobSelect: React.FC<JobSelectWithAddProps> = ({
   return (
     <Form.Item name={name} rules={rules}>
       <Select
+        style={{ background: theme.transparentInputBg }}
         loading={loading}
-        placeholder="Select job"
+        placeholder={
+          <span style={{ color: theme.formPlaceholder }}>{t.selectJob}</span>
+        }
         dropdownRender={(menu) => (
           <>
             {menu}
@@ -259,7 +357,7 @@ export const JobSelect: React.FC<JobSelectWithAddProps> = ({
                   block
                   onClick={() => setIsAdding(true)}
                 >
-                  Add new job
+                  {t.addJob}
                 </Button>
               </div>
             )}

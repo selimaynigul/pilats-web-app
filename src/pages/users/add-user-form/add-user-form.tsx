@@ -15,6 +15,7 @@ import {
   JobSelect,
 } from "components/FormFields";
 import { hasRole, getBranchId } from "utils/permissionUtils";
+import { useLanguage } from "hooks";
 
 interface AddUserFormProps {
   visible: boolean;
@@ -31,6 +32,8 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
   loading,
   form,
 }) => {
+  const { t } = useLanguage();
+
   const {
     companies,
     branches,
@@ -64,12 +67,12 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
 
   const formSteps: CustomStep[] = [
     {
-      label: "About user",
-      buttonText: "Save & Continue",
+      label: t.aboutUser,
+      buttonText: t.saveAndContinue,
       blocks: [
         {
-          title: "Personal Info",
-          description: "Provide user's personal info",
+          title: t.personalInfo,
+          description: t.userPersonalInfoDescription,
           fields: [
             <JobSelect />,
             <FormRow>
@@ -83,8 +86,8 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
           ],
         },
         {
-          title: "Contact Info",
-          description: "Provide user's contact info",
+          title: t.contactInfo,
+          description: t.userContactInfoDescription,
           fields: [
             <FormRow>
               <EmailInput />
@@ -96,12 +99,13 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
       ],
     },
     {
-      label: "Company info",
-      buttonText: "Add User",
+      label: t.companyInfo || "Company info",
+      buttonText: t.addUser || "Add User",
       blocks: [
         {
-          title: "Company Info",
-          description: "Provide user's company/branch info",
+          title: t.companyInfo || "Company Info",
+          description:
+            t.companyInfoDescription || "Provide user's company/branch info",
           fields: [
             <Form.Item name="company">
               <CompanySelect
@@ -126,7 +130,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
       visible={visible}
       onClose={onClose}
       onSubmit={handleSubmit}
-      title="Add User"
+      title={t.addUser}
       steps={formSteps}
       loading={loading}
       form={form}

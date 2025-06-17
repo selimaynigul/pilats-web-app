@@ -9,7 +9,8 @@ select,
 a {
     -webkit-tap-highlight-color: transparent;
 }
-    
+
+
  a {
  color: black;
 
@@ -23,17 +24,55 @@ a {
   .ant-layout {
   background-color: ${({ theme }) => theme.bodyBg};
   }
+
+  .ant-card-meta-description {
+  color:  ${({ theme }) => theme.text}70 !important; 
+  }
   
   .ant-input-filled, .ant-picker-filled, .ant-select-filled, .ant-input-number-input{
     height: 40px;
     border-radius: 8px;
+   color:  ${({ theme }) => theme.text}; 
+    &::placeholder {
+    color:  ${({ theme }) => theme.formPlaceholder}; 
+    }
   }
 
+  .ant-input-filled:focus-within {
+  border-color:  ${({ theme }) => theme.primary}; 
+  }
+
+  .ant-select-dropdown {
+  background:  ${({ theme }) => theme.cardBg}; ;
+  }
+
+  .ant-select-focused:where(.css-dev-only-do-not-override-5wsri9).ant-select-filled:not(.ant-select-disabled):not(.ant-select-customize-input):not(.ant-pagination-size-changer) .ant-select-selector {
+background: ${({ theme }) => theme.menuItemHover}; 
+  }
+
+  .ant-select-item .ant-select-item-option-content{
+  color:  ${({ theme }) => theme.text}; 
+  }
+  .ant-select-item:hover {
+  background:  ${({ theme }) => theme.menuItemHover} !important; 
+  }
+  
+  .ant-select-item-option-active {
+    background:  ${({ theme }) => theme.menuItemHover} !important; 
+}
   .country-code.ant-select-single .ant-select-selector  {
     border-radius: 8px 0 0 8px;
     
+  }    
+
+  .ant-select-selection-item {
+  
+  color: ${({ theme }) => theme.text};
   }
-    
+   .ant-select-arrow > *, .ant-picker-suffix > * {
+  color: ${({ theme }) => theme.formPlaceholder};
+   }
+  
     .ant-modal-content {
       border-radius: 20px !important;
       background-color: ${({ theme }) => theme.bodyBg} !important;

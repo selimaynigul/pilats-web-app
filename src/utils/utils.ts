@@ -7,14 +7,15 @@ export const mapToItemData = (raw: any): ItemData => {
 
     title: raw?.ucGetResponse
       ? `${raw.ucGetResponse.name ?? ""} ${raw.ucGetResponse.surname ?? ""}`.trim()
-      : "Unnamed",
-    subtitle: raw?.jobName ?? null,
+      : raw?.companyName,
+    subtitle: (raw?.jobName || raw?.location) ?? null,
 
     detailUrl: raw?.detailUrl && raw?.id ? `${raw.detailUrl}/${raw.id}` : null,
 
     company: {
       id: raw?.companyId?.toString() ?? null,
       name: raw?.companyName ?? null,
+      location: raw?.location ?? null,
       branch: raw?.branchName ?? null,
     },
 
@@ -27,7 +28,6 @@ export const mapToItemData = (raw: any): ItemData => {
 };
 
 export const isMobile = () => {
-  return true;
   if (typeof navigator === "undefined") return false;
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
     navigator.userAgent

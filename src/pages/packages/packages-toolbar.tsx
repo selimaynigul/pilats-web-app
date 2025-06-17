@@ -1,60 +1,12 @@
 import React, { useState } from "react";
-import styled from "styled-components";
-import AddButton from "components/AddButton";
 import AddPackageForm from "./add-package-form/add-package-form";
-import {
-  companyAdminService,
-  companyPackageService,
-  trainerService,
-} from "services";
+import { companyPackageService } from "services";
 import { handleError } from "utils/apiHelpers";
 import { Form, message } from "antd";
-import { CompanyDropdown } from "components";
-import moment from "moment";
+
 import { getBranchId, getCompanyId, hasRole } from "utils/permissionUtils";
 import { useLanguage } from "hooks";
-
-const ToolbarContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  align-items: center;
-`;
-
-const CountContainer = styled.div`
-  font-size: 16px;
-  font-weight: bold;
-  height: 50px;
-  background: white;
-  padding: 10px 20px;
-  gap: 6px;
-  border-radius: 50px;
-  display: flex;
-  align-items: center;
-
-  @media (max-width: 768px) {
-    display: none;
-  }
-`;
-
-const ActionContainer = styled.div`
-  display: flex;
-  gap: 8px;
-  background: red;
-  background: white;
-  height: 50px;
-  border-radius: 50px;
-  align-items: center;
-  padding: 10px;
-
-  @media (max-width: 768px) {
-    margin-left: auto;
-  }
-`;
-
-const CountNumber = styled.span`
-  color: ${({ theme }) => theme.primary}; /* Primary color for the number */
-`;
+import EntityToolbar from "components/EntityToolbar";
 
 const PackagesToolbar: React.FC<{
   packageCount: number;
@@ -105,19 +57,15 @@ const PackagesToolbar: React.FC<{
   };
 
   return (
-    <ToolbarContainer>
-      <CountContainer>
-        <CountNumber>{packageCount}</CountNumber> {t.packagesListed}
-      </CountContainer>
-      <ActionContainer>
-        {hasRole(["ADMIN", "COMPANY_ADMIN"]) && (
-          <CompanyDropdown
-            selectedItem={selectedCompany}
-            onSelect={(company) => setSelectedCompany(company)}
-          />
-        )}
-        <AddButton onClick={() => setIsModalVisible(true)} />
-      </ActionContainer>
+    <>
+      <EntityToolbar
+        count={packageCount}
+        entityLabel={t.packagesListed}
+        selectedCompany={selectedCompany}
+        setSelectedCompany={setSelectedCompany}
+        onAddClick={() => setIsModalVisible(true)}
+        showCompanyDropdown={hasRole(["ADMIN", "COMPANY_ADMIN"])}
+      />
       <AddPackageForm
         form={form}
         visible={isModalVisible}
@@ -127,7 +75,7 @@ const PackagesToolbar: React.FC<{
         }}
         onSubmit={handleAddPackage}
       />
-    </ToolbarContainer>
+    </>
   );
 };
 

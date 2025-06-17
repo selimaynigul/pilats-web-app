@@ -4,6 +4,7 @@ export interface Theme {
   header: string;
   primary: string;
   inputBg: string;
+  transparentInputBg: string;
   inputBorder: string;
   contentBg: string;
   offRangeBg: string;
@@ -16,7 +17,14 @@ export interface Theme {
   menuItemSelected: string;
   triggerBg: string;
   avatarBg: string;
+  profileAvatarBg: string;
   cardBg: string;
   title: string;
   placeholder: string;
+  formPlaceholder: string;
+  stepBg: string;
+  stepIcon: string;
+  completedStepIcon: string;
+  stepSeperator: string;
+  completedStepBorder: string;
 }

@@ -18,6 +18,7 @@ import { Link } from "react-router-dom";
 import { ItemData, ListItemType } from "types/types";
 import { capitalize } from "utils/permissionUtils";
 import CardInfo from "components/CardInfo";
+import { useTheme } from "contexts/ThemeProvider";
 
 interface ListItemProps {
   data: ItemData;
@@ -27,6 +28,7 @@ interface ListItemProps {
 const { Meta } = Card;
 
 const ListItem: React.FC<ListItemProps> = ({ data, type = "default" }) => {
+  const { theme } = useTheme();
   const {
     id,
     isActive,
@@ -64,7 +66,7 @@ const ListItem: React.FC<ListItemProps> = ({ data, type = "default" }) => {
               <Avatar
                 size={60}
                 src={imageUrl ?? undefined}
-                style={{ background: "lightgrey", flexShrink: 0 }}
+                style={{ background: theme.avatarBg, flexShrink: 0 }}
               >
                 {title?.[0]?.toUpperCase()}
               </Avatar>

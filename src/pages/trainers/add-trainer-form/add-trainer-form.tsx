@@ -16,6 +16,7 @@ import {
   BranchSelect,
   JobSelect,
 } from "components/FormFields";
+import { useLanguage } from "hooks";
 
 interface AddTrainerFormProps {
   visible: boolean;
@@ -41,6 +42,8 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
     fetchBranches,
   } = useCompanyBranchSelect();
 
+  const { t } = useLanguage();
+
   const handleSubmit = () => {
     form
       .validateFields()
@@ -65,12 +68,12 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
 
   const formSteps: CustomStep[] = [
     {
-      label: "About trainer",
-      buttonText: "Save & Continue",
+      label: t.aboutTrainer,
+      buttonText: t.saveAndContinue,
       blocks: [
         {
-          title: "Personal Info",
-          description: "Provide trainer's personal info",
+          title: t.personalInfo,
+          description: t.trainerPersonalInfoDescription,
           fields: [
             <JobSelect />,
             <FormRow>
@@ -84,8 +87,8 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
           ],
         },
         {
-          title: "Contact Info",
-          description: "Provide trainer's contact info",
+          title: t.contactInfo,
+          description: t.contactInfoDescription,
           fields: [
             <FormRow>
               <EmailInput />
@@ -97,12 +100,12 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
       ],
     },
     {
-      label: "Company info",
-      buttonText: "Add Trainer",
+      label: t.companyInfo,
+      buttonText: t.addTrainer,
       blocks: [
         {
-          title: "Company Info",
-          description: "Provide trainer's company/branch info",
+          title: t.companyInfo,
+          description: t.companyInfoDescription,
           fields: [
             <Form.Item {...addTrainerFormItems.company} name="company">
               <CompanySelect
@@ -128,7 +131,7 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
       visible={visible}
       onClose={onClose}
       onSubmit={handleSubmit}
-      title="Add Trainer"
+      title={t.addTrainer}
       steps={formSteps}
       loading={loading}
       form={form}

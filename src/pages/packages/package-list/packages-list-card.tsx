@@ -14,6 +14,7 @@ import ProgressBar from "components/ProgressBar";
 import customerPackageService from "services/customer-package-service";
 import CardInfo from "components/CardInfo";
 import { useLanguage } from "hooks";
+import { useTheme } from "contexts/ThemeProvider";
 
 interface Package {
   id: string | number;
@@ -41,10 +42,10 @@ interface CardProps {
 
 const CardContainer = styled.div<{ mode?: "customer" | "admin" }>`
   position: relative;
-  background: white;
+  background: ${({ theme }) => theme.cardBg};
   border-radius: 20px;
   color: #4f46e5;
-  border: 1px solid #e5e5e5;
+  /*  border: 1px solid #e5e5e5; */
   transition: 0.3s;
 
   &:hover {
@@ -67,7 +68,7 @@ const CardHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 15px;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid ${({ theme }) => theme.calendarBorder};
 
   &:hover {
     cursor: pointer;
@@ -82,6 +83,7 @@ const Title = styled.h2`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: ${({ theme }) => theme.text};
 `;
 
 const Price = styled.p`
@@ -108,7 +110,7 @@ const Description = styled.p`
 `;
 
 const FeatureList = styled.div`
-  background: #f5f3ff;
+  background: ${({ theme }) => theme.contentBg};
   border-radius: 10px;
   padding: 15px;
   margin-top: 10px;
@@ -128,9 +130,9 @@ const FeatureItem = styled.div`
 `;
 
 const FeatureValue = styled.div`
-  background: white;
+  background: transparent;
   border: 1px solid #4f46e5;
-  color: #4f46e5;
+  color: ${({ theme }) => theme.title};
   width: 20px;
   height: 20px;
   display: flex;
@@ -142,7 +144,7 @@ const FeatureValue = styled.div`
 
 const FeatureLabel = styled.span`
   font-size: 0.9rem;
-  color: #4f46e5;
+  color: ${({ theme }) => theme.title};
 `;
 
 const InfoContainer = styled.div`
@@ -208,6 +210,7 @@ const PackageCard: React.FC<CardProps> = ({
   } = pkg;
 
   const { t } = useLanguage();
+  const { theme } = useTheme();
   const [showProgress, setShowProgress] = useState(false);
   const [assignModalVisible, setAssignModalVisible] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -340,7 +343,7 @@ const PackageCard: React.FC<CardProps> = ({
               setShowProgress((prev) => !prev);
             }}
           >
-            <strong style={{ color: "#4f46e5" }}>
+            <strong style={{ color: theme.title }}>
               {showProgress ? t.remainingUsages : t.features}
             </strong>
             {mode !== "admin" && (

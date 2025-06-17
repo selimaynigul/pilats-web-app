@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Modal, Steps, Button, Form, Row, Col } from "antd";
 import styled from "styled-components";
 import { useLanguage } from "hooks";
+import { useTheme } from "contexts/ThemeProvider";
 
 const SliderWrapper = styled.div<{ height?: number }>`
   display: flex;
@@ -85,6 +86,42 @@ const StepBarWrapper = styled.div`
     background: ${({ theme }) => theme.primary};
   }
 
+  .ant-steps
+    .ant-steps-item-process
+    > .ant-steps-item-container
+    > .ant-steps-item-content
+    > .ant-steps-item-title {
+    color: ${({ theme }) => theme.text};
+  }
+
+  .ant-steps
+    .ant-steps-item-wait
+    > .ant-steps-item-container
+    > .ant-steps-item-content
+    > .ant-steps-item-title {
+    color: ${({ theme }) => theme.text}70;
+  }
+
+  .ant-steps .ant-steps-item-wait .ant-steps-item-icon > .ant-steps-icon {
+    color: ${({ theme }) => theme.text}70;
+  }
+
+  .ant-steps .ant-steps-item-wait .ant-steps-item-icon {
+    background: ${({ theme }) => theme.stepBg};
+  }
+
+  .ant-steps
+    .ant-steps-item-finish
+    > .ant-steps-item-container
+    > .ant-steps-item-content
+    > .ant-steps-item-title {
+    color: ${({ theme }) => theme.text}70;
+  }
+
+  .ant-steps .ant-steps-item-finish .ant-steps-item-icon {
+    border-color: transparent;
+  }
+
   @media (max-width: 768px) {
     max-width: 1000px;
   }
@@ -158,6 +195,7 @@ const StepModal: React.FC<StepModalProps> = ({
   form,
 }) => {
   const { t } = useLanguage();
+  const { theme } = useTheme();
   const [currentStep, setCurrentStep] = useState(0);
   const current = steps[currentStep];
   const isLast = currentStep === steps.length - 1;
@@ -256,7 +294,14 @@ const StepModal: React.FC<StepModalProps> = ({
                 * {t.thisFieldIsMandatory}
               </small>
               {!isFirst && (
-                <Button onClick={() => setCurrentStep(currentStep - 1)}>
+                <Button
+                  style={{
+                    background: theme.bodyBg,
+                    color: theme.text,
+                    borderColor: `${theme.text}70`,
+                  }}
+                  onClick={() => setCurrentStep(currentStep - 1)}
+                >
                   {t.previous}
                 </Button>
               )}

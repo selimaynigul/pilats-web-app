@@ -52,7 +52,7 @@ const CompanyName = styled.div`
     color: ${({ theme }) => theme.text};
   }
   small {
-    color: ${({ theme }) => theme.text}90;
+    color: ${({ theme }) => theme.text}70;
   }
 `;
 

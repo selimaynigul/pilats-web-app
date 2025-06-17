@@ -1,11 +1,10 @@
 import React, { useEffect, useMemo } from "react";
 import styled from "styled-components";
-import { Row, Col, Spin, Button, List } from "antd";
-import CompanyCard from "./company-list-card";
+import { Row, Col, Spin, Button } from "antd";
 import { usePagination } from "hooks";
-import { companyService, trainerService } from "services";
-import { Link } from "react-router-dom";
-import { ListContainer } from "components";
+import { companyService } from "services";
+import { ListContainer, ListItem } from "components";
+import { mapToItemData } from "utils/utils";
 
 const LoadMoreContainer = styled.div`
   text-align: center;
@@ -49,7 +48,13 @@ const CompanyList: React.FC<TrainerListProps> = ({
       <Row gutter={[16, 16]}>
         {trainers.map((company: any, index: number) => (
           <Col xs={24} sm={12} md={8} lg={6} key={index}>
-            <CompanyCard company={company} />
+            <ListItem
+              data={mapToItemData({
+                ...company,
+                detailUrl: "/companies",
+              })}
+              type="company"
+            />
           </Col>
         ))}
       </Row>

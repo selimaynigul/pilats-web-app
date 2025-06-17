@@ -1,15 +1,8 @@
 import React, { useEffect, useMemo } from "react";
 import styled from "styled-components";
 import { Row, Col, Spin, Button, message, Menu, Dropdown } from "antd";
-import AdminCard from "./admin-list-card";
 import { useLanguage, usePagination } from "hooks";
-import {
-  branchAdminService,
-  companyAdminService,
-  trainerService,
-} from "services";
-import { Link } from "react-router-dom";
-import { hasRole } from "utils/permissionUtils";
+import { branchAdminService, companyAdminService } from "services";
 import { ListContainer, ListItem } from "components";
 import { mapToItemData } from "utils/utils";
 import { DeleteOutlined } from "@ant-design/icons";
