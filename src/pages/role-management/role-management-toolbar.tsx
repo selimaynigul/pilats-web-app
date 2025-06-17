@@ -84,6 +84,7 @@ const RoleManagementToolbar: React.FC<{
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { t } = useLanguage();
+  const [loading, setLoading] = useState(false);
 
   const handleAddAdmin = async (values: any) => {
     const payload = {
@@ -102,6 +103,7 @@ const RoleManagementToolbar: React.FC<{
       ...(isBranchMode && { branchId: values.branch }),
     };
 
+    setLoading(true);
     try {
       if (isBranchMode) {
         await branchAdminService.register(payload);
@@ -121,6 +123,8 @@ const RoleManagementToolbar: React.FC<{
       } else {
         message.error("Failed to add admin. Please try again.");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -170,6 +174,7 @@ const RoleManagementToolbar: React.FC<{
         onSubmit={handleAddAdmin}
         isBranchMode={isBranchMode}
         form={form}
+        loading={loading}
       />
     </ToolbarContainer>
   );

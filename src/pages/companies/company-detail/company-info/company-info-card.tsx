@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
-import { Avatar, Button, Spin } from "antd";
-import { Link, useParams } from "react-router-dom";
+import { Avatar, Button, message, Modal, Spin } from "antd";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { BsBuilding, BsEnvelopeFill } from "react-icons/bs";
 import {
   PhoneFilled,
@@ -14,6 +14,7 @@ import {
 import { companyService, branchService, imageService } from "services";
 import { capitalize } from "utils/permissionUtils";
 import { Helmet } from "react-helmet";
+import EditCompanyForm from "pages/companies/edit-company-form/edit-company-form";
 
 const Container = styled.div`
   background: white;
@@ -172,6 +173,9 @@ const CompanyInfo: React.FC<{ setBranches: any }> = ({ setBranches }) => {
   const [company, setCompany] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
+  const [editLoading, setEditLoading] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
 
   useEffect(() => {
     companyService
@@ -199,25 +203,48 @@ const CompanyInfo: React.FC<{ setBranches: any }> = ({ setBranches }) => {
       });
   }, [id]);
 
-  const handleEdit = () => {};
-  const handleEditSubmit = () => {};
-  const handleDelete = () => {};
+  const handleEdit = () => {
+    setIsEditModalVisible(true);
+  };
 
-  if (loading) {
-    return (
-      <Container>
-        <Spin size="large" style={{ margin: "auto" }} />
-      </Container>
-    );
-  }
+  const handleEditSubmit = async (payload: any) => {
+    setEditLoading(true);
+    try {
+      await companyService.update(payload);
+      setIsEditModalVisible(false);
+      const response = await companyService.search({ id });
+      setCompany(response.data[0]);
+      message.success("Company updated successfully");
+    } catch (error) {
+      console.error("Error updating company:", error);
+      message.error("Failed to update company.");
+    } finally {
+      setEditLoading(false);
+    }
+  };
 
-  if (!company) {
-    return (
-      <Container>
-        <p style={{ textAlign: "center" }}>Company not found</p>
-      </Container>
-    );
-  }
+  const handleDelete = () => {
+    Modal.confirm({
+      title: "Are you sure?",
+      content: "This action will permanently delete the company.",
+      okText: "Delete",
+      okType: "danger",
+      cancelText: "Cancel",
+      onOk: () => {
+        companyService
+          .delete(company.id)
+          .then(() => {
+            message.success("Comppany deleted successfully");
+            navigate("/companies");
+          })
+          .catch((error) => {
+            console.error("Error deleting company:", error);
+            message.error("Failed to delete company");
+          });
+      },
+    });
+  };
+
   const handleAvatarClick = () => {
     fileInputRef.current?.click(); // File input'u tıklanmış gibi tetikle
   };
@@ -239,6 +266,22 @@ const CompanyInfo: React.FC<{ setBranches: any }> = ({ setBranches }) => {
     await imageService.postCompanyImage(formData);
     window.location.reload();
   };
+
+  if (loading) {
+    return (
+      <Container>
+        <Spin size="large" style={{ margin: "auto" }} />
+      </Container>
+    );
+  }
+
+  if (!company) {
+    return (
+      <Container>
+        <p style={{ textAlign: "center" }}>Company not found</p>
+      </Container>
+    );
+  }
 
   return (
     <>
@@ -310,6 +353,14 @@ const CompanyInfo: React.FC<{ setBranches: any }> = ({ setBranches }) => {
           </a>
         </ContactInfo>
       </Container>
+
+      <EditCompanyForm
+        visible={isEditModalVisible}
+        onClose={() => setIsEditModalVisible(false)}
+        onSubmit={handleEditSubmit}
+        initialValues={company}
+        loading={editLoading}
+      />
     </>
   );
 };

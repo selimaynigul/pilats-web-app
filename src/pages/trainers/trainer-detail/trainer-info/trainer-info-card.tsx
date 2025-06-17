@@ -15,6 +15,7 @@ import { imageService, trainerService } from "services";
 import moment from "moment";
 import { capitalize } from "utils/permissionUtils";
 import EditTrainerForm from "../edit-trainer-form/edit-trainer-form";
+import { Helmet } from "react-helmet";
 
 const UploadOverlay = styled.div`
   position: absolute;
@@ -359,6 +360,11 @@ const TrainerInfo: React.FC<{
 
   return (
     <>
+      <Helmet>
+        <title>
+          Pilats - {trainer.ucGetResponse.name} {trainer.ucGetResponse.surname}
+        </title>
+      </Helmet>
       <Container>
         {/*  {!trainer.active && <Status>Not active</Status>} */}
         <ActionButtons>

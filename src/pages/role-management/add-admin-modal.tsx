@@ -1,13 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { Form, Input, DatePicker, Select, Button, Modal } from "antd";
 import { companyService, branchService } from "services";
-import { hasRole, getCompanyId } from "utils/permissionUtils";
+import { hasRole, getCompanyId, getUser } from "utils/permissionUtils";
+import {
+  BirthdatePicker,
+  BranchSelect,
+  CompanySelect,
+  EmailInput,
+  GenderSelect,
+  LocationInput,
+  NameInput,
+  PhoneInput,
+  SurnameInput,
+} from "components/FormFields";
+import StepModal, { CustomStep, FormRow } from "components/StepModal";
+import { useCompanyBranchSelect } from "hooks/useCompanyBranchSelect";
 interface AddAdminModalProps {
   visible: boolean;
   onClose: () => void;
   onSubmit: (values: any) => void;
   isBranchMode: boolean;
   form: any;
+  loading: boolean;
 }
 
 const AddAdminModal: React.FC<AddAdminModalProps> = ({
@@ -16,49 +30,18 @@ const AddAdminModal: React.FC<AddAdminModalProps> = ({
   onSubmit,
   isBranchMode,
   form,
+  loading,
 }) => {
-  const [companies, setCompanies] = useState([]);
-  const [branches, setBranches] = useState([]);
-  const [companySearchLoading, setCompanySearchLoading] = useState(false);
-  const [branchLoading, setBranchLoading] = useState(false);
-
   useEffect(() => {
     if (isBranchMode && hasRole(["COMPANY_ADMIN"])) {
       const companyId = getCompanyId();
-      if (companyId) {
-        form.setFieldsValue({ company: companyId });
+      const companyName = getUser().companyName;
+      if (companyName) {
+        form.setFieldsValue({ company: companyName });
         fetchBranches(companyId);
       }
     }
   }, [isBranchMode, form]);
-
-  const handleCompanySearch = async (value: string) => {
-    setCompanySearchLoading(true);
-    try {
-      const res = await companyService.search({ companyName: value });
-      setCompanies(res.data);
-    } catch (error) {
-      console.error("Error fetching companies:", error);
-    } finally {
-      setCompanySearchLoading(false);
-    }
-  };
-
-  const handleCompanySelect = async (companyId: string) => {
-    fetchBranches(companyId);
-  };
-
-  const fetchBranches = async (companyId: string) => {
-    setBranchLoading(true);
-    try {
-      const res = await branchService.search({ companyId });
-      setBranches(res.data);
-    } catch (error) {
-      console.error("Error fetching branches:", error);
-    } finally {
-      setBranchLoading(false);
-    }
-  };
 
   const handleSubmit = () => {
     form
@@ -71,8 +54,90 @@ const AddAdminModal: React.FC<AddAdminModalProps> = ({
       });
   };
 
+  const {
+    companies,
+    branches,
+    companySearchLoading,
+    branchLoading,
+    searchCompanies,
+    fetchBranches,
+  } = useCompanyBranchSelect();
+
+  const formSteps: CustomStep[] = [
+    {
+      label: "About admin",
+      buttonText: "Save & Continue",
+      blocks: [
+        {
+          title: "Personal Info",
+          description: "Provide admin's personal info",
+          fields: [
+            <FormRow>
+              <NameInput />
+              <SurnameInput />
+            </FormRow>,
+            <FormRow>
+              <GenderSelect />
+              <BirthdatePicker />
+            </FormRow>,
+          ],
+        },
+        {
+          title: "Contact Info",
+          description: "Provide admin's contact info",
+          fields: [
+            <FormRow>
+              <EmailInput />
+              <PhoneInput />
+            </FormRow>,
+          ],
+        },
+      ],
+    },
+    {
+      label: isBranchMode ? "Branch Info" : "Company Info",
+      buttonText: isBranchMode ? "Add Branch Admin" : "Add Company Admin",
+      blocks: [
+        {
+          title: isBranchMode ? "Branch Info" : "Company Info",
+          description: isBranchMode
+            ? "Provide admin's branch info"
+            : "Provide admin's company info",
+          fields: [
+            <Form.Item name="company">
+              <CompanySelect
+                companies={companies}
+                loading={companySearchLoading}
+                onSearch={searchCompanies}
+                disabled={hasRole(["COMPANY_ADMIN"])}
+                onSelect={(value) => {
+                  fetchBranches(value);
+                  form.setFieldsValue({ branch: undefined });
+                }}
+              />
+              {isBranchMode && (
+                <BranchSelect branches={branches} loading={branchLoading} />
+              )}
+            </Form.Item>,
+          ],
+        },
+      ],
+    },
+  ];
+
   return (
-    <Modal
+    <StepModal
+      visible={visible}
+      onClose={onClose}
+      onSubmit={handleSubmit}
+      title={isBranchMode ? "Add Branch Admin" : "Add Company Admin"}
+      steps={formSteps}
+      loading={loading}
+      form={form}
+    />
+  );
+  {
+    /* <Modal
       title={isBranchMode ? "Add Branch Admin" : "Add Company Admin"}
       open={visible}
       onCancel={onClose}
@@ -159,8 +224,8 @@ const AddAdminModal: React.FC<AddAdminModalProps> = ({
           </Button>
         </Form.Item>
       </Form>
-    </Modal>
-  );
+    </Modal> */
+  }
 };
 
 export default AddAdminModal;

@@ -133,11 +133,13 @@ export const CompanySelect = ({
   loading,
   onSearch,
   onSelect,
+  disabled,
 }: {
   companies: any[];
   loading: boolean;
   onSearch: (text: string) => void;
   onSelect: (id: string) => void;
+  disabled?: boolean;
 }) => {
   const isDisabled = !hasRole(["ADMIN"]);
   const defaultCompany = hasRole(["COMPANY_ADMIN", "BRANCH_ADMIN"])
@@ -151,7 +153,7 @@ export const CompanySelect = ({
       style={{ marginBottom: 8 }}
     >
       <Select
-        disabled={isDisabled}
+        disabled={disabled ? disabled : isDisabled}
         showSearch
         placeholder="Search and select company"
         filterOption={false}

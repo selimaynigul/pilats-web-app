@@ -13,7 +13,7 @@ import {
   JobSelect,
 } from "components/FormFields";
 
-interface EditTrainerFormProps {
+interface EditUserFormProps {
   visible: boolean;
   onClose: () => void;
   onSubmit: (values: any) => void;
@@ -24,7 +24,7 @@ interface EditTrainerFormProps {
 const safeFormat = (d?: dayjs.Dayjs | null) =>
   d && dayjs.isDayjs(d) && d.isValid() ? d.format("YYYY-MM-DD") : null;
 
-const EditTrainerForm: React.FC<EditTrainerFormProps> = ({
+const EditUserForm: React.FC<EditUserFormProps> = ({
   visible,
   onClose,
   onSubmit,
@@ -60,7 +60,6 @@ const EditTrainerForm: React.FC<EditTrainerFormProps> = ({
       location: initialValues.location,
       jobId: initialValues.jobId,
       jobName: initialValues.jobName,
-      isActive: !initialValues.passive,
       endDate: initialValues.passive
         ? dayjs(initialValues.passiveEndDate)
         : null,
@@ -100,8 +99,8 @@ const EditTrainerForm: React.FC<EditTrainerFormProps> = ({
       buttonText: "Next",
       blocks: [
         {
-          title: "Trainer Info",
-          description: "Update trainer's personal and contact details",
+          title: "User Info",
+          description: "Update user's personal and contact details",
           fields: [
             <JobSelect />,
             <FormRow>
@@ -118,36 +117,17 @@ const EditTrainerForm: React.FC<EditTrainerFormProps> = ({
     },
     {
       label: "Contact & Status",
-      buttonText: "Update Trainer",
+      buttonText: "Update User",
       blocks: [
         {
           title: "Contact & Status",
-          description: "Update trainer's contact information and status",
+          description: "Update user's contact information and status",
           fields: [
             <FormRow>
               <EmailInput disabled={true} />
               <PhoneInput />
             </FormRow>,
             <LocationInput />,
-            <FormRow>
-              <Form.Item
-                style={{ height: 40 }}
-                name="isActive"
-                valuePropName="checked"
-              >
-                <Checkbox onChange={(e) => setIsActive(e.target.checked)}>
-                  Is Active
-                </Checkbox>
-              </Form.Item>
-              {!isActive && (
-                <Form.Item name="endDate">
-                  <DatePicker
-                    placeholder="End date *"
-                    style={{ width: "100%" }}
-                  />
-                </Form.Item>
-              )}
-            </FormRow>,
           ],
         },
       ],
@@ -159,7 +139,7 @@ const EditTrainerForm: React.FC<EditTrainerFormProps> = ({
       visible={visible}
       onClose={onClose}
       onSubmit={handleSubmit}
-      title="Edit Trainer"
+      title="Edit Customer"
       steps={formSteps}
       form={form}
       loading={loading}
@@ -167,4 +147,4 @@ const EditTrainerForm: React.FC<EditTrainerFormProps> = ({
   );
 };
 
-export default EditTrainerForm;
+export default EditUserForm;
