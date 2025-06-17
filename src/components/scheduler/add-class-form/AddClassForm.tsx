@@ -70,7 +70,7 @@ const SpinnerContainer = styled.span`
   display: flex;
   padding-bottom: 2px;
   background: #f5f5f5;
-  border-radius: 6px;
+  border-radius: 8px;
 
   &:first-child > div:last-child {
     /*  border-left: 1px solid rgb(216, 216, 216); */
@@ -132,11 +132,12 @@ const AddClassForm: React.FC<AddClassFormProps> = forwardRef((props, ref) => {
   const [branchOptions, setBranchOptions] = useState<any[]>([]);
   const [selectedBranch, setSelectedBranch] = useState<any>(null);
   const [selectedDate, setSelectedDate] = useState<dayjs.Dayjs | null>(null);
+  const [spinnerTime, setSpinnerTime] = useState<any>([]);
+
   const { t } = useLanguage();
 
   useImperativeHandle(ref, () => ({
     resetForm: () => {
-      setTrainers([]);
       setSelectedBranch(null);
     },
   }));
@@ -335,8 +336,6 @@ const AddClassForm: React.FC<AddClassFormProps> = forwardRef((props, ref) => {
         message.error("Error searching branches");
       });
   };
-
-  const [spinnerTime, setSpinnerTime] = useState<any>([]);
 
   return (
     <StyleOverrides>

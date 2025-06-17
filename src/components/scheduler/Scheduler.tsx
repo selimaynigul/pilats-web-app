@@ -75,8 +75,14 @@ const Scheduler: React.FC<{
 
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [selectedSession, setSelectedSession] = useState<any | null>(null);
+  const [selectedSessionId, setSelectedSessionId] = useState<number | null>(
+    null
+  );
 
+  const selectedSession = useMemo(
+    () => sessions.find((s) => s.id === selectedSessionId) || null,
+    [sessions, selectedSessionId]
+  );
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRange, setSelectedRange] = useState<{
     start: Date;
@@ -256,11 +262,11 @@ const Scheduler: React.FC<{
       /* 1) ID takvimdeki veriler içindeyse hemen aç */
       const found = sessions.find((s) => String(s.id) === id);
       if (found) {
-        setSelectedSession(found);
+        setSelectedSessionId(found);
         setDrawerVisible(true);
       } else {
         /* 2) Henüz gelmediyse, Drawer’ı boş aç → Drawer fetch eder */
-        setSelectedSession(null);
+        setSelectedSessionId(null);
         setDrawerVisible(true);
       }
     }
@@ -457,8 +463,12 @@ const Scheduler: React.FC<{
         }
       })
       .catch((error) => {
+        if (error?.response.data.errorCode === 2001) {
+          message.error("Trainer is not available at this time interval");
+        } else {
+          message.error("Failed to add event. Please try again.");
+        }
         console.error("Failed to add event:", error);
-        message.error("Failed to add event. Please try again.");
       })
       .finally(() => {
         setLoading(false); // Stop loading
@@ -650,12 +660,12 @@ const Scheduler: React.FC<{
 
   // --------------- ortak fonksiyonlar ---------------
   const openDrawer = (ev: any) => {
-    setSelectedSession(ev);
+    setSelectedSessionId(ev.id);
     setDrawerVisible(true);
   };
 
   const openEditModal = (ev: any) => {
-    setSelectedSession(ev);
+    setSelectedSessionId(ev.id);
     setEditModalOpen(true);
   };
 
@@ -678,7 +688,7 @@ const Scheduler: React.FC<{
             fetchSessions(visibleRange.start, visibleRange.end, false, true);
 
           setDrawerVisible(false);
-          setSelectedSession(null);
+          setSelectedSessionId(null);
         } catch {
           message.error(t.deleteFailed || "Silinemedi");
         }
@@ -691,6 +701,23 @@ const Scheduler: React.FC<{
       return fetchSessions(visibleRange.start, visibleRange.end, true, true);
     }
   };
+
+  // TODO: scheduler sayfasındayken session search yapılıp takvimde görünen aydan başka bir aya gidilirse
+  //       o aya gitmiyor, bu sorunu çözmek için bu useeffect eklendi ama bu da takvimde navigate ederken
+  //       urldate de değiştiği için buranın tetiklenmesine ve gotodate() iki kere çalışmasına sebep oluyor.
+  //       görünürde bir sıkıntı yok ama yine de düzeltilmesi gerek.
+  /*   useEffect(() => {
+    if (!urlDate) return;
+
+    // YYYY-MM veya YYYY-MM-DD formatında mı?
+    if (
+      dayjs(urlDate, "YYYY-MM", true).isValid() ||
+      dayjs(urlDate, "YYYY-MM-DD", true).isValid()
+    ) {
+      const newDate = dayjs(urlDate).toDate();
+      setDate(newDate);
+    }
+  }, [urlDate]); */
 
   const goToDate = (newDate: Date) => {
     const current = dateRef.current;
@@ -897,7 +924,7 @@ const Scheduler: React.FC<{
         open={drawerVisible}
         onClose={() => {
           setDrawerVisible(false);
-          setSelectedSession(null);
+          setSelectedSessionId(null);
           searchParams.delete("id");
           navigate({ search: searchParams.toString() }, { replace: true });
         }}
@@ -912,6 +939,7 @@ const Scheduler: React.FC<{
         footer={null}
       >
         <EditSessionForm
+          visible={editModalOpen}
           session={selectedSession}
           onClose={() => setEditModalOpen(false)}
           onUpdated={fetch}

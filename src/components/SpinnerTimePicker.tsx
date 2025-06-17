@@ -1,21 +1,22 @@
-import { message } from "antd";
 import { useLanguage } from "hooks";
 import React from "react";
 import { TimePicker } from "react-ios-time-picker";
 import styled from "styled-components";
+import dayjs from "dayjs";
 
 const StyleOverrides = styled.div`
   .react-ios-time-picker-input {
     background: #f5f5f5;
     padding: 6px 11px 4px;
     width: 100%;
+    height: 40px;
 
     font-size: 14px;
     line-height: 1;
     border-width: 1px;
     border-style: solid;
     border-color: transparent;
-    border-radius: 6px;
+    border-radius: 8px;
     transition:
       border 0.2s,
       box-shadow 0.2s,
@@ -32,7 +33,7 @@ const StyleOverrides = styled.div`
 `;
 
 interface SpinnerTimePickerProps {
-  value?: string | null; // Örnek: "12:00 PM"
+  value?: string;
   onChange?: (time: string) => void;
   placeHolder?: string;
   isOpen?: boolean;
@@ -40,13 +41,15 @@ interface SpinnerTimePickerProps {
 }
 
 const SpinnerTimePicker: React.FC<SpinnerTimePickerProps> = ({
-  value = null,
+  value,
   onChange,
   placeHolder,
   isOpen,
   onSave,
 }) => {
-  const { userLanguage } = useLanguage();
+  const formattedValue = value
+    ? dayjs(value, ["HH:mm", "hh:mm A"]).format("HH:mm")
+    : "";
 
   return (
     <StyleOverrides>
@@ -57,8 +60,7 @@ const SpinnerTimePicker: React.FC<SpinnerTimePickerProps> = ({
         saveButtonText="Save"
         placeHolder={placeHolder}
         onChange={onChange}
-        value={value}
-        use12Hours={userLanguage === "en"}
+        value={formattedValue || undefined}
       />
     </StyleOverrides>
   );
