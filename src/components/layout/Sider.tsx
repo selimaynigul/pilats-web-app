@@ -81,7 +81,7 @@ const CustomTrigger = styled.div.withConfig({
   left: 10px;
   border-radius: 10px;
   background: ${({ theme }) => theme.triggerBg};
-  color: black;
+  color: ${({ theme }) => theme.title};
 `;
 
 const BottomSwitch = styled(Switch)`

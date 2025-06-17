@@ -70,7 +70,7 @@ export const CalendarWrapper = styled.div`
 
   .rbc-agenda-time-cell,
   .rbc-agenda-date-cell {
-    color: #4d3abd;
+    color: ${({ theme }) => theme.title};
   }
 
   .rbc-agenda-view::-webkit-scrollbar {
@@ -179,7 +179,7 @@ export const CalendarWrapper = styled.div`
   }
 
   .rbc-label {
-    color: #5d46e5;
+    color: ${({ theme }) => theme.title};
   }
 
   .rbc-time-view .rbc-allday-cell {
@@ -208,7 +208,7 @@ export const CalendarWrapper = styled.div`
 
   .rbc-agenda-view table.rbc-agenda-table tbody > tr > td + td,
   .rbc-agenda-view table.rbc-agenda-table thead > tr > th {
-    border-left: 1px solid #e6e3ff;
+    border-left: 1px solid ${({ theme }) => theme.calendarBorder};
   }
 
   .rbc-time-content,
@@ -246,17 +246,19 @@ export const CalendarWrapper = styled.div`
 
   /* Alternating vertical backgrounds */
   .rbc-time-content .rbc-day-slot:nth-child(2n + 1) {
-    border-right: 1px solid #e6e3ff;
-    border-left: 1px solid #e6e3ff;
+    border-right: 1px solid ${({ theme }) => theme.calendarBorder};
+    border-left: 1px solid ${({ theme }) => theme.calendarBorder};
   }
 
   /* Alternating horizontal backgrounds */
   .rbc-time-slot:nth-child(2n) {
-    background-color: rgba(245, 243, 255, 1);
+    background-color: #f5f3ff;
+    background: ${({ theme }) => theme.cardBg}80;
   }
 
   .rbc-time-slot:nth-child(2n + 1) {
     background-color: rgba(230, 227, 255, 0.5);
+    background: ${({ theme }) => theme.contentBg};
   }
 
   /* Make left time slot transparent */

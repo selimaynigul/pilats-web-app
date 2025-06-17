@@ -198,7 +198,7 @@ export const StyledAvatar = styled(Avatar)`
   background-size: cover;
   font-size: 18px;
   cursor: pointer;
-  background-color: ${({ theme }) => theme.avatarBg};
+  background-color: ${({ theme }) => theme.profileAvatarBg};
 `;
 
 export const ResultItem = styled.div`

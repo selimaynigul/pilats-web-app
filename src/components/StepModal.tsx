@@ -161,6 +161,10 @@ const FooterButtons = styled.div`
   display: flex;
   justify-content: flex-end;
   gap: 12px;
+
+  .ant-btn-default:hover {
+    background: ${({ theme }) => theme.contentBg} !important;
+  }
 `;
 
 export interface StepBlock {
@@ -298,7 +302,7 @@ const StepModal: React.FC<StepModalProps> = ({
                   style={{
                     background: theme.bodyBg,
                     color: theme.text,
-                    borderColor: `${theme.text}70`,
+                    borderColor: `${theme.text}50`,
                   }}
                   onClick={() => setCurrentStep(currentStep - 1)}
                 >

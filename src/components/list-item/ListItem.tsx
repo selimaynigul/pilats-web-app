@@ -88,7 +88,7 @@ const ListItem: React.FC<ListItemProps> = ({ data, type = "default" }) => {
             <Avatar
               size={60}
               src={imageUrl ?? undefined}
-              style={{ background: "lightgrey", flexShrink: 0 }}
+              style={{ background: theme.avatarBg, flexShrink: 0 }}
             >
               {title?.[0]?.toUpperCase()}
             </Avatar>

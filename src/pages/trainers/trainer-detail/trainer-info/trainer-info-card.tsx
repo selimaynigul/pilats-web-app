@@ -47,7 +47,7 @@ const AvatarWrapper = styled.div`
   }
 `;
 const Container = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.cardBg};
   border-radius: 20px;
   height: 100%;
   display: flex;
@@ -85,12 +85,14 @@ const ProfileSection = styled.div`
 const Name = styled.h2`
   font-size: 1.5em;
   margin: 10px 0 5px;
+  color: ${({ theme }) => theme.text};
 `;
 
 const Title = styled.h4`
   font-size: 1.1em;
   color: gray;
   margin: 0;
+  color: ${({ theme }) => theme.text};
 `;
 
 const InfoSection = styled.div`
@@ -105,8 +107,10 @@ const InfoItem = styled.div`
   margin-bottom: 10px;
   font-size: 1em;
   line-height: 1.5;
+  color: ${({ theme }) => theme.text}90;
 
   span {
+    color: ${({ theme }) => theme.text};
     font-weight: bold;
   }
 `;
@@ -161,7 +165,7 @@ const CompanyInfo = styled.div`
 `;
 
 const CompanyLogo = styled.div`
-  background: #e6e3ff;
+  background: ${({ theme }) => theme.avatarBg};
   height: 40px;
   width: 40px;
   border-radius: 10px;

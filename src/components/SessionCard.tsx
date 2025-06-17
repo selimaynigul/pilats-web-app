@@ -29,7 +29,7 @@ const Card = styled.div`
   p {
     margin: 4px 0 12px;
     font-size: 0.9em;
-    color: #666;
+    color: ${({ theme }) => theme.text}90;
   }
 
   .date-time {
@@ -48,11 +48,11 @@ const DateTimeBox = styled.div`
   align-items: center;
   gap: 8px;
   padding: 8px;
-  border: 1px solid #e6e6e6;
+  border: 1px solid ${({ theme }) => theme.calendarBorder};
   border-radius: 8px;
-  background: #f9f9f9;
+  background: ${({ theme }) => theme.contentBg};
   font-size: 0.9em;
-  color: #555;
+  color: ${({ theme }) => theme.text};
 
   .icon {
     color: ${({ theme }) => theme.primary};
