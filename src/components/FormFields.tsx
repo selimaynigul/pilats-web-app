@@ -16,6 +16,7 @@ import JobForm from "./JobForm";
 interface FormFieldProps {
   rules?: any[];
   placeholder?: string;
+  disabled?: boolean | undefined;
 }
 
 const countryCodes = [
@@ -59,7 +60,10 @@ export const BirthdatePicker: React.FC<FormFieldProps> = ({ rules }) => (
   </Form.Item>
 );
 
-export const EmailInput: React.FC<FormFieldProps> = ({ rules }) => (
+export const EmailInput: React.FC<FormFieldProps> = ({
+  rules,
+  disabled = false,
+}) => (
   <Form.Item
     name="email"
     rules={
@@ -69,7 +73,7 @@ export const EmailInput: React.FC<FormFieldProps> = ({ rules }) => (
       ]
     }
   >
-    <Input placeholder="Email *" />
+    <Input disabled={disabled} placeholder="Email *" />
   </Form.Item>
 );
 
@@ -87,9 +91,21 @@ export const PhoneInput: React.FC<FormFieldProps> = ({ rules }) => (
       </Form.Item>
       <Form.Item
         name="phoneNumber"
-        rules={
-          rules || [{ required: true, message: "Please enter phone number" }]
-        }
+        rules={[
+          ...(rules || [
+            { required: true, message: "Please enter phone number" },
+          ]),
+          {
+            validator: (_, value) => {
+              if (!value || value.length === 10) {
+                return Promise.resolve();
+              }
+              // Sadece submit sırasında hata gösterilsin
+              return Promise.reject("Geçerli bir telefon numarası giriniz");
+            },
+            validateTrigger: "onSubmit",
+          },
+        ]}
         noStyle
       >
         <Input

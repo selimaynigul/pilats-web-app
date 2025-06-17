@@ -23,10 +23,9 @@ const CompaniesToolbar: React.FC<{ trainerCount: number }> = ({
       setIsModalVisible(false);
       window.location.reload();
     } catch (err: any) {
-      if (err.response?.data?.message) {
-        message.error(err.response.data.message);
+      if (err.response?.data?.errorCode === 1606) {
+        message.error("A company with this email already exists");
       }
-      handleError(err);
     } finally {
       setLoading(false);
     }

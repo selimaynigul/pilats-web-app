@@ -15,20 +15,22 @@ const TrainerDetailPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const { id } = useParams<{ id: string }>();
 
-  useEffect(() => {
-    const fetchTrainer = async () => {
-      try {
-        const response = await trainerService.getById(id);
-        setTrainer(response.data);
-      } catch (error) {
-        console.error("Error fetching trainer:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchTrainer = async () => {
+    setLoading(true);
+    try {
+      const response = await trainerService.getById(id);
+      setTrainer(response.data);
+    } catch (error) {
+      console.error("Error fetching trainer:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchTrainer();
   }, [id]);
+
   return (
     <Container>
       {loading ? (
@@ -36,7 +38,11 @@ const TrainerDetailPage: React.FC = () => {
       ) : (
         <Row gutter={[16, 16]} style={{ height: "100%" }}>
           <Col xs={24} sm={24} md={8}>
-            <TrainerInfo trainer={trainer} loading={loading} />
+            <TrainerInfo
+              refresh={fetchTrainer}
+              trainer={trainer}
+              loading={loading}
+            />
           </Col>
           <Col xs={24} sm={24} md={16}>
             <TrainerClassesList trainer={trainer} />

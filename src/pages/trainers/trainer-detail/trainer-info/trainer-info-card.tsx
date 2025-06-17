@@ -261,10 +261,11 @@ const Status = styled.div`
   font-size: 0.9em;
 `;
 
-const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
-  trainer,
-  loading,
-}) => {
+const TrainerInfo: React.FC<{
+  trainer: any;
+  loading: boolean;
+  refresh: any;
+}> = ({ trainer, loading, refresh }) => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -278,9 +279,9 @@ const TrainerInfo: React.FC<{ trainer: any; loading: any }> = ({
     setEditLoading(true);
     try {
       await trainerService.update(payload);
-      message.success("Trainer updated successfully");
       setIsEditModalVisible(false);
-      window.location.reload();
+      refresh();
+      message.success("Trainer updated successfully");
     } catch (error) {
       console.error("Error updating trainer:", error);
       message.error("Failed to update trainer.");

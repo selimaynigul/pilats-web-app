@@ -168,12 +168,16 @@ const StepModal: React.FC<StepModalProps> = ({
 
   useEffect(() => {
     const activeSlide = slideRefs.current[currentStep];
-    if (activeSlide) {
-      requestAnimationFrame(() => {
-        setContainerHeight(activeSlide.offsetHeight);
-      });
-    }
-  }, [currentStep, form]);
+    if (!activeSlide) return;
+
+    const observer = new ResizeObserver(() => {
+      setContainerHeight(activeSlide.offsetHeight);
+    });
+
+    observer.observe(activeSlide);
+
+    return () => observer.disconnect();
+  }, [currentStep]);
 
   return (
     <Modal

@@ -1,7 +1,12 @@
 import React from "react";
 import { Form } from "antd";
 import StepModal, { CustomStep, FormRow } from "components/StepModal";
-import { NameInput, EmailInput, PhoneInput } from "components/FormFields";
+import {
+  NameInput,
+  EmailInput,
+  PhoneInput,
+  LocationInput,
+} from "components/FormFields";
 
 interface AddCompanyFormProps {
   visible: boolean;
@@ -26,6 +31,7 @@ const AddCompanyForm: React.FC<AddCompanyFormProps> = ({
           companyName: values.name,
           telNo: `${values.countryCode}${values.phoneNumber}`,
           mail: values.email,
+          location: values.location,
         };
         onSubmit(payload);
       })
@@ -60,6 +66,7 @@ const AddCompanyForm: React.FC<AddCompanyFormProps> = ({
                 ]}
               />
             </FormRow>,
+            <LocationInput />,
           ],
         },
       ],

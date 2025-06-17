@@ -92,7 +92,6 @@ const EditTrainerForm: React.FC<EditTrainerFormProps> = ({
 
       onSubmit(payload);
     } catch (err) {
-      message.error("Validation error.");
       console.error(err);
     }
   };
@@ -128,7 +127,7 @@ const EditTrainerForm: React.FC<EditTrainerFormProps> = ({
           description: "Update trainer's contact information and status",
           fields: [
             <FormRow>
-              <EmailInput />
+              <EmailInput disabled={true} />
               <PhoneInput />
             </FormRow>,
             <LocationInput />,

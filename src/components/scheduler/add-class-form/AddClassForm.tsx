@@ -211,12 +211,6 @@ const AddClassForm: React.FC<AddClassFormProps> = forwardRef((props, ref) => {
     form.setFieldsValue({ trainer: null });
   };
 
-  /* const parseTimeString = (date: dayjs.Dayjs, timeStr: string) => {
-    const is12Hour = /AM|PM/i.test(timeStr);
-    const format = is12Hour ? "YYYY-MM-DD hh.mm A" : "YYYY-MM-DD HH.mm";
-    return dayjs(`${date.format("YYYY-MM-DD")} ${timeStr}`, format);
-  }; */
-
   const handleFinish = (values: any) => {
     values = { ...values, repeatFrequency };
 
@@ -238,23 +232,25 @@ const AddClassForm: React.FC<AddClassFormProps> = forwardRef((props, ref) => {
       );
       endTime = dayjs(`${selectedDate.format("YYYY-MM-DD")} ${endStr}`, format);
 
-      // Bu değerleri formdaki timeRange alanına da yazalım (uyumlu kalsın)
       values.timeRange = [startTime, endTime];
     } else {
       [startTime, endTime] = values.timeRange || [null, null];
     }
 
-    console.log(startTime, endTime);
     if (!startTime || !endTime) {
       message.warning("Başlangıç ve bitiş saatleri zorunludur.");
       return;
     }
 
-    const startDateTime = selectedDate
+    const startDateTime = dayjs(selectedDate)
       .hour(dayjs(startTime).hour())
       .minute(dayjs(startTime).minute());
 
-    const endDateTime = selectedDate
+    const repeatEndDate = values.endDate
+      ? dayjs(values.endDate)
+      : dayjs(selectedDate); // Tekrarsızsa aynı gün olur
+
+    const endDateTime = repeatEndDate
       .hour(dayjs(endTime).hour())
       .minute(dayjs(endTime).minute());
 
@@ -293,7 +289,7 @@ const AddClassForm: React.FC<AddClassFormProps> = forwardRef((props, ref) => {
     setRepeat(false);
     setRepeatFrequency("weekly");
     setShowDescription(false);
-    setSpinnerTime([]); // Temizlik
+    setSpinnerTime([]);
   };
 
   const dateFormat = (value: dayjs.Dayjs) => value.format("MMMM D, YYYY"); // Custom format
