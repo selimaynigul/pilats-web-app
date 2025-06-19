@@ -409,14 +409,19 @@ const Scheduler: React.FC<{
       return;
     }
 
-    // ⏳ 2. Aynı günse ve saat geçmişse
-    if (startDay.isSame(nowDay, "day") && startDay.isBefore(nowDay)) {
+    // ⏳ 2. Yalnızca week veya day view'da: Aynı günse ve saat geçmişse
+    if (
+      (currentView === "week" || currentView === "day") &&
+      startDay.isSame(nowDay, "day") &&
+      startDay.isBefore(nowDay)
+    ) {
       message.warning("Başlangıç saati geçmiş olamaz.");
       return;
     }
 
     if (hasRole(["COMPANY_ADMIN", "BRANCH_ADMIN"])) {
-      setSelectedRange(slotInfo);
+      const adjustedEnd = dayjs(slotInfo.end).subtract(1, "day").toDate();
+      setSelectedRange({ start: slotInfo.start, end: adjustedEnd });
       setIsModalVisible(true);
     }
   };

@@ -12,6 +12,7 @@ import {
   LocationInput,
   JobSelect,
 } from "components/FormFields";
+import { useLanguage } from "hooks";
 
 interface EditCompanyFormProps {
   visible: boolean;
@@ -32,6 +33,7 @@ const EditCompanyForm: React.FC<EditCompanyFormProps> = ({
   loading,
 }) => {
   const [form] = Form.useForm();
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (!initialValues) return;
@@ -76,12 +78,12 @@ const EditCompanyForm: React.FC<EditCompanyFormProps> = ({
 
   const formSteps: CustomStep[] = [
     {
-      label: "Company Info",
-      buttonText: "Add Company",
+      label: t.companyInfo,
+      buttonText: t.save,
       blocks: [
         {
-          title: "Basic Details",
-          description: "Enter company information",
+          title: t.companyInfo,
+          description: t.companyInfoDescription,
           fields: [
             <NameInput
               placeholder="Company Name *"
@@ -113,7 +115,7 @@ const EditCompanyForm: React.FC<EditCompanyFormProps> = ({
       visible={visible}
       onClose={onClose}
       onSubmit={handleSubmit}
-      title="Edit Company"
+      title={t.editCompany}
       steps={formSteps}
       form={form}
       loading={loading}

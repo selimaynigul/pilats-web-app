@@ -35,9 +35,9 @@ apiClient.interceptors.response.use(
   },
   (error) => {
     if (error.response && error.response.status === 403) {
-      sessionStorage.setItem("redirectAfterLogin", window.location.pathname);
+      /*    sessionStorage.setItem("redirectAfterLogin", window.location.pathname);
       localStorage.clear();
-      window.location.href = "/login";
+      window.location.href = "/login"; */
     }
 
     return Promise.reject(error);

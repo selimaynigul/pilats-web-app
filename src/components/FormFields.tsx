@@ -228,10 +228,27 @@ export const CompanySelect = ({
     ? getUser().companyName
     : undefined;
 
+  // Eğer defaultCompany varsa, Form.Item'ın initialValue'su olarak ver
   return (
     <Form.Item
       name="company"
-      rules={[{ required: true, message: "Please select company" }]}
+      initialValue={defaultCompany}
+      rules={[
+        {
+          required: true,
+          message: "Please select company",
+          // Eğer defaultCompany varsa valid say
+          validator: (_, value) => {
+            if (value !== undefined && value !== null && value !== "") {
+              return Promise.resolve();
+            }
+            if (defaultCompany) {
+              return Promise.resolve();
+            }
+            return Promise.reject("Please select company");
+          },
+        },
+      ]}
       style={{ marginBottom: 8 }}
     >
       <Select
@@ -242,7 +259,6 @@ export const CompanySelect = ({
         onSearch={onSearch}
         onSelect={onSelect}
         loading={loading}
-        defaultValue={defaultCompany}
         placeholder={
           <span style={{ color: theme.formPlaceholder }}>
             {t.selectCompany}
@@ -274,16 +290,31 @@ export const BranchSelect = ({
     ? getUser().branchName
     : undefined;
 
+  // Eğer defaultBranch varsa, Form.Item'ın initialValue'su olarak ver
   return (
     <Form.Item
       name="branch"
-      rules={[{ required: true, message: "Please select branch" }]}
+      initialValue={defaultBranch}
+      rules={[
+        {
+          required: true,
+          message: "Please select branch",
+          validator: (_, value) => {
+            if (value !== undefined && value !== null && value !== "") {
+              return Promise.resolve();
+            }
+            if (defaultBranch) {
+              return Promise.resolve();
+            }
+            return Promise.reject("Please select branch");
+          },
+        },
+      ]}
     >
       <Select
         style={{ background: theme.transparentInputBg }}
         disabled={isDisabled}
         loading={loading}
-        defaultValue={defaultBranch}
         placeholder={
           <span style={{ color: theme.formPlaceholder }}>{t.selectBranch}</span>
         }

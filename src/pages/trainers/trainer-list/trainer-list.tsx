@@ -39,11 +39,13 @@ const TrainerList: React.FC<TrainerListProps> = ({
           : null,
     };
   }, [company?.id, company?.companyId]);
+
   const {
     items: trainers,
     loading,
     hasMore,
     loadMore,
+    refetch,
   } = usePagination({
     fetchService: trainerService.search,
     params,

@@ -12,7 +12,7 @@ import {
   DeleteOutlined,
 } from "@ant-design/icons";
 import { companyService, branchService, imageService } from "services";
-import { capitalize } from "utils/permissionUtils";
+import { capitalize, hasRole } from "utils/permissionUtils";
 import { Helmet } from "react-helmet";
 import EditCompanyForm from "pages/companies/edit-company-form/edit-company-form";
 
@@ -168,7 +168,10 @@ const AvatarWrapper = styled.div`
   }
 `;
 
-const CompanyInfo: React.FC<{ setBranches: any }> = ({ setBranches }) => {
+const CompanyInfo: React.FC<{
+  setCompanyId: any;
+  fetchBranches: any;
+}> = ({ setCompanyId, fetchBranches }) => {
   const { id } = useParams<{ id: string }>();
   const [company, setCompany] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -180,20 +183,14 @@ const CompanyInfo: React.FC<{ setBranches: any }> = ({ setBranches }) => {
   useEffect(() => {
     companyService
       .search({ id })
-      .then((response) => {
+      .then(async (response) => {
         const fetchedCompany = response.data[0];
         setCompany(fetchedCompany);
 
         if (fetchedCompany?.id) {
-          return branchService.search({
-            companyId: fetchedCompany.id,
-          });
+          setCompanyId(fetchedCompany.id);
+          await fetchBranches(fetchedCompany.id);
         }
-
-        return Promise.reject("company not found");
-      })
-      .then((branchResponse) => {
-        setBranches(branchResponse.data);
       })
       .catch((error) => {
         console.error("Error fetching company or branches:", error);
@@ -289,14 +286,18 @@ const CompanyInfo: React.FC<{ setBranches: any }> = ({ setBranches }) => {
         <title>Pilats - {company.companyName}</title>
       </Helmet>
       <Container>
-        <ActionButtons>
-          <EditButton onClick={handleEdit} type="primary">
-            <EditFilled />
-          </EditButton>
-          <DeleteButton onClick={handleDelete} type="primary">
-            <DeleteOutlined />
-          </DeleteButton>
-        </ActionButtons>
+        {hasRole(["ADMIN"]) && (
+          <ActionButtons>
+            <EditButton onClick={handleEdit} type="primary">
+              <EditFilled />
+            </EditButton>
+            {hasRole(["ADMIN"]) && (
+              <DeleteButton onClick={handleDelete} type="primary">
+                <DeleteOutlined />
+              </DeleteButton>
+            )}
+          </ActionButtons>
+        )}
         <ProfileSection>
           <AvatarContainer onClick={handleAvatarClick}>
             <AvatarWrapper>
@@ -321,7 +322,6 @@ const CompanyInfo: React.FC<{ setBranches: any }> = ({ setBranches }) => {
             />
           </AvatarContainer>
           <Name>{capitalize(company.companyName)}</Name>
-          <Title>İstanbul</Title>
         </ProfileSection>
 
         <InfoSection>

@@ -99,8 +99,8 @@
   "trainerPersonalInfoDescription": "Eğitmenin kişisel bilgilerini girin",
   "userPersonalInfoDescription": "Kullanıcının kişisel bilgilerini girin",
   "contactInfo": "İletişim Bilgileri",
-  "contactInfoDescription": "Eğitmenin iletişim bilgilerini girin",
-  "companyInfoDescription": "Eğitmenin şirket/şube bilgilerini girin",
+  "trainerContactInfoDescription": "Eğitmenin iletişim bilgilerini girin",
+  "trainerCompanyInfoDescription": "Eğitmenin şirket/şube bilgilerini girin",
   "selectJob": "Meslek seçin",
   "firstName": "Ad *",
   "lastName": "Soyad *",
@@ -142,5 +142,15 @@
   "discountPlaceholder": "İndirim (örn. 0.2 = %20) *",
   "bonusCountPlaceholder": "Bonus sayısı *",
   "changeCountPlaceholder": "Değişim hakkı *",
-  "addPackage": "Paketi Ekle"
+  "addPackage": "Paketi Ekle",
+  "save": "Kaydet",
+  "editCompany": "Şirketi Düzenle",
+  "editBranch": "Şubeyi Düzenle",
+  "editTrainer": "Eğitmeni Düzenle",
+  "editUser": "Kullanıcıyı Düzenle",
+  "editAdmin": "Yönetici Düzenle",
+  "companyInfoDescription": "Şirket bilgilerini girin",
+  "addAdmin": "Yönetici Ekle",
+  "aboutAdmin": "Yönetici bilgisi",
+  "addBranch": "Şube Ekle"
 }

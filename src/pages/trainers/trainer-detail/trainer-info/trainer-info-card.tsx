@@ -13,7 +13,7 @@ import {
 } from "@ant-design/icons";
 import { imageService, trainerService } from "services";
 import moment from "moment";
-import { capitalize } from "utils/permissionUtils";
+import { capitalize, hasRole } from "utils/permissionUtils";
 import EditTrainerForm from "../edit-trainer-form/edit-trainer-form";
 import { Helmet } from "react-helmet";
 
@@ -371,14 +371,16 @@ const TrainerInfo: React.FC<{
       </Helmet>
       <Container>
         {/*  {!trainer.active && <Status>Not active</Status>} */}
-        <ActionButtons>
-          <EditButton onClick={handleEdit} type="primary">
-            <EditFilled />
-          </EditButton>
-          <DeleteButton onClick={handleDelete} type="primary">
-            <DeleteOutlined />
-          </DeleteButton>
-        </ActionButtons>
+        {!hasRole(["COMPANY_ADMIN"]) && (
+          <ActionButtons>
+            <EditButton onClick={handleEdit} type="primary">
+              <EditFilled />
+            </EditButton>
+            <DeleteButton onClick={handleDelete} type="primary">
+              <DeleteOutlined />
+            </DeleteButton>
+          </ActionButtons>
+        )}
 
         <ProfileSection>
           <AvatarContainer onClick={handleAvatarClick}>

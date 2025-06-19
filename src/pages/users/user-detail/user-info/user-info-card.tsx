@@ -13,7 +13,7 @@ import {
 import { imageService, userService } from "services";
 import moment from "moment";
 
-import { capitalize } from "utils/permissionUtils";
+import { capitalize, hasRole } from "utils/permissionUtils";
 import { Helmet } from "react-helmet";
 import EditUserForm from "pages/users/edit-user-form/edit-user-form";
 
@@ -276,14 +276,16 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
         </title>
       </Helmet>
       <Container>
-        <ActionButtons>
-          <EditButton onClick={handleEdit} type="primary">
-            <EditFilled />
-          </EditButton>
-          <DeleteButton onClick={handleDelete} type="primary">
-            <DeleteOutlined />
-          </DeleteButton>
-        </ActionButtons>
+        {!hasRole(["COMPANY_ADMIN"]) && (
+          <ActionButtons>
+            <EditButton onClick={handleEdit} type="primary">
+              <EditFilled />
+            </EditButton>
+            <DeleteButton onClick={handleDelete} type="primary">
+              <DeleteOutlined />
+            </DeleteButton>
+          </ActionButtons>
+        )}
 
         <ProfileSection>
           <AvatarContainer onClick={handleAvatarClick}>

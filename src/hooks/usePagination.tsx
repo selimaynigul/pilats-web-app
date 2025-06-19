@@ -51,9 +51,13 @@ export function usePagination<T>({
     fetchItems(nextPage);
   };
 
-  useEffect(() => {
+  const refetch = () => {
     setPage(initialPage);
     fetchItems(initialPage, true);
+  };
+
+  useEffect(() => {
+    refetch();
   }, [params, fetchService]);
 
   return {
@@ -61,6 +65,7 @@ export function usePagination<T>({
     loading,
     hasMore,
     loadMore,
+    refetch,
   };
 }
 

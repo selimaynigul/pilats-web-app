@@ -129,7 +129,7 @@ const Sidebar: React.FC<SiderProps> = ({
   const navigate = useNavigate();
 
   const loc = useLocation();
-  const { toggleTheme } = useTheme();
+  const { toggleTheme, getTheme } = useTheme();
 
   // Update selected key based on URL path
   useEffect(() => {
@@ -199,9 +199,7 @@ const Sidebar: React.FC<SiderProps> = ({
         <img
           className="logo-text"
           src={
-            window.localStorage.getItem("app-theme") === "dark"
-              ? "/logo-text.svg"
-              : "/logo-text-white.svg"
+            getTheme() === "light" ? "/logo-text.svg" : "/logo-text-white.svg"
           }
           alt="Logo Text"
         />

@@ -12,12 +12,14 @@ import { lightTheme, darkTheme } from "../theme";
 interface ThemeContextType {
   theme: Theme;
   toggleTheme: () => void;
+  getTheme: () => string;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 interface ThemeProviderProps {
   children: ReactNode;
+  getTheme?: () => Theme;
 }
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
@@ -36,8 +38,10 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     );
   };
 
+  const getTheme = () => (theme === darkTheme ? "dark" : "light");
+
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, getTheme }}>
       <StyledThemeProvider theme={theme}>{children}</StyledThemeProvider>
     </ThemeContext.Provider>
   );

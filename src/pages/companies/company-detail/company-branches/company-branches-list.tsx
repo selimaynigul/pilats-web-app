@@ -174,14 +174,16 @@ const CompanyBranchList: React.FC<{
       <MenuItem key="edit" onClick={() => handleEdit(branch)}>
         <BsPencil style={{ marginRight: 8 }} /> Update
       </MenuItem>
-      <MenuItem
-        key="delete"
-        className="delete"
-        onClick={() => handleDelete(branch.id)}
-        style={{ color: "red" }}
-      >
-        <BsTrash style={{ marginRight: 8 }} /> Delete
-      </MenuItem>
+      {!hasRole(["BRANCH_ADMIN"]) && (
+        <MenuItem
+          key="delete"
+          className="delete"
+          onClick={() => handleDelete(branch.id)}
+          style={{ color: "red" }}
+        >
+          <BsTrash style={{ marginRight: 8 }} /> Delete
+        </MenuItem>
+      )}
     </Menu>
   );
   return (
@@ -198,7 +200,8 @@ const CompanyBranchList: React.FC<{
             <BranchCard>
               <div>
                 <h3>{branch.branchName}</h3>
-                <p>{branch.address || "No address available"}</p>
+                {/*                 <p>{branch.address || "No address available"}</p>
+                 */}{" "}
               </div>
               <Dropdown
                 overlay={renderMenu(branch)}
@@ -215,7 +218,7 @@ const CompanyBranchList: React.FC<{
       </Row>
 
       <Modal
-        title="Add Branch"
+        title={t.addBranch}
         open={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
         onOk={() => {
@@ -225,7 +228,6 @@ const CompanyBranchList: React.FC<{
         <Form form={form} layout="vertical" variant="filled">
           <Form.Item
             name="branchName"
-            label="Branch Name"
             rules={[
               { required: true, message: "Please enter the branch name" },
             ]}

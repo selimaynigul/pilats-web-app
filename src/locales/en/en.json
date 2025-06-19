@@ -99,8 +99,8 @@
   "trainerPersonalInfoDescription": "Provide trainer's personal info",
   "userPersonalInfoDescription": "Provide trainer's personal info",
   "contactInfo": "Contact Info",
-  "contactInfoDescription": "Provide trainer's contact info",
-  "companyInfoDescription": "Provide trainer's company/branch info",
+  "trainerContactInfoDescription": "Provide trainer's contact info",
+  "trainerCompanyInfoDescription": "Provide trainer's company/branch info",
   "selectJob": "Select job",
   "firstName": "Firstname *",
   "lastName": "Lastname *",
@@ -142,5 +142,15 @@
   "discountPlaceholder": "Discount (e.g., 0.2 for 20%) *",
   "bonusCountPlaceholder": "Bonus count *",
   "changeCountPlaceholder": "Change count *",
-  "addPackage": "Add package"
+  "addPackage": "Add package",
+  "save": "Save",
+  "editCompany": "Edit Company",
+  "editBranch": "Edit Branch",
+  "editTrainer": "Edit Trainer",
+  "editUser": "Edit User",
+  "editAdmin": "Edit Admin",
+  "companyInfoDescription": "Provide company information",
+  "addAdmin": "Add Admin",
+  "aboutAdmin": "About admin",
+  "addBranch": "Add Branch"
 }

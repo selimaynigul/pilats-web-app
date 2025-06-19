@@ -55,7 +55,7 @@ const EventDrawer: React.FC<{
   const hasFetched = useRef(false);
   const navigate = useNavigate();
 
-  const [event, setEvent] = useState<any | null>(null); // session prop varsa
+  const [event, setEvent] = useState<any | null>(null);
   const [prevId, setPrevId] = useState<number | undefined>();
 
   const { t } = useLanguage();
@@ -69,20 +69,17 @@ const EventDrawer: React.FC<{
 
   const [searchValue, setSearchValue] = useState("");
 
-  const showAttendance = dayjs().isAfter(dayjs(event?.start), "minute");
-
   useEffect(() => {
     if (!open || !sessionId) return;
 
     // ID değiştiyse veriyi sıfırla ve yeniden çek
-    if (prevId !== sessionId) {
+    // TODO: ders update olunca yeni veri gelmiyor tekrar çekmediği için
+    /*   if (prevId !== sessionId) {
       setPrevId(sessionId);
       setEvent(null);
       setAttendees([]);
       setLoadingAttendees(true);
-    }
-
-    if (event) return; // ayni id için ikinci kez çağırma
+    } */
 
     const fetchData = async () => {
       try {
