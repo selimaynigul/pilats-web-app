@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from "react";
 import styled from "styled-components";
 import { Row, Col, Spin, Button } from "antd";
-import { usePagination } from "hooks";
+import { useLanguage, usePagination } from "hooks";
 import { companyService } from "services";
 import { ListContainer, ListItem } from "components";
 import { mapToItemData } from "utils/utils";
@@ -20,6 +20,8 @@ const CompanyList: React.FC<TrainerListProps> = ({
   onTrainerCountChange,
   company,
 }) => {
+  const { t } = useLanguage();
+
   const params = useMemo(
     () => ({
       pageSize: 8,
@@ -63,7 +65,7 @@ const CompanyList: React.FC<TrainerListProps> = ({
 
       {!loading && hasMore && (
         <LoadMoreContainer>
-          <Button onClick={loadMore}>Load More</Button>
+          <Button onClick={loadMore}>{t.loadMore}</Button>
         </LoadMoreContainer>
       )}
 

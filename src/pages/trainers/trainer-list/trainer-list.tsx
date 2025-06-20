@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from "react";
 import styled from "styled-components";
 import { Row, Col, Spin, Button } from "antd";
 import TrainerCard from "./trainer-list-card";
-import { usePagination } from "hooks";
+import { useLanguage, usePagination } from "hooks";
 import { trainerService } from "services";
 import { getCompanyId, hasRole } from "utils/permissionUtils";
 import { ListContainer, ListItem } from "components";
@@ -22,6 +22,8 @@ const TrainerList: React.FC<TrainerListProps> = ({
   onTrainerCountChange,
   company,
 }) => {
+  const { t } = useLanguage();
+
   const params = useMemo(() => {
     const isAdmin = hasRole(["ADMIN"]);
     return {
@@ -74,7 +76,7 @@ const TrainerList: React.FC<TrainerListProps> = ({
 
       {!loading && hasMore && (
         <LoadMoreContainer>
-          <Button onClick={loadMore}>Load More</Button>
+          <Button onClick={loadMore}>{t.loadMore}</Button>
         </LoadMoreContainer>
       )}
 

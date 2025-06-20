@@ -7,6 +7,7 @@ import {
   PhoneInput,
   LocationInput,
 } from "components/FormFields";
+import { useLanguage } from "hooks";
 
 interface AddCompanyFormProps {
   visible: boolean;
@@ -23,6 +24,8 @@ const AddCompanyForm: React.FC<AddCompanyFormProps> = ({
   loading,
   form,
 }) => {
+  const { t } = useLanguage();
+
   const handleSubmit = () => {
     form
       .validateFields()
@@ -42,27 +45,25 @@ const AddCompanyForm: React.FC<AddCompanyFormProps> = ({
 
   const formSteps: CustomStep[] = [
     {
-      label: "Company Info",
-      buttonText: "Add Company",
+      label: t.companyInfo,
+      buttonText: t.addCompany,
       blocks: [
         {
-          title: "Basic Details",
-          description: "Enter company information",
+          title: t.companyInfo,
+          description: t.enterCompanyInfo,
           fields: [
             <NameInput
-              placeholder="Company Name *"
-              rules={[{ required: true, message: "Please enter company name" }]}
+              placeholder={t.companyNamePlaceholder}
+              rules={[{ required: true, message: t.pleaseEnterCompanyName }]}
             />,
             <FormRow>
               <PhoneInput
-                rules={[
-                  { required: true, message: "Please enter phone number" },
-                ]}
+                rules={[{ required: true, message: t.pleaseEnterPhoneNumber }]}
               />
               <EmailInput
                 rules={[
-                  { required: true, message: "Please enter email" },
-                  { type: "email", message: "Enter a valid email" },
+                  { required: true, message: t.pleaseEnterEmail },
+                  { type: "email", message: t.invalidEmailFormat },
                 ]}
               />
             </FormRow>,
@@ -79,7 +80,7 @@ const AddCompanyForm: React.FC<AddCompanyFormProps> = ({
       onClose={onClose}
       onSubmit={handleSubmit}
       loading={loading}
-      title="Add Company"
+      title={t.addCompany}
       steps={formSteps}
       form={form}
     />

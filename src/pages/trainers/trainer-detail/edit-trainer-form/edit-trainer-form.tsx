@@ -12,6 +12,7 @@ import {
   LocationInput,
   JobSelect,
 } from "components/FormFields";
+import { useLanguage } from "hooks";
 
 interface EditTrainerFormProps {
   visible: boolean;
@@ -33,6 +34,7 @@ const EditTrainerForm: React.FC<EditTrainerFormProps> = ({
 }) => {
   const [form] = Form.useForm();
   const [isActive, setIsActive] = useState(true);
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (!initialValues) return;
@@ -96,12 +98,12 @@ const EditTrainerForm: React.FC<EditTrainerFormProps> = ({
 
   const formSteps: CustomStep[] = [
     {
-      label: "Personal Information",
-      buttonText: "Next",
+      label: t.personalInfo,
+      buttonText: t.saveAndContinue,
       blocks: [
         {
-          title: "Trainer Info",
-          description: "Update trainer's personal and contact details",
+          title: t.trainerInfo,
+          description: t.trainerPersonalInfoDescription,
           fields: [
             <JobSelect />,
             <FormRow>
@@ -117,12 +119,12 @@ const EditTrainerForm: React.FC<EditTrainerFormProps> = ({
       ],
     },
     {
-      label: "Contact & Status",
-      buttonText: "Update Trainer",
+      label: t.contactAndStatus,
+      buttonText: t.save,
       blocks: [
         {
-          title: "Contact & Status",
-          description: "Update trainer's contact information and status",
+          title: t.contactAndStatus,
+          description: t.updateContactAndStatus,
           fields: [
             <FormRow>
               <EmailInput disabled={true} />
@@ -136,13 +138,13 @@ const EditTrainerForm: React.FC<EditTrainerFormProps> = ({
                 valuePropName="checked"
               >
                 <Checkbox onChange={(e) => setIsActive(e.target.checked)}>
-                  Is Active
+                  {t.isActive}
                 </Checkbox>
               </Form.Item>
               {!isActive && (
                 <Form.Item name="endDate">
                   <DatePicker
-                    placeholder="End date *"
+                    placeholder={t.endDate}
                     style={{ width: "100%" }}
                   />
                 </Form.Item>
@@ -159,7 +161,7 @@ const EditTrainerForm: React.FC<EditTrainerFormProps> = ({
       visible={visible}
       onClose={onClose}
       onSubmit={handleSubmit}
-      title="Edit Trainer"
+      title={t.editTrainer}
       steps={formSteps}
       form={form}
       loading={loading}

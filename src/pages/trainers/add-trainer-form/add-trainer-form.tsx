@@ -88,7 +88,7 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
         },
         {
           title: t.contactInfo,
-          description: t.contactInfoDescription,
+          description: t.trainerContactInfoDescription,
           fields: [
             <FormRow>
               <EmailInput />

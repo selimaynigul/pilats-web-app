@@ -12,6 +12,7 @@ import {
   LocationInput,
   JobSelect,
 } from "components/FormFields";
+import { useLanguage } from "hooks";
 
 interface EditUserFormProps {
   visible: boolean;
@@ -33,6 +34,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({
 }) => {
   const [form] = Form.useForm();
   const [isActive, setIsActive] = useState(true);
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (!initialValues) return;
@@ -95,12 +97,12 @@ const EditUserForm: React.FC<EditUserFormProps> = ({
 
   const formSteps: CustomStep[] = [
     {
-      label: "Personal Information",
-      buttonText: "Next",
+      label: t.personalInfo,
+      buttonText: t.saveAndContinue,
       blocks: [
         {
-          title: "User Info",
-          description: "Update user's personal and contact details",
+          title: t.editUser,
+          description: t.userPersonalInfoDescription,
           fields: [
             <JobSelect />,
             <FormRow>
@@ -116,12 +118,12 @@ const EditUserForm: React.FC<EditUserFormProps> = ({
       ],
     },
     {
-      label: "Contact & Status",
-      buttonText: "Update User",
+      label: t.contactInfo,
+      buttonText: t.save,
       blocks: [
         {
-          title: "Contact & Status",
-          description: "Update user's contact information and status",
+          title: t.contactInfo,
+          description: t.userContactInfoDescription,
           fields: [
             <FormRow>
               <EmailInput disabled={true} />
@@ -139,7 +141,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({
       visible={visible}
       onClose={onClose}
       onSubmit={handleSubmit}
-      title="Edit Customer"
+      title={t.editUser}
       steps={formSteps}
       form={form}
       loading={loading}

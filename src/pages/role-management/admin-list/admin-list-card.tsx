@@ -11,6 +11,7 @@ import { BsEnvelopeFill, BsWhatsapp } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import { capitalize } from "utils/permissionUtils";
 import { branchAdminService, companyAdminService } from "services";
+import { useLanguage } from "hooks";
 
 const { Meta } = Card;
 
@@ -130,6 +131,7 @@ const AdminCard: React.FC<AdminCardProps> = ({
   onDelete,
 }) => {
   const whatsappLink = `https://wa.me/+905077845678`;
+  const { t } = useLanguage();
 
   const menu = (
     <Menu>
@@ -138,7 +140,7 @@ const AdminCard: React.FC<AdminCardProps> = ({
         icon={<UserOutlined style={{ color: "red" }} />}
         onClick={onDelete}
       >
-        Delete Admin
+        {t.delete}
       </Menu.Item>
     </Menu>
   );

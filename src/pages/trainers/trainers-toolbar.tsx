@@ -44,14 +44,14 @@ const TrainersToolbar: React.FC<{
     trainerService
       .register(payload)
       .then(() => {
-        message.success("Trainer is added");
+        message.success(t.msg.trainerAddedSuccess);
         setIsModalVisible(false);
         form.resetFields();
         window.location.reload();
       })
       .catch((err) => {
         if (err.response?.data.errorCode === 102) {
-          message.error("Trainer with this email already exists");
+          message.error(t.msg.trainerEmailExists);
           return;
         }
         handleError(err);

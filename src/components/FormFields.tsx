@@ -37,15 +37,11 @@ export const NameInput: React.FC<FormFieldProps> = ({ rules, placeholder }) => {
   return (
     <Form.Item
       name="name"
-      rules={
-        rules || [
-          { required: true, message: t.pleaseEnterName || "Please enter name" },
-        ]
-      }
+      rules={rules || [{ required: true, message: t.pleaseEnterName }]}
     >
       <Input
         style={{ background: theme.inputBg }}
-        placeholder={placeholder || t.firstname || "Firstname *"}
+        placeholder={placeholder || t.firstname}
       />
     </Form.Item>
   );
@@ -65,14 +61,14 @@ export const SurnameInput: React.FC<FormFieldProps> = ({
         rules || [
           {
             required: true,
-            message: t.pleaseEnterSurname || "Please enter surname",
+            message: t.pleaseEnterSurname,
           },
         ]
       }
     >
       <Input
         style={{ background: theme.inputBg }}
-        placeholder={placeholder || t.lastname || "Lastname *"}
+        placeholder={placeholder || t.lastname}
       />
     </Form.Item>
   );
@@ -130,11 +126,11 @@ export const EmailInput: React.FC<FormFieldProps> = ({
         rules || [
           {
             required: true,
-            message: t.pleaseEnterEmail || "Please enter email",
+            message: t.pleaseEnterEmail,
           },
           {
             type: "email",
-            message: t.invalidEmailFormat || "Invalid email format",
+            message: t.invalidEmailFormat,
           },
         ]
       }
@@ -142,7 +138,7 @@ export const EmailInput: React.FC<FormFieldProps> = ({
       <Input
         style={{ background: theme.inputBg }}
         disabled={disabled}
-        placeholder={placeholder || t.email || "Email *"}
+        placeholder={placeholder || t.email}
       />
     </Form.Item>
   );
@@ -170,14 +166,14 @@ export const PhoneInput: React.FC<FormFieldProps> = ({ rules }) => {
           name="phoneNumber"
           rules={[
             ...(rules || [
-              { required: true, message: "Please enter phone number" },
+              { required: true, message: t.pleaseEnterPhoneNumber },
             ]),
             {
               validator: (_, value) => {
                 if (!value || value.length === 10) {
                   return Promise.resolve();
                 }
-                return Promise.reject("Geçerli bir telefon numarası giriniz");
+                return Promise.reject(t.invalidPhoneNumber);
               },
               validateTrigger: "onSubmit",
             },
@@ -236,7 +232,7 @@ export const CompanySelect = ({
       rules={[
         {
           required: true,
-          message: "Please select company",
+          message: t.pleaseSelectCompany,
           // Eğer defaultCompany varsa valid say
           validator: (_, value) => {
             if (value !== undefined && value !== null && value !== "") {
@@ -245,7 +241,7 @@ export const CompanySelect = ({
             if (defaultCompany) {
               return Promise.resolve();
             }
-            return Promise.reject("Please select company");
+            return Promise.reject(t.pleaseSelectCompany);
           },
         },
       ]}
@@ -298,7 +294,7 @@ export const BranchSelect = ({
       rules={[
         {
           required: true,
-          message: "Please select branch",
+          message: t.pleaseSelectBranch,
           validator: (_, value) => {
             if (value !== undefined && value !== null && value !== "") {
               return Promise.resolve();
@@ -306,7 +302,7 @@ export const BranchSelect = ({
             if (defaultBranch) {
               return Promise.resolve();
             }
-            return Promise.reject("Please select branch");
+            return Promise.reject(t.pleaseSelectBranch);
           },
         },
       ]}

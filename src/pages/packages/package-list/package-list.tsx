@@ -94,7 +94,7 @@ const PackageList: React.FC<PackageListProps> = ({
 
       {!loading && hasMore && (
         <LoadMoreContainer>
-          <Button onClick={loadMore}>Load More</Button>
+          <Button onClick={loadMore}>{t.loadMore}</Button>
         </LoadMoreContainer>
       )}
 

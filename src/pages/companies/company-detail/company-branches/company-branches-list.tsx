@@ -168,20 +168,22 @@ const CompanyBranchList: React.FC<{
         {t.trainers}
       </MenuItem>
       <MenuItem key="sessions" onClick={() => handleSeeSessions(branch)}>
-        Sessions
+        {t.sessions}
       </MenuItem>
       <Menu.Divider />
       <MenuItem key="edit" onClick={() => handleEdit(branch)}>
-        <BsPencil style={{ marginRight: 8 }} /> Update
+        <BsPencil style={{ marginRight: 8 }} /> {t.edit}
       </MenuItem>
       {!hasRole(["BRANCH_ADMIN"]) && (
         <MenuItem
           key="delete"
           className="delete"
           onClick={() => handleDelete(branch.id)}
-          style={{ color: "red" }}
+          style={{ display: "flex", alignItems: "center" }}
         >
-          <BsTrash style={{ marginRight: 8 }} /> Delete
+          <span style={{ color: "red", display: "flex", alignItems: "center" }}>
+            <BsTrash style={{ marginRight: 8 }} /> {t.delete}
+          </span>
         </MenuItem>
       )}
     </Menu>
@@ -228,18 +230,16 @@ const CompanyBranchList: React.FC<{
         <Form form={form} layout="vertical" variant="filled">
           <Form.Item
             name="branchName"
-            rules={[
-              { required: true, message: "Please enter the branch name" },
-            ]}
+            rules={[{ required: true, message: t.pleaseEnterBranchName }]}
           >
-            <Input placeholder="Enter branch name" />
+            <Input placeholder={t.enterBranchName} />
           </Form.Item>
         </Form>
       </Modal>
 
       {/* Update Branch Modal */}
       <Modal
-        title="Add Branch"
+        title={t.editBranch}
         open={isUpdateModalVisible}
         onCancel={() => setIsUpdateModalVisible(false)}
         onOk={() => {
@@ -252,12 +252,9 @@ const CompanyBranchList: React.FC<{
         <Form form={updateForm} layout="vertical">
           <Form.Item
             name="branchName"
-            label="Branch Name"
-            rules={[
-              { required: true, message: "Please enter the branch name" },
-            ]}
+            rules={[{ required: true, message: t.pleaseEnterBranchName }]}
           >
-            <Input placeholder="Enter branch name" />
+            <Input placeholder={t.enterBranchName} />
           </Form.Item>
         </Form>
       </Modal>

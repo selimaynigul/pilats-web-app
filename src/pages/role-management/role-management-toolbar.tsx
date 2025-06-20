@@ -108,11 +108,11 @@ const RoleManagementToolbar: React.FC<{
     try {
       if (isBranchMode) {
         await branchAdminService.register(payload);
-        message.success("Branch Admin added successfully!");
+        message.success(t.msg.branchAdminAddedSuccess);
         window.location.reload();
       } else {
         await companyAdminService.register(payload);
-        message.success("Company Admin added successfully!");
+        message.success(t.msg.companyAdminAddedSuccess);
         form.resetFields();
         window.location.reload();
       }
@@ -120,9 +120,9 @@ const RoleManagementToolbar: React.FC<{
     } catch (err: any) {
       console.error("Error adding admin:", err);
       if (err.response && err.response.data.errorCode === 102) {
-        message.error("Email already exists. Please use a different email.");
+        message.error(t.msg.emailAlreadyExists);
       } else {
-        message.error("Failed to add admin. Please try again.");
+        message.error(t.msg.failedToAddAdmin);
       }
     } finally {
       setLoading(false);

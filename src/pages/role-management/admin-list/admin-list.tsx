@@ -62,11 +62,11 @@ const AdminList: React.FC<TrainerListProps> = ({
 
     deleteService(id)
       .then(() => {
-        message.success("Admin deleted successfully");
+        message.success(t.msg.adminDeletedSuccess);
         window.location.reload();
       })
       .catch((error) => {
-        message.error("Failed to delete admin");
+        message.error(t.msg.failedToDeleteAdmin);
       });
   };
 
@@ -77,7 +77,7 @@ const AdminList: React.FC<TrainerListProps> = ({
         icon={<DeleteOutlined style={{ color: "red" }} />}
         onClick={() => handleDelete(adminId)}
       >
-        Delete Admin
+        {t.delete}
       </Menu.Item>
     </Menu>
   );
@@ -105,7 +105,7 @@ const AdminList: React.FC<TrainerListProps> = ({
 
       {!loading && hasMore && (
         <LoadMoreContainer>
-          <Button onClick={loadMore}>Load More</Button>
+          <Button onClick={loadMore}>{t.loadMore}</Button>
         </LoadMoreContainer>
       )}
 

@@ -339,3 +339,7 @@ export const StyledModal = styled(Modal)`
     background: white;
   }
 `;
+
+export const AddModalContainer = styled.div`
+  backdrop-filter: none !important;
+`;

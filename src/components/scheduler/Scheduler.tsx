@@ -11,6 +11,7 @@ import { Form, message, Modal } from "antd";
 import AddClassForm from "components/scheduler/add-class-form/AddClassForm";
 import CustomToolbar from "components/scheduler/toolbar/scheduler-toolbar";
 import {
+  AddModalContainer,
   CalendarWrapper,
   StyledModal,
 } from "components/scheduler/SchedulerStyles";
@@ -687,7 +688,7 @@ const Scheduler: React.FC<{
       onOk: async () => {
         try {
           await sessionService.delete(ev.id);
-          message.success(t.deleted || "Silindi");
+          message.success(t.msg.sessionDeletedSuccess);
           /* listeyi yenile */
           if (visibleRange)
             fetchSessions(visibleRange.start, visibleRange.end, false, true);
@@ -695,7 +696,7 @@ const Scheduler: React.FC<{
           setDrawerVisible(false);
           setSelectedSessionId(null);
         } catch {
-          message.error(t.deleteFailed || "Silinemedi");
+          message.error(t.msg.failedToDeleteSession);
         }
       },
     });
@@ -878,51 +879,53 @@ const Scheduler: React.FC<{
         eventPropGetter={eventPropGetter}
       />
 
-      <StyledModal
-        open={isModalVisible}
-        onCancel={() => {
-          setIsModalVisible(false);
-          form.resetFields();
-          if (addClassFormRef.current) {
-            addClassFormRef.current.resetForm();
+      <AddModalContainer>
+        <StyledModal
+          open={isModalVisible}
+          onCancel={() => {
+            setIsModalVisible(false);
+            form.resetFields();
+            if (addClassFormRef.current) {
+              addClassFormRef.current.resetForm();
+            }
+          }}
+          footer={null}
+          closable={false}
+          afterOpenChange={(open) => {
+            if (open) {
+              nameInputRef.current?.focus();
+            }
+          }}
+          styles={{
+            mask: { background: "transparent" },
+          }}
+          modalRender={
+            isMobile
+              ? undefined
+              : (modal) => (
+                  <Draggable
+                    handle=".ant-modal-content"
+                    cancel=".ant-modal-body"
+                    bounds={bounds}
+                    nodeRef={draggleRef}
+                    onStart={onStart}
+                  >
+                    <div ref={draggleRef}>{modal}</div>
+                  </Draggable>
+                )
           }
-        }}
-        footer={null}
-        closable={false}
-        afterOpenChange={(open) => {
-          if (open) {
-            nameInputRef.current?.focus();
-          }
-        }}
-        styles={{
-          mask: { background: "transparent" },
-        }}
-        modalRender={
-          isMobile
-            ? undefined
-            : (modal) => (
-                <Draggable
-                  handle=".ant-modal-content"
-                  cancel=".ant-modal-body"
-                  bounds={bounds}
-                  nodeRef={draggleRef}
-                  onStart={onStart}
-                >
-                  <div ref={draggleRef}>{modal}</div>
-                </Draggable>
-              )
-        }
-      >
-        <AddClassForm
-          form={form}
-          visible={isModalVisible}
-          onSubmit={addSession}
-          selectedRange={selectedRange}
-          nameRef={nameInputRef}
-          currentView={currentView}
-          ref={addClassFormRef}
-        />
-      </StyledModal>
+        >
+          <AddClassForm
+            form={form}
+            visible={isModalVisible}
+            onSubmit={addSession}
+            selectedRange={selectedRange}
+            nameRef={nameInputRef}
+            currentView={currentView}
+            ref={addClassFormRef}
+          />
+        </StyledModal>
+      </AddModalContainer>
 
       {/* Takvimin hemen altına ekleyin */}
       <EventDrawer

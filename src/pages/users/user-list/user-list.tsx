@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from "react";
 import styled from "styled-components";
 import { Row, Col, Spin, Button } from "antd";
 import UserCard from "./user-list-card";
-import { usePagination } from "hooks";
+import { useLanguage, usePagination } from "hooks";
 import { userService } from "services";
 import { ListContainer, ListItem } from "components";
 import { mapToItemData } from "utils/utils";
@@ -22,6 +22,8 @@ const UserList: React.FC<TrainerListProps> = ({
   onUserCountChange,
   company,
 }) => {
+  const { t } = useLanguage();
+
   const params = useMemo(() => {
     const isAdmin = hasRole(["ADMIN"]);
     return {
@@ -74,7 +76,7 @@ const UserList: React.FC<TrainerListProps> = ({
 
       {!loading && hasMore && (
         <LoadMoreContainer>
-          <Button onClick={loadMore}>Load More</Button>
+          <Button onClick={loadMore}>{t.loadMore}</Button>
         </LoadMoreContainer>
       )}
     </ListContainer>
