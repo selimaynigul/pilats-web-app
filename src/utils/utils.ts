@@ -17,6 +17,7 @@ export const mapToItemData = (raw: any): ItemData => {
       name: raw?.companyName ?? null,
       location: raw?.location ?? null,
       branch: raw?.branchName ?? null,
+      imageUrl: raw?.companyImageUrl ?? null,
     },
 
     contact: {

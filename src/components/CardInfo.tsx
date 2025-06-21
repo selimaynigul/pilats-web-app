@@ -8,6 +8,8 @@ interface CardInfoProps {
   title: string | null;
   detail?: string | null;
   to?: string; // opsiyonel: varsa Link, yoksa div
+  imageUrl?: string | null; // opsiyonel: varsa logo, yoksa varsayılan ikon
+  companyImageUrl?: string | null; // opsiyonel: varsa şirket logosu, yoksa varsayılan ikon
   onClick?: () => void; // opsiyonel: custom tıklama
 }
 
@@ -74,13 +76,25 @@ const CardInfo: React.FC<CardInfoProps> = ({
   title,
   detail,
   to,
+  imageUrl,
+  companyImageUrl,
   onClick,
 }) => {
   const content = (
     <CompanyInfo onClick={onClick}>
-      <CompanyLogo>
+      {
+        companyImageUrl ?
+        <img 
+      src={`https://uat-platesapi-latest.onrender.com/api/v1/images/${companyImageUrl}`} 
+      alt="Company Logo"
+      style={{ width: 30, height: 30, objectFit: 'contain' }} 
+    />
+          :
+        <CompanyLogo>
         <UserOutlined style={{ fontSize: 20 }} />
       </CompanyLogo>
+      }
+      
       <CompanyName>
         <strong>{title || "Unnamed Company"}</strong>
         {detail && <small>{detail}</small>}

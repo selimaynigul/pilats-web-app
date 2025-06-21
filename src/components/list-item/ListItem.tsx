@@ -37,7 +37,7 @@ const ListItem: React.FC<ListItemProps> = ({ data, type = "default" }) => {
     subtitle,
     detailUrl,
     company,
-    contact,
+    contact
   } = data;
 
   const showCompanyInfo = type !== "user";
@@ -105,6 +105,8 @@ const ListItem: React.FC<ListItemProps> = ({ data, type = "default" }) => {
               title={company.name}
               detail={company.branch}
               to={`/companies/${company.id}`}
+              imageUrl={imageUrl}
+              companyImageUrl={company.imageUrl ? company.imageUrl : undefined}
             />
           )}
 
