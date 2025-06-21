@@ -9,6 +9,7 @@ import {
 import { PiClockClockwiseFill } from "react-icons/pi";
 import { TiCancel } from "react-icons/ti";
 import { FaCheck } from "react-icons/fa";
+import { useLanguage } from "hooks";
 
 const Card = styled.div`
   /*  border: 1px solid #e6e6e6; */
@@ -66,20 +67,24 @@ interface SessionCardProps {
   isJoinedButNotAttended?: boolean;
 }
 
-const formatDateTime = (startDate: string, endDate: string) => {
+const formatDateTime = (
+  startDate: string,
+  endDate: string,
+  locale?: string
+) => {
   const parsedStart = new Date(startDate);
   const parsedEnd = new Date(endDate);
 
-  const date = parsedStart.toLocaleDateString(undefined, {
+  const date = parsedStart.toLocaleDateString(locale, {
     weekday: "short",
     day: "numeric",
     month: "short",
   });
-  const start = parsedStart.toLocaleTimeString(undefined, {
+  const start = parsedStart.toLocaleTimeString(locale, {
     hour: "2-digit",
     minute: "2-digit",
   });
-  const end = parsedEnd.toLocaleTimeString(undefined, {
+  const end = parsedEnd.toLocaleTimeString(locale, {
     hour: "2-digit",
     minute: "2-digit",
   });
@@ -87,9 +92,14 @@ const formatDateTime = (startDate: string, endDate: string) => {
 };
 
 const SessionCard: React.FC<SessionCardProps> = ({ session, onClick }) => {
+  const { t, userLanguage } = useLanguage();
+
+  // Use 'en-US' for English, otherwise default (or set your locale)
+  const locale = userLanguage === "en" ? "en-US" : undefined;
   const { date, start, end } = formatDateTime(
     session.startDate,
-    session.endDate
+    session.endDate,
+    locale
   );
 
   const isAttended = session.customerLastEvent === "ATTENDED";
@@ -153,12 +163,12 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, onClick }) => {
             </div>
             <span>
               {isAttended
-                ? "Katıldı"
+                ? t.attended
                 : isPostponed
-                  ? "Ertelendi"
+                  ? t.postponed
                   : isCancelled
-                    ? "İptal Edildi"
-                    : "Katılmadı"}
+                    ? t.cancelled
+                    : t.notAttended}
             </span>
           </div>
         )}

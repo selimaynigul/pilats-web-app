@@ -3,7 +3,7 @@ import { Alert, Col, Row, Spin, Checkbox } from "antd";
 import styled from "styled-components";
 import SessionCard from "components/SessionCard";
 import { sessionService } from "services";
-import { usePagination } from "hooks";
+import { useLanguage, usePagination } from "hooks";
 import { useNavigate, useParams } from "react-router-dom";
 
 const Sessions = styled.div`
@@ -32,6 +32,7 @@ const FilterContainer = styled.div`
 const SessionsContainer: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const { t } = useLanguage();
 
   const [selectedFilters, setSelectedFilters] = useState<string[]>(["ALL"]);
 
@@ -107,31 +108,31 @@ const SessionsContainer: React.FC = () => {
           checked={selectedFilters.includes("ALL")}
           onChange={(e) => handleFilterChange(e.target.checked, "ALL")}
         >
-          Tümü
+          {t.all}
         </Checkbox>
         <Checkbox
           checked={selectedFilters.includes("JOINED")}
           onChange={(e) => handleFilterChange(e.target.checked, "JOINED")}
         >
-          Katılmadı
+          {t.notAttended}
         </Checkbox>
         <Checkbox
           checked={selectedFilters.includes("ATTENDED")}
           onChange={(e) => handleFilterChange(e.target.checked, "ATTENDED")}
         >
-          Katıldı
+          {t.attended}
         </Checkbox>
         <Checkbox
           checked={selectedFilters.includes("POSTPONED")}
           onChange={(e) => handleFilterChange(e.target.checked, "POSTPONED")}
         >
-          Ertelendi
+          {t.postponed}
         </Checkbox>
         <Checkbox
           checked={selectedFilters.includes("CANCELLED")}
           onChange={(e) => handleFilterChange(e.target.checked, "CANCELLED")}
         >
-          İptal Edildi
+          {t.cancelled}
         </Checkbox>
       </FilterContainer>
 

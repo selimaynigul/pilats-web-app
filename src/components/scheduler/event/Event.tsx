@@ -168,7 +168,6 @@ const CustomEvent: React.FC<{
         onDoubleClick={handleDoubleClick}
         bgColor={bgColor}
         darkColor={darkColor}
-        title={bgColor}
       >
         <strong>{capitalize((event as any)?.name)}</strong>
         {!isMobile && showTime && (
