@@ -389,7 +389,7 @@ const TrainerInfo: React.FC<{
               <Avatar
                 size={150}
                 src={
-                  "https://prod-grad.onrender.com/api/v1/images" +
+                  "https://uat-platesapi-latest.onrender.com/api/v1/images" +
                   trainer.imageUrl
                 }
                 icon={<UserOutlined />}

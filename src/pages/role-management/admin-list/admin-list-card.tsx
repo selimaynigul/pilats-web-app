@@ -161,7 +161,7 @@ const AdminCard: React.FC<AdminCardProps> = ({
             <Avatar
               size={60}
               src={
-                "https://prod-grad.onrender.com/api/v1/images" + admin.imageUrl
+                "https://uat-platesapi-latest.onrender.com/api/v1/images" + admin.imageUrl
               }
               style={{ background: "lightgrey" }}
             >

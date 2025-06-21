@@ -293,7 +293,7 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
               <Avatar
                 size={150}
                 src={
-                  "https://prod-grad.onrender.com/api/v1/images" + user.imageUrl
+                  "https://uat-platesapi-latest.onrender.com/api/v1/images" + user.imageUrl
                 }
                 icon={<UserOutlined />}
               />

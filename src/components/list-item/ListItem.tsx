@@ -65,7 +65,7 @@ const ListItem: React.FC<ListItemProps> = ({ data, type = "default" }) => {
               {/*       {!isActive && <InactiveIcon title="Inactive" />} */}
               <Avatar
                 size={60}
-                src={imageUrl ?? undefined}
+                src={imageUrl != null ? "https://uat-platesapi-latest.onrender.com/api/v1/images"+imageUrl :  undefined}
                 style={{ background: theme.avatarBg, flexShrink: 0 }}
               >
                 {title?.[0]?.toUpperCase()}
@@ -87,7 +87,7 @@ const ListItem: React.FC<ListItemProps> = ({ data, type = "default" }) => {
             {/* TODO: isActive düzeltilecek ters şu an*/}
             <Avatar
               size={60}
-              src={imageUrl ?? undefined}
+              src={imageUrl != null ? "https://uat-platesapi-latest.onrender.com/api/v1/images"+imageUrl :  undefined}
               style={{ background: theme.avatarBg, flexShrink: 0 }}
             >
               {title?.[0]?.toUpperCase()}

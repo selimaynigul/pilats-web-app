@@ -304,7 +304,7 @@ const CompanyInfo: React.FC<{
               <Avatar
                 size={150}
                 src={
-                  "https://prod-grad.onrender.com/api/v1/images" +
+                  "https://uat-platesapi-latest.onrender.com/api/v1/images" +
                   company.imageUrl
                 }
                 icon={<UserOutlined />}
