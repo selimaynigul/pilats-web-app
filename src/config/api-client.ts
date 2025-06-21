@@ -1,9 +1,8 @@
 import axios from "axios";
 
-const baseURL =
-  window.location.hostname.includes("localhost") && false
-    ? "http://localhost:8000/api/v1"
-    : "https://uat-platesapi-latest.onrender.com/api/v1";
+const baseURL = window.location.hostname.includes("localhost")
+  ? "http://localhost:8000/api/v1"
+  : "https://uat-platesapi-latest.onrender.com/api/v1";
 
 const apiClient = axios.create({
   baseURL,
