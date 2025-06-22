@@ -34,6 +34,7 @@ export interface ItemData {
     name: string | null;
     location: string | null;
     branch?: string | null;
+    imageUrl?: string | null;
   };
 
   contact?: {

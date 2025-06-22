@@ -151,7 +151,9 @@ const UserCard: React.FC<{ user: any }> = ({ user }) => {
           >
             <Avatar
               size={60}
-              src={"https://prod-grad.onrender.com/api/v1/images" + user.imageUrl}
+              src={
+                  "https://uat-platesapi-latest.onrender.com/api/v1/images" + user.imageUrl
+                }
               style={{ background: "lightgrey" }}
             >
               {user.ucGetResponse.name[0].toUpperCase()}
