@@ -33,7 +33,7 @@ const StyledSider = styled(Sider).withConfig({
   top: 0;
   left: 0;
   margin: 0 10px;
-  z-index: 3;
+  z-index: 1000;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

@@ -201,7 +201,17 @@ const SearchBar: React.FC<SearchBarProps> = ({
               index === highlightedResultIndex ? theme.bodyBg : "transparent",
           }}
         >
-          <Avatar>{company.companyName[0].toUpperCase()}</Avatar>
+          <Avatar
+            src={
+              company.imageUrl
+                ? `https://uat-platesapi-latest.onrender.com/api/v1/images${company.imageUrl}`
+                : undefined
+            }
+          >
+            {!company.imageUrl && company.companyName
+              ? company.companyName[0].toUpperCase()
+              : null}
+          </Avatar>
           <div>
             <strong>{company.companyName}</strong>
           </div>
@@ -218,7 +228,17 @@ const SearchBar: React.FC<SearchBarProps> = ({
               index === highlightedResultIndex ? theme.bodyBg : "transparent",
           }}
         >
-          <Avatar>{trainer.ucGetResponse?.name[0].toUpperCase()}</Avatar>
+          <Avatar
+            src={
+              trainer.imageUrl
+                ? `https://uat-platesapi-latest.onrender.com/api/v1/images${trainer.imageUrl}`
+                : undefined
+            }
+          >
+            {!trainer.imageUrl && trainer.ucGetResponse?.name
+              ? trainer.ucGetResponse.name[0].toUpperCase()
+              : null}
+          </Avatar>
           <div>
             <strong>
               {trainer.ucGetResponse?.name} {trainer.ucGetResponse?.surname}
@@ -241,7 +261,17 @@ const SearchBar: React.FC<SearchBarProps> = ({
               index === highlightedResultIndex ? theme.bodyBg : "transparent",
           }}
         >
-          <Avatar>{user.ucGetResponse?.name[0].toUpperCase()}</Avatar>
+          <Avatar
+            src={
+              user.imageUrl
+                ? `https://uat-platesapi-latest.onrender.com/api/v1/images${user.imageUrl}`
+                : undefined
+            }
+          >
+            {!user.imageUrl && user.ucGetResponse?.name
+              ? user.ucGetResponse.name[0].toUpperCase()
+              : null}
+          </Avatar>
           <div>
             <strong>
               {user.ucGetResponse?.name} {user.ucGetResponse?.surname}

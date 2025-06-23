@@ -6,7 +6,16 @@ import {
   LeftOutlined,
   UserAddOutlined,
 } from "@ant-design/icons";
-import { Card, Dropdown, Input, Menu, Modal, Tooltip, message } from "antd";
+import {
+  Avatar,
+  Card,
+  Dropdown,
+  Input,
+  Menu,
+  Modal,
+  Tooltip,
+  message,
+} from "antd";
 import type { InputRef } from "antd/es/input";
 import { companyPackageService, userService } from "services";
 import { capitalize, hasRole } from "utils/permissionUtils";
@@ -496,15 +505,12 @@ const PackageCard: React.FC<CardProps> = ({
                   (e.currentTarget.style.background = "transparent")
                 }
               >
-                <img
-                  src={
-                    user.avatarUrl ||
-                    "https://ui-avatars.com/api/?name=" +
-                      encodeURIComponent(user.ucGetResponse.name)
-                  }
-                  alt={user.name}
-                  style={{ width: 32, height: 32, borderRadius: "50%" }}
-                />
+                <Avatar
+                  src={`https://uat-platesapi-latest.onrender.com/api/v1/images${user.imageUrl}`}
+                  size={32}
+                >
+                  {user.ucGetResponse.name?.[0]}
+                </Avatar>
                 <div>
                   <strong>
                     {user.ucGetResponse.name} {user.ucGetResponse.surname}

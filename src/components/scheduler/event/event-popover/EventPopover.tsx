@@ -313,7 +313,16 @@ const EventPopover: React.FC<EventPopoverProps> = ({
         <Link to={`/trainers/${event.trainerId}`}>
           <TrainerInfo>
             <TrainerPhoto>
-              <UserOutlined style={{ fontSize: 20 }} />
+              {event.trainerImageUrl ? ( // TODO: gerçek resimle değişmeli backend döndürmeli
+                <Avatar
+                  src={event.trainerImageUrl}
+                  size={40}
+                  style={{ background: "transparent" }}
+                  icon={<UserOutlined style={{ fontSize: 20 }} />}
+                />
+              ) : (
+                <UserOutlined style={{ fontSize: 20 }} />
+              )}
             </TrainerPhoto>
             <TrainerName>
               <strong>
@@ -354,16 +363,27 @@ const EventPopover: React.FC<EventPopoverProps> = ({
                       }
                       placement="top"
                     >
-                      <StyledAvatar
-                        src={a.imageUrl}
+                      <div
                         style={{
-                          backgroundColor: a.imageUrl ? undefined : pair.bg,
-                          color: a.imageUrl ? undefined : pair.color,
+                          border: `1px solid ${a.imageUrl ? "lightgrey" : "transparent"}`,
+                          borderRadius: "50%",
                         }}
                       >
-                        {!a.imageUrl &&
-                          `${(a.ucGetResponse.name || "?")[0] || ""}${(a.ucGetResponse.surname || "?")[0] || ""}`}
-                      </StyledAvatar>
+                        <StyledAvatar
+                          src={
+                            a.imageUrl
+                              ? `https://uat-platesapi-latest.onrender.com/api/v1/images${a.imageUrl}`
+                              : undefined
+                          }
+                          style={{
+                            backgroundColor: a.imageUrl ? undefined : pair.bg,
+                            color: a.imageUrl ? undefined : pair.color,
+                          }}
+                        >
+                          {!a.imageUrl &&
+                            `${(a.ucGetResponse.name || "?")[0] || ""}${(a.ucGetResponse.surname || "?")[0] || ""}`}
+                        </StyledAvatar>
+                      </div>
                     </Tooltip>
                   </Link>
                 );

@@ -110,7 +110,7 @@ const EventDrawer: React.FC<{
             id: c.customerId,
             firstName: c.ucGetResponse?.name,
             lastName: c.ucGetResponse?.surname,
-            avatar: null,
+            imageUrl: c.imageUrl,
             present: c.customerLastEvent === "ATTENDED",
           }))
         );
@@ -220,7 +220,16 @@ const EventDrawer: React.FC<{
     key: String(u.id), // key zorunlu ⇒ string
     label: (
       <>
-        <Avatar size={24}>{u.ucGetResponse.name?.[0]}</Avatar>{" "}
+        {u.imageUrl ? (
+          <Avatar
+            src={`https://uat-platesapi-latest.onrender.com/api/v1/images${u.imageUrl}`}
+            size={24}
+          >
+            {u.ucGetResponse.name?.[0]}
+          </Avatar>
+        ) : (
+          <Avatar size={24}>{u.ucGetResponse.name?.[0]}</Avatar>
+        )}{" "}
         <span style={{ marginLeft: 8 }}>
           {u.ucGetResponse.name} {u.ucGetResponse.surname}
         </span>
@@ -383,7 +392,10 @@ const EventDrawer: React.FC<{
                     onClick={() => navigate(`/users/${user.id}`)}
                   >
                     <AttendeeInfo>
-                      <Avatar size={40} src={user.avatar}>
+                      <Avatar
+                        size={40}
+                        src={`https://uat-platesapi-latest.onrender.com/api/v1/images${user.imageUrl}`}
+                      >
                         {user.firstName?.[0]}
                       </Avatar>
                       <div>
@@ -723,29 +735,5 @@ const MoreButton = styled.div`
 
   &:hover {
     background: rgb(227, 227, 227);
-  }
-`;
-
-const SearchResults = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  max-height: 200px;
-  overflow-y: auto;
-  margin-top: 8px;
-`;
-
-const SearchResultItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: #f5f5f5;
-  padding: 8px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s;
-
-  &:hover {
-    background: #e6f7ff;
   }
 `;

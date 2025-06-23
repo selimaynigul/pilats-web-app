@@ -137,7 +137,7 @@ const SessionsContainer: React.FC = () => {
       </FilterContainer>
 
       {/* Session Cards */}
-      <Sessions onScroll={loadMore}>
+      <Sessions>
         {loading ? (
           <Spin />
         ) : sessions.length === 0 ? (

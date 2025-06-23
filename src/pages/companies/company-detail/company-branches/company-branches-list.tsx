@@ -154,6 +154,10 @@ const CompanyBranchList: React.FC<{
     updateForm.setFieldsValue({ branchName: branch.branchName });
   };
 
+  const handleSeeUsers = (branch: any) => {
+    navigate(`/users?company=${id}&branch=${branch.id}`);
+  };
+
   const handleSeeTrainers = (branch: any) => {
     navigate(`/trainers?company=${id}&branch=${branch.id}`);
   };
@@ -164,6 +168,9 @@ const CompanyBranchList: React.FC<{
 
   const renderMenu = (branch: any) => (
     <Menu>
+      <MenuItem key="users" onClick={() => handleSeeUsers(branch)}>
+        {t.users}
+      </MenuItem>
       <MenuItem key="trainers" onClick={() => handleSeeTrainers(branch)}>
         {t.trainers}
       </MenuItem>
