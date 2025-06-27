@@ -70,6 +70,7 @@ const TrainersToolbar: React.FC<{
         setSelectedCompany={setSelectedCompany}
         onAddClick={() => setIsModalVisible(true)}
         showCompanyDropdown={hasRole(["ADMIN", "COMPANY_ADMIN"])}
+        showAddButton={hasRole(["ADMIN", "COMPANY_ADMIN", "BRANCH_ADMIN"])}
       />
       <AddTrainerModal
         loading={loading}

@@ -141,7 +141,7 @@
   "packageNamePlaceholder": "Ad *",
   "packagePricePlaceholder": "Fiyat (₺) *",
   "creditCountPlaceholder": "Kredi sayısı *",
-  "discountPlaceholder": "İndirim (örn. 0.2 = %20) *",
+  "discountPlaceholder": "İndirim *",
   "bonusCountPlaceholder": "Bonus sayısı *",
   "changeCountPlaceholder": "Değişim hakkı *",
   "addPackage": "Paket Ekle",

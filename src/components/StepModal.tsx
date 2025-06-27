@@ -305,6 +305,7 @@ const StepModal: React.FC<StepModalProps> = ({
                     borderColor: `${theme.text}50`,
                   }}
                   onClick={() => setCurrentStep(currentStep - 1)}
+                  disabled={loading}
                 >
                   {t.previous}
                 </Button>
@@ -313,6 +314,7 @@ const StepModal: React.FC<StepModalProps> = ({
                 <Button
                   type="primary"
                   onClick={() => setCurrentStep(currentStep + 1)}
+                  loading={loading}
                 >
                   {current.buttonText || "Next"}
                 </Button>
@@ -322,7 +324,6 @@ const StepModal: React.FC<StepModalProps> = ({
                   htmlType="submit"
                   onClick={() => {
                     onSubmit();
-                    setTimeout(() => setCurrentStep(0), 300);
                   }}
                   loading={loading}
                 >

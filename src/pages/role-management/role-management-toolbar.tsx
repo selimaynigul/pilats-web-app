@@ -1,53 +1,18 @@
 import React, { useState } from "react";
-import styled from "styled-components";
+import { Form, message, Tooltip } from "antd";
+import { AiOutlineSwap } from "react-icons/ai";
 import AddButton from "components/AddButton";
 import AddAdminModal from "./add-admin-modal";
-import { Button, Form, message, Tooltip } from "antd";
 import { CompanyDropdown } from "components";
 import { hasRole } from "utils/permissionUtils";
 import { companyAdminService, branchAdminService } from "services";
-import { AiOutlineSwap } from "react-icons/ai";
 import { useLanguage } from "hooks";
+import EntityToolbar from "components/EntityToolbar";
+import { Button } from "antd";
+import styled from "styled-components";
+import { count } from "console";
 
-const ToolbarContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  align-items: center;
-`;
-
-const CountContainer = styled.div`
-  font-size: 16px;
-  font-weight: bold;
-  height: 50px;
-  background: ${({ theme }) => theme.bodyBg};
-  color: ${({ theme }) => theme.text};
-  padding: 10px 20px;
-  gap: 6px;
-  border-radius: 50px;
-  display: flex;
-  align-items: center;
-
-  @media (max-width: 768px) {
-    display: none;
-  }
-`;
-
-const ActionContainer = styled.div`
-  display: flex;
-  gap: 8px;
-  background: ${({ theme }) => theme.bodyBg};
-  height: 50px;
-  border-radius: 50px;
-  align-items: center;
-  padding: 10px;
-
-  @media (max-width: 768px) {
-    margin-left: auto;
-  }
-`;
-
-export const TabButton = styled(Button)`
+const TabButton = styled(Button)`
   border: 1px solid transparent;
   background: ${({ theme }) => theme.contentBg};
   color: #4d3abd;
@@ -66,10 +31,6 @@ export const TabButton = styled(Button)`
   }
 `;
 
-const CountNumber = styled.span`
-  color: ${({ theme }) => theme.primary}; /* Primary color for the number */
-`;
-
 const RoleManagementToolbar: React.FC<{
   adminCount: number;
   selectedCompany: any;
@@ -86,8 +47,10 @@ const RoleManagementToolbar: React.FC<{
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
+  const [form] = Form.useForm();
 
-  const handleAddAdmin = async (values: any) => {
+  const handleSubmit = async (values: any) => {
+    const phoneNumber = `${values.countryCode}${values.phoneNumber}`;
     const payload = {
       uaRegisterRequest: {
         email: values.email,
@@ -98,7 +61,8 @@ const RoleManagementToolbar: React.FC<{
         surname: values.surname,
         birthdate: values.birthdate,
         gender: values.gender,
-        telNo1: values.phoneNumber,
+        telNo1: phoneNumber,
+        countryCode: values.countryCode,
       },
       companyId: values.company,
       ...(isBranchMode && { branchId: values.branch }),
@@ -131,53 +95,54 @@ const RoleManagementToolbar: React.FC<{
 
   const changeTabs = () => {
     if (hasRole(["ADMIN"])) {
-      setIsBranchMode((prev: any) => !prev);
+      setIsBranchMode((prev: boolean) => !prev);
     }
   };
 
-  const tabs = (
+  const switchTab = (
     <TabButton disabled={!hasRole(["ADMIN"])} onClick={changeTabs}>
       {isBranchMode ? t.branch : t.company}
       <AiOutlineSwap />
     </TabButton>
   );
 
-  const [form] = Form.useForm();
+  const extraContent = (
+    <>
+      {hasRole(["ADMIN"]) ? (
+        <Tooltip
+          title={
+            isBranchMode ? "Switch to Company Mode" : "Switch to Branch Mode"
+          }
+        >
+          {switchTab}
+        </Tooltip>
+      ) : (
+        switchTab
+      )}
+    </>
+  );
 
   return (
-    <ToolbarContainer>
-      <CountContainer>
-        <CountNumber>{adminCount}</CountNumber> {t.adminsListed}
-      </CountContainer>
-      <ActionContainer>
-        {hasRole(["ADMIN", "COMPANY_ADMIN"]) && (
-          <CompanyDropdown
-            selectedItem={selectedCompany}
-            onSelect={(company) => setSelectedCompany(company)}
-          />
-        )}
-        {hasRole(["ADMIN"]) ? (
-          <Tooltip
-            title={
-              isBranchMode ? "Switch to Company Mode" : "Switch to Branch Mode"
-            }
-          >
-            {tabs}
-          </Tooltip>
-        ) : (
-          tabs
-        )}
-        <AddButton onClick={() => setIsModalVisible(true)} />
-      </ActionContainer>
+    <>
+      <EntityToolbar
+        count={adminCount}
+        entityLabel={t.adminsListed}
+        selectedCompany={selectedCompany}
+        setSelectedCompany={setSelectedCompany}
+        onAddClick={() => setIsModalVisible(true)}
+        showCompanyDropdown={true}
+        showAddButton={true}
+        extra={extraContent}
+      />
       <AddAdminModal
         visible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
-        onSubmit={handleAddAdmin}
+        onSubmit={handleSubmit}
         isBranchMode={isBranchMode}
         form={form}
         loading={loading}
       />
-    </ToolbarContainer>
+    </>
   );
 };
 

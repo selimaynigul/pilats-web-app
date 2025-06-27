@@ -52,11 +52,9 @@ const EventDrawer: React.FC<{
   const [attendees, setAttendees] = useState<any[]>([]);
   const [loadingAttendees, setLoadingAttendees] = useState(true);
   const [joining, setJoining] = useState(false);
-  const hasFetched = useRef(false);
   const navigate = useNavigate();
 
   const [event, setEvent] = useState<any | null>(null);
-  const [prevId, setPrevId] = useState<number | undefined>();
 
   const { t } = useLanguage();
 
@@ -122,7 +120,7 @@ const EventDrawer: React.FC<{
     };
 
     fetchData();
-  }, [open, sessionId, prevId, event]);
+  }, [open, sessionId]);
 
   useEffect(() => {
     if (!showSearch || !event) return;

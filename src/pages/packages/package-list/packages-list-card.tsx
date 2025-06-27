@@ -324,15 +324,16 @@ const PackageCard: React.FC<CardProps> = ({
           <Price>₺{price}</Price>
         </CardHeader>
       </Dropdown>
-      {hasRole(["COMPANY_ADMIN", "ADMIN"]) && mode === "admin" && (
-        <CardInfoContainer>
-          <CardInfo
-            title={companyName || null}
-            detail={branchName || null}
-            to={`/companies/${companyId}`}
-          />
-        </CardInfoContainer>
-      )}
+      {hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN", "ADMIN"]) &&
+        mode === "admin" && (
+          <CardInfoContainer>
+            <CardInfo
+              title={companyName || null}
+              detail={branchName || null}
+              to={`/companies/${companyId}`}
+            />
+          </CardInfoContainer>
+        )}
       <InfoContainer>
         {description && (
           <Tooltip title={description} mouseEnterDelay={0.5}>

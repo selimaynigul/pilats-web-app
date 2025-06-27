@@ -20,13 +20,13 @@ const PackagesToolbar: React.FC<{
 
   const handleAddPackage = (values: any) => {
     const payload = {
-      name: values.name, // Map the name field
-      description: values.description, // Map the description field
-      price: values.price ? parseFloat(values.price) : null, // Ensure price is a valid BigDecimal
-      discount: values.discount ? parseFloat(values.discount) : null, // Ensure discount is a valid BigDecimal
-      bonusCount: parseInt(values.bonusCount, 10) || 0, // Map bonus count, defaulting to 0 if not provided
-      changeCount: parseInt(values.changeCount, 10) || 0, // Map change count, defaulting to 0 if not provided
-      creditCount: parseInt(values.creditCount, 10) || 0, // Map credit count, defaulting to 0 if not provided
+      name: values.name,
+      description: values.description,
+      price: values.price ? parseFloat(values.price) : null,
+      discount: values.discount ? parseFloat(values.discount) : null,
+      bonusCount: parseInt(values.bonusCount, 10) || 0,
+      changeCount: parseInt(values.changeCount, 10) || 0,
+      creditCount: parseInt(values.creditCount, 10) || 0,
       companyId: hasRole(["ADMIN"])
         ? parseInt(values.companyId, 10)
         : getCompanyId(),
@@ -65,6 +65,7 @@ const PackagesToolbar: React.FC<{
         setSelectedCompany={setSelectedCompany}
         onAddClick={() => setIsModalVisible(true)}
         showCompanyDropdown={hasRole(["ADMIN", "COMPANY_ADMIN"])}
+        showAddButton={true}
       />
       <AddPackageForm
         form={form}

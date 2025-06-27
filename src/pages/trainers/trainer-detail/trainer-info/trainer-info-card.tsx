@@ -371,17 +371,14 @@ const TrainerInfo: React.FC<{
       </Helmet>
       <Container>
         {/*  {!trainer.active && <Status>Not active</Status>} */}
-        {!hasRole(["COMPANY_ADMIN"]) && (
-          <ActionButtons>
-            <EditButton onClick={handleEdit} type="primary">
-              <EditFilled />
-            </EditButton>
-            <DeleteButton onClick={handleDelete} type="primary">
-              <DeleteOutlined />
-            </DeleteButton>
-          </ActionButtons>
-        )}
-
+        <ActionButtons>
+          <EditButton onClick={handleEdit} type="primary">
+            <EditFilled />
+          </EditButton>
+          <DeleteButton onClick={handleDelete} type="primary">
+            <DeleteOutlined />
+          </DeleteButton>
+        </ActionButtons>
         <ProfileSection>
           <AvatarContainer onClick={handleAvatarClick}>
             {trainer.passive && <InactiveIcon title="Not working" />}
@@ -412,7 +409,6 @@ const TrainerInfo: React.FC<{
           </Name>
           <Title>{trainer.jobName}</Title>
         </ProfileSection>
-
         <Link to={`/companies/${trainer.companyId}`}>
           <CompanyInfo>
             <CompanyLogo>
@@ -427,7 +423,6 @@ const TrainerInfo: React.FC<{
             </CompanyDetailButton>
           </CompanyInfo>
         </Link>
-
         <InfoSection>
           <InfoItem>
             <span>Email:</span> {trainer.email}
@@ -466,7 +461,6 @@ const TrainerInfo: React.FC<{
             </ContactButton>
           </a>
         </ContactInfo>
-
         <EditTrainerForm
           visible={isEditModalVisible}
           onClose={() => setIsEditModalVisible(false)}

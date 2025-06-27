@@ -1,9 +1,9 @@
 import axios from "axios";
 
-const baseURL =
-  window.location.hostname.includes("localhost") && false
-    ? "https://uat-platesapi-latest.onrender.com"
-    : "https://uat-platesapi-latest.onrender.com/api/v1";
+/* 
+const baseURL = "http://localhost:8000/api/v1";
+*/
+const baseURL = "https://uat-platesapi-latest.onrender.com/api/v1";
 
 const apiClient = axios.create({
   baseURL,
@@ -13,7 +13,7 @@ const apiClient = axios.create({
   timeout: 1000000,
 });
 
-// Add a request interceptor to include the token in the headers
+//  request interceptor to include the token in the headers
 apiClient.interceptors.request.use(
   (config) => {
     const storedUser = localStorage.getItem("user");
@@ -28,16 +28,20 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Add a response interceptor to handle token-related errors
+// response interceptor to handle token-related errors
 apiClient.interceptors.response.use(
   (response) => {
     return response;
   },
   (error) => {
-    if (error.response && error.response.status === 403) {
-      /*    sessionStorage.setItem("redirectAfterLogin", window.location.pathname);
+    if (
+      error.response &&
+      error.response.status === 403 &&
+      error.config &&
+      error.config.method === "get"
+    ) {
       localStorage.clear();
-      window.location.href = "/login"; */
+      window.location.href = "/login";
     }
 
     return Promise.reject(error);

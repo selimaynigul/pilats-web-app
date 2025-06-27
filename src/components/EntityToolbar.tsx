@@ -44,7 +44,6 @@ const ActionContainer = styled.div`
 const CountNumber = styled.span`
   color: ${({ theme }) => theme.primary};
 `;
-
 interface EntityToolbarProps {
   count: number;
   entityLabel: string;
@@ -52,6 +51,8 @@ interface EntityToolbarProps {
   setSelectedCompany?: (company: any) => void;
   onAddClick: () => void;
   showCompanyDropdown?: boolean;
+  showAddButton?: boolean;
+  extra?: React.ReactNode;
 }
 
 const EntityToolbar: React.FC<EntityToolbarProps> = ({
@@ -61,23 +62,28 @@ const EntityToolbar: React.FC<EntityToolbarProps> = ({
   setSelectedCompany,
   onAddClick,
   showCompanyDropdown = true,
+  showAddButton = true,
+  extra,
 }) => {
   return (
     <ToolbarContainer>
       <CountContainer>
         <CountNumber>{count}</CountNumber> {entityLabel}
       </CountContainer>
-      <ActionContainer>
-        {showCompanyDropdown && (
-          <CompanyDropdown
-            selectedItem={selectedCompany}
-            onSelect={(company) => {
-              setSelectedCompany && setSelectedCompany(company);
-            }}
-          />
-        )}
-        <AddButton onClick={onAddClick} />
-      </ActionContainer>
+      {(showCompanyDropdown || showAddButton || extra) && (
+        <ActionContainer>
+          {showCompanyDropdown && (
+            <CompanyDropdown
+              selectedItem={selectedCompany}
+              onSelect={(company) => {
+                setSelectedCompany && setSelectedCompany(company);
+              }}
+            />
+          )}
+          {extra && extra}
+          {showAddButton && <AddButton onClick={onAddClick} />}
+        </ActionContainer>
+      )}
     </ToolbarContainer>
   );
 };

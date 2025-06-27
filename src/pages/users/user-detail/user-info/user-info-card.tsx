@@ -276,16 +276,14 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
         </title>
       </Helmet>
       <Container>
-        {!hasRole(["COMPANY_ADMIN"]) && (
-          <ActionButtons>
-            <EditButton onClick={handleEdit} type="primary">
-              <EditFilled />
-            </EditButton>
-            <DeleteButton onClick={handleDelete} type="primary">
-              <DeleteOutlined />
-            </DeleteButton>
-          </ActionButtons>
-        )}
+        <ActionButtons>
+          <EditButton onClick={handleEdit} type="primary">
+            <EditFilled />
+          </EditButton>
+          <DeleteButton onClick={handleDelete} type="primary">
+            <DeleteOutlined />
+          </DeleteButton>
+        </ActionButtons>
 
         <ProfileSection>
           <AvatarContainer onClick={handleAvatarClick}>
@@ -293,7 +291,8 @@ const UserInfo: React.FC<{ user: any; loading: any }> = ({ user, loading }) => {
               <Avatar
                 size={150}
                 src={
-                  "https://uat-platesapi-latest.onrender.com/api/v1/images" + user.imageUrl
+                  "https://uat-platesapi-latest.onrender.com/api/v1/images" +
+                  user.imageUrl
                 }
                 icon={<UserOutlined />}
               />

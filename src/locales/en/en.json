@@ -141,7 +141,7 @@
   "packageNamePlaceholder": "Name *",
   "packagePricePlaceholder": "Price (₺) *",
   "creditCountPlaceholder": "Credit count *",
-  "discountPlaceholder": "Discount (e.g., 0.2 for 20%) *",
+  "discountPlaceholder": "Discount *",
   "bonusCountPlaceholder": "Bonus count *",
   "changeCountPlaceholder": "Change count *",
   "addPackage": "Add package",

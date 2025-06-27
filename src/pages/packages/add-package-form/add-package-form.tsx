@@ -1,15 +1,5 @@
-import React, { useEffect, useState } from "react";
-import {
-  Form,
-  Input,
-  InputNumber,
-  Select,
-  Button,
-  Modal,
-  Switch,
-  message,
-} from "antd";
-import { companyService, branchService } from "services";
+import React from "react";
+import { Form, Input, InputNumber, Select, message } from "antd";
 import { getCompanyId, getUser, hasRole } from "utils/permissionUtils";
 import StepModal, { CustomStep, FormRow } from "components/StepModal";
 import { useCompanyBranchSelect } from "hooks/useCompanyBranchSelect";
@@ -95,7 +85,7 @@ const AddPackageForm: React.FC<AddPackageFormProps> = ({
               >
                 <InputNumber
                   style={{ width: "100%" }}
-                  min={0}
+                  min={1}
                   placeholder={t.creditCountPlaceholder}
                 />
               </Form.Item>
@@ -104,13 +94,16 @@ const AddPackageForm: React.FC<AddPackageFormProps> = ({
                 name="discount"
                 rules={[{ required: true, message: t.pleaseEnterDiscount }]}
               >
-                <InputNumber
-                  style={{ width: "100%" }}
-                  min={0}
-                  max={1}
-                  step={0.01}
+                <Select
                   placeholder={t.discountPlaceholder}
-                />
+                  style={{ width: "100%" }}
+                >
+                  {Array.from({ length: 11 }, (_, i) => (
+                    <Select.Option key={i * 10} value={i * 10}>
+                      {i * 10}%
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
             </FormRow>,
             <FormRow>
@@ -126,14 +119,29 @@ const AddPackageForm: React.FC<AddPackageFormProps> = ({
               </Form.Item>
 
               <Form.Item
-                name="changeCount"
-                rules={[{ required: true, message: t.pleaseEnterChangeCount }]}
+                shouldUpdate={(prevValues, curValues) =>
+                  prevValues.creditCount !== curValues.creditCount
+                }
               >
-                <InputNumber
-                  style={{ width: "100%" }}
-                  min={0}
-                  placeholder={t.changeCountPlaceholder}
-                />
+                {({ getFieldValue }) => {
+                  const creditCount = getFieldValue("creditCount");
+                  return (
+                    <Form.Item
+                      name="changeCount"
+                      rules={[
+                        { required: true, message: t.pleaseEnterChangeCount },
+                      ]}
+                    >
+                      <InputNumber
+                        style={{ width: "100%" }}
+                        min={0}
+                        max={creditCount || 0}
+                        disabled={!creditCount}
+                        placeholder={t.changeCountPlaceholder}
+                      />
+                    </Form.Item>
+                  );
+                }}
               </Form.Item>
             </FormRow>,
           ],
@@ -183,6 +191,7 @@ const AddPackageForm: React.FC<AddPackageFormProps> = ({
             </Form.Item>,
             <Form.Item name="branchId">
               <Select
+                allowClear
                 disabled={hasRole(["BRANCH_ADMIN"])}
                 placeholder={t.selectBranch}
                 loading={branchLoading}

@@ -15,6 +15,7 @@ import JobForm from "./JobForm";
 import { useLanguage } from "hooks";
 import { useTheme } from "contexts/ThemeProvider";
 import styled from "styled-components";
+import dayjs from "dayjs";
 
 interface FormFieldProps {
   rules?: any[];
@@ -107,6 +108,7 @@ export const BirthdatePicker: React.FC<FormFieldProps> = ({ rules }) => {
       <StyledDatePicker
         style={{ background: theme.inputBg, width: "100%" }}
         placeholder={t.birthdate}
+        disabledDate={(current) => current && current > dayjs().endOf("day")}
       />
     </Form.Item>
   );

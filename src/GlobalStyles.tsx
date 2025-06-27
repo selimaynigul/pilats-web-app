@@ -191,7 +191,7 @@ const GlobalStyle = createGlobalStyle`
   }
 
   .ant-picker-panel-container {
-    background: transparent !important;
+    background: white !important;
   }
 
   .ant-picker-cell-inner,
