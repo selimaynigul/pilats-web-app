@@ -219,7 +219,13 @@ const EditSessionForm: React.FC<EditSessionFormProps> = ({
         onClose();
       })
       .catch((error) => {
-        message.error("Failed to update session.");
+        if (error?.response?.data?.errorCode == 2007) {
+          message.warning(
+            "Derse müşteri kayıtlı olduğu için güncelleme yapılamaz."
+          );
+        } else {
+          message.error("Failed to update session.");
+        }
         console.error("Update error:", error);
       });
   };

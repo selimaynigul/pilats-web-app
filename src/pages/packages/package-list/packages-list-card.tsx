@@ -41,6 +41,7 @@ interface Package {
   remainingCreditCount: number;
   companyName?: string;
   branchName?: string;
+  discount?: number;
 }
 
 interface CardProps {
@@ -102,6 +103,18 @@ const Price = styled.p`
   color: #6a5bff;
   margin-left: 5px;
 `;
+
+const DiscountPrice = styled.p`
+  font-size: 0.8rem;
+  color: #b0b0b0;
+  margin-left: 8px;
+  background: none;
+  font-weight: normal;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+`;
+
 const Description = styled.p`
   font-size: 0.9rem;
   color: rgb(182, 172, 198);
@@ -323,7 +336,20 @@ const PackageCard: React.FC<CardProps> = ({
       <Dropdown overlay={menu} trigger={["click"]}>
         <CardHeader>
           <Title title={capitalize(title)}>{capitalize(title)}</Title>
-          <Price>₺{price}</Price>
+          {pkg.discount && pkg.discount > 0 ? (
+            <DiscountPrice>
+              <span
+                style={{ textDecoration: "line-through", color: "#b0b0b0" }}
+              >
+                ₺{price}
+              </span>
+              <Price style={{ fontSize: "1.3rem" }}>
+                ₺{pkg.price * (1 - pkg.discount / 100)}
+              </Price>
+            </DiscountPrice>
+          ) : (
+            <Price>₺{price}</Price>
+          )}
         </CardHeader>
       </Dropdown>
       {hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN", "ADMIN"]) &&

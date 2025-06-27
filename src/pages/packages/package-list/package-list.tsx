@@ -81,6 +81,7 @@ const PackageList: React.FC<PackageListProps> = ({
                 branchId: item.branchId,
                 companyName: item.companyName,
                 branchName: item.branchName,
+                discount: item.discount,
               }}
               mode="admin"
               onDelete={() => {

@@ -23,7 +23,7 @@ const PackagesToolbar: React.FC<{
       name: values.name,
       description: values.description,
       price: values.price ? parseFloat(values.price) : null,
-      discount: values.discount ? parseFloat(values.discount) : null,
+      discount: values.discount ? parseFloat(values.discount) : 0,
       bonusCount: parseInt(values.bonusCount, 10) || 0,
       changeCount: parseInt(values.changeCount, 10) || 0,
       creditCount: parseInt(values.creditCount, 10) || 0,

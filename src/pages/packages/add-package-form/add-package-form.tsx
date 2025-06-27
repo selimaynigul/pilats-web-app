@@ -65,6 +65,7 @@ const AddPackageForm: React.FC<AddPackageFormProps> = ({
                 <InputNumber
                   style={{ width: "100%" }}
                   min={0}
+                  max={999999}
                   placeholder={t.packagePricePlaceholder}
                 />
               </Form.Item>
@@ -92,6 +93,7 @@ const AddPackageForm: React.FC<AddPackageFormProps> = ({
 
               <Form.Item
                 name="discount"
+                initialValue={0}
                 rules={[{ required: true, message: t.pleaseEnterDiscount }]}
               >
                 <Select

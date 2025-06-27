@@ -20,7 +20,6 @@ import {
   ArrowRightOutlined,
   UserOutlined,
   AntDesignOutlined,
-  CheckOutlined,
   CloseOutlined,
   MoreOutlined,
 } from "@ant-design/icons";
@@ -36,7 +35,7 @@ import { sessionService, userService } from "services";
 import { useSearchParams } from "react-router-dom";
 import "dayjs/locale/tr";
 import EventStatusAlert from "./EventStatusAlert";
-import { Dropdown, Menu } from "antd";
+import { Dropdown } from "antd";
 const { Panel } = Collapse;
 dayjs.locale("tr");
 dayjs.extend(isSameOrAfter);
@@ -44,8 +43,8 @@ dayjs.extend(isSameOrAfter);
 const EventDrawer: React.FC<{
   open: boolean;
   onClose: () => void;
-  onEdit: () => void;
-  onDelete: () => void;
+  onEdit: any;
+  onDelete: any;
 }> = ({ open, onClose, onEdit, onDelete }) => {
   const [searchParams] = useSearchParams();
   const sessionId = parseInt(searchParams.get("id") || "0", 10);
@@ -69,15 +68,6 @@ const EventDrawer: React.FC<{
 
   useEffect(() => {
     if (!open || !sessionId) return;
-
-    // ID değiştiyse veriyi sıfırla ve yeniden çek
-    // TODO: ders update olunca yeni veri gelmiyor tekrar çekmediği için
-    /*   if (prevId !== sessionId) {
-      setPrevId(sessionId);
-      setEvent(null);
-      setAttendees([]);
-      setLoadingAttendees(true);
-    } */
 
     const fetchData = async () => {
       try {
@@ -249,9 +239,16 @@ const EventDrawer: React.FC<{
         hasRole(["BRANCH_ADMIN", "COMPANY_ADMIN"]) && (
           <ActionButtonGroup>
             {dayjs(event?.start).isSameOrAfter(dayjs(), "minute") && (
-              <SquareButton icon={<EditFilled />} onClick={onEdit} />
+              <SquareButton
+                icon={<EditFilled />}
+                onClick={() => onEdit(sessionId)}
+              />
             )}
-            <SquareButton icon={<DeleteOutlined />} danger onClick={onDelete} />
+            <SquareButton
+              icon={<DeleteOutlined />}
+              danger
+              onClick={() => onDelete(sessionId)}
+            />
           </ActionButtonGroup>
         )
       }

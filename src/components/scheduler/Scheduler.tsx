@@ -671,12 +671,14 @@ const Scheduler: React.FC<{
   };
 
   const openEditModal = (ev: any) => {
-    setSelectedSessionId(ev.id);
+    const sessionId = ev.id || ev;
+    setSelectedSessionId(sessionId);
     setEditModalOpen(true);
   };
 
   const handleDelete = (ev: any) => {
-    if (!ev) return; // güvenlik
+    if (!ev) return;
+    const sessionId = ev.id || ev;
 
     Modal.confirm({
       title: t.confirmDelete || "Emin misiniz?",
@@ -687,7 +689,7 @@ const Scheduler: React.FC<{
       okType: "danger",
       onOk: async () => {
         try {
-          await sessionService.delete(ev.id);
+          await sessionService.delete(sessionId);
           message.success(t.msg.sessionDeletedSuccess);
           /* listeyi yenile */
           if (visibleRange)
@@ -936,8 +938,8 @@ const Scheduler: React.FC<{
           searchParams.delete("id");
           navigate({ search: searchParams.toString() }, { replace: true });
         }}
-        onEdit={() => openEditModal(selectedSession)}
-        onDelete={() => handleDelete(selectedSession)}
+        onEdit={openEditModal}
+        onDelete={handleDelete}
       />
 
       {/* Edit Session Modal */}
