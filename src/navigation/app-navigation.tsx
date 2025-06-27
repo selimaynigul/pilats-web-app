@@ -17,6 +17,7 @@ import {
 } from "pages";
 import AppLayout from "components/layout/Layout";
 import AuthGuard from "components/guards/AuthGuard";
+import { hasRole } from "utils/permissionUtils";
 
 const AppNavigation = () => {
   return (
@@ -42,6 +43,8 @@ const AppNavigation = () => {
               requiredRoles={["COMPANY_ADMIN", "ADMIN", "BRANCH_ADMIN"]}
             >
               <HomePage />
+
+              {hasRole(["ADMIN"]) ? <CompaniesPage /> : <CompanyDetailsPage />}
             </AuthGuard>
           }
         />
@@ -120,12 +123,7 @@ const AppNavigation = () => {
           }
         />
 
-        <Route
-          path="/trainers/:id"
-          element={
-              <TrainerDetailsPage />
-          }
-        />
+        <Route path="/trainers/:id" element={<TrainerDetailsPage />} />
 
         <Route
           path="/packages"
@@ -149,7 +147,6 @@ const AppNavigation = () => {
           }
         />
         {/* Test Page (publicly accessible or add roles as needed) */}
-        <Route path="/test" element={<TestPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
         {/* Redirect for non-existent routes */}

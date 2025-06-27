@@ -83,6 +83,7 @@ const PackagesContainer: React.FC = () => {
                   creditCount: pkg.creditCount,
                   remainingCreditCount: pkg.remainingCreditCount,
                   companyId: pkg.companyId,
+                  discount: pkg.discount,
                 }}
                 onDelete={() => handleDelete(pkg.id)}
                 mode="customer"
