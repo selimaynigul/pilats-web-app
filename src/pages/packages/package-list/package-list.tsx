@@ -78,6 +78,7 @@ const PackageList: React.FC<PackageListProps> = ({
                 creditCount: item.creditCount,
                 remainingCreditCount: item.remainingCreditCount,
                 companyId: item.companyId,
+                branchId: item.branchId,
                 companyName: item.companyName,
                 branchName: item.branchName,
               }}

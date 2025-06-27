@@ -306,13 +306,15 @@ const PackageCard: React.FC<CardProps> = ({
           {t.assignToCustomer}
         </Menu.Item>
       )}
-      <Menu.Item
-        key="delete"
-        icon={<DeleteOutlined style={{ color: "red" }} />}
-        onClick={handleDelete}
-      >
-        {t.delete}
-      </Menu.Item>
+      {(!hasRole(["BRANCH_ADMIN"]) || pkg.branchId != null) && (
+        <Menu.Item
+          key="delete"
+          icon={<DeleteOutlined style={{ color: "red" }} />}
+          onClick={handleDelete}
+        >
+          {t.delete}
+        </Menu.Item>
+      )}
     </Menu>
   );
 
