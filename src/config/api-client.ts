@@ -1,8 +1,5 @@
 import axios from "axios";
 
-/* 
-const baseURL = "http://localhost:8000/api/v1";
-*/
 const baseURL = "https://uat-platesapi-latest.onrender.com/api/v1";
 
 const apiClient = axios.create({
